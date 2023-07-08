@@ -1,3 +1,4 @@
+import { Tooltip } from "../tooltip/Tooltip";
 import "./assets/css/Copyright.css";
 import GitHubIcon from "@mui/icons-material/GitHub";
 
@@ -10,15 +11,23 @@ function Copyright() {
 
   return (
     <div className="Copyright">
-      <div className="copyright-banner flex flex-row items-center uppercase font-medium opacity-80">
+      <div className="copyright-banner flex flex-row items-center uppercase font-medium">
         <span>
           <span className="copyright-header">Copyright</span> © {currentYear}{" "}
           Jarrett Huang
         </span>
-        <GitHubIcon
-          className="github-icon hover:opacity-80"
-          onClick={handleGithubClick}
-        />
+
+        <Tooltip
+          title="🎉 JSON Viewer is now open-source!"
+          placement="top-start"
+          fontSize="0.4rem"
+          padding="0.3rem"
+        >
+          <GitHubIcon
+            className="github-icon hover:opacity-80"
+            onClick={handleGithubClick}
+          />
+        </Tooltip>
       </div>
     </div>
   );
