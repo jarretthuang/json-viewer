@@ -14,21 +14,22 @@
   .override-anchor();
 
   .copyright-banner {
-    .font-family();
     .subtle-box-shadow();
     .readonly();
-    .darken-on-hover();
 
-    display: inline-block;
     width: min-content;
     white-space: nowrap;
-    padding: 10px 15px 10px 15px;
+    padding: 10px 15px 10px 35px;
     margin-bottom: 10px;
     margin-top: 10px;
-    font-size: small;
+    font-size: medium;
     border-radius: 2rem;
     background-color: fade(white, 20%);
     align-self: flex-end;
+
+    .github-icon {
+      height: 0.8rem;
+    }
   }
 }
 
@@ -38,6 +39,15 @@
 
     .copyright-banner {
       align-self: center;
+      font-size: large;
+
+      .copyright-header {
+        display: none;
+      }
+
+      .github-icon {
+        height: 1rem;
+      }
     }
   }
 }
