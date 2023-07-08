@@ -1,0 +1,91 @@
+@import url(./../../../common/\ less/constants.less);
+
+.JsonViewerTree {
+    height: 100%;
+    width: 100%;
+    padding: 1rem;
+
+    >ul {
+        height: 100%;
+        overflow-x: hidden;
+        padding-right: 0.5rem;
+
+        .MuiTreeItem-content {
+            border-radius: 0.2rem;
+            margin: 0.1rem 0 0.1rem 0;
+            align-items: center;
+            min-height: 1rem;
+            height: fit-content;
+        }
+    
+        .MuiTreeItem-iconContainer {
+            svg {
+                font-size: 0.6rem;
+            }
+        }
+
+        .MuiTreeItem-label {
+            font-size: 0.5rem;
+            padding: 2px 0.6rem 0 0.1rem;
+            text-align: start;
+
+            .JsonViewerTreeItemLabel {
+                display: flex;
+                justify-content: space-between;
+                
+                .label-content {
+                    display: flex;
+                    width: 100%;
+    
+                    .label-separator {
+                        cursor: pointer;
+                        user-select: none;
+                        margin: 0 0.2rem;
+                        color: @shakespeare-darker-40;
+                    }
+    
+                    .label-value {
+                        text-overflow: ellipsis;
+                        overflow: hidden;
+                    }
+
+                    .label-name {
+                        white-space: nowrap;
+                    }
+                }
+
+                .label-actions {
+                    width: 2rem;
+                    padding: 0 0.5rem 0 0.5rem;
+                    display: none;
+                    align-items: center;
+                }
+
+                .label-icon {
+                    align-self: center;
+                    margin-left: 0.2rem;
+                    font-size: 0.6rem;
+                    color: @shakespeare-darker-40;
+
+                    &:hover {
+                        color: @shakespeare-darker-20;
+                    }
+                }
+            }
+
+            &:hover {
+                .label-content {
+                    width: calc(100% - 3rem);
+                }
+
+                .label-actions {
+                    display: flex;
+                }
+
+            }
+
+        }
+        
+    }
+
+}

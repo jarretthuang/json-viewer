@@ -1,0 +1,43 @@
+@import url(./../../../common/\ less/constants.less);
+
+.Copyright {
+  height: 3rem;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100vw;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding-left: 5vw;
+  padding-right: 5vw;
+  .override-anchor();
+
+  .copyright-banner {
+    .font-family();
+    .subtle-box-shadow();
+    .readonly();
+    .darken-on-hover();
+
+    display: inline-block;
+    width: min-content;
+    white-space: nowrap;
+    padding: 10px 15px 10px 15px;
+    margin-bottom: 10px;
+    margin-top: 10px;
+    font-size: small;
+    border-radius: 2rem;
+    background-color: fade(white, 20%);
+    align-self: flex-end;
+  }
+}
+
+@media (max-width: @mobile-screen-width) {
+  .Copyright {
+    height: 6rem;
+
+    .copyright-banner {
+      align-self: center;
+    }
+  }
+}

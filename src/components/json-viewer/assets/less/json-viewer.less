@@ -1,0 +1,132 @@
+@import url(./../../../common/\ less/constants.less);
+@import url(json-viewer-mobile.less);
+
+.JsonViewer {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  background-color: lighten(@powder-blue, 20%);
+}
+
+.json-viewer-container {
+  .subtle-box-shadow();
+  position: absolute;
+  height: calc(90vh - 48px);
+  width: 95vw;
+  top: calc(7.5vh + 48px);
+  left: 2.5vw;
+  border-radius: 1rem;
+  overflow: hidden;
+}
+
+.view-switcher {
+  position: absolute;
+  height: 7.5vh;
+  width: 95vw;
+  top: 48px;
+  left: 2.5vw;
+  display: flex;
+
+  .buttons {
+    margin: auto;
+    font-size: 0.6rem;
+    font-weight: 700;
+    display: flex;
+    flex-direction: row;
+
+    b {
+      width: 1rem;
+    }
+
+    .button {
+      .subtle-box-shadow();
+      width: 3rem;
+      padding: 0.1rem;
+      border-radius: 0.5rem;
+      text-align: center;
+      cursor: pointer;
+      user-select: none;
+      color: darken(@powder-blue, 60%);
+
+      &:hover {
+        background-color: darken(@powder-blue, 30%);
+        color: @almost-white;
+      }
+
+      &.selected {
+        background-color: darken(@powder-blue, 40%);
+        color: @almost-white;
+      }
+    }
+  }
+}
+
+.tool-bar {
+  height: 1.5rem;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding-left: 1rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  overflow-y: hidden;
+
+  .tool-bar-button {
+    width: min-content;
+    height: min-content;
+    font-size: 0.6rem;
+    font-weight: 500;
+    border: none;
+    border-radius: 5px;
+    text-align: center;
+    cursor: pointer;
+    user-select: none;
+    color: darken(@powder-blue, 50%);
+    margin: 0 5px 0 5px;
+    text-transform: uppercase;
+    padding: 0.1rem 0.5rem 0.1rem 0.5rem;
+
+    &:hover {
+      background-color: darken(@powder-blue, 20%);
+      color: @almost-white;
+    }
+  }
+}
+
+.main-textarea {
+  height: calc(100% - 1.5rem);
+  width: 100%;
+  background: none;
+  border: none;
+  border-radius: 1rem;
+  font-size: 2vmin;
+  resize: none;
+  padding: 0.5rem 1rem 1rem 0.5rem;
+  outline: none;
+  .font-code();
+}
+
+.json-viewer-container {
+  border: solid 2px transparent;
+  &:has(.main-textarea:focus) {
+    border: solid 2px darken(@powder-blue, 30%);
+    animation: borderFade 2s ease-in-out infinite;
+  }
+}
+
+@keyframes borderFade {
+  from,
+  to {
+    border: solid 2px transparent;
+  }
+  50% {
+    border: solid 2px darken(@powder-blue, 35%);
+  }
+}
+
+.readonly-view {
+  height: 100%;
+  width: 100%;
+}
