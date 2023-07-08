@@ -4,6 +4,9 @@ import { TooltipProps, tooltipClasses } from "@mui/material/Tooltip";
 
 type AdditionalProps = {
   fontSize?: string;
+  backgroundColor?: string;
+  fontColor?: string;
+  padding?: string;
 };
 
 export const Tooltip = styled(
@@ -15,10 +18,15 @@ export const Tooltip = styled(
       classes={{ popper: className }}
     />
   )
-)<AdditionalProps>(({ theme, fontSize }) => ({
-  [`& .${tooltipClasses.tooltip}`]: {
-    boxShadow: theme.shadows[1],
-    fontSize: fontSize ?? "0.4rem",
-    userSelect: "none",
-  },
-}));
+)<AdditionalProps>(
+  ({ theme, fontSize, backgroundColor, fontColor, padding }) => ({
+    [`& .${tooltipClasses.tooltip}`]: {
+      boxShadow: theme.shadows[1],
+      fontSize: fontSize ?? "0.4rem",
+      userSelect: "none",
+      backgroundColor: backgroundColor,
+      color: fontColor,
+      padding: padding,
+    },
+  })
+);
