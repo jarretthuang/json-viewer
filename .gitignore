@@ -36,3 +36,8 @@ next-env.d.ts
 
 # IDE
 .vscode
+
+#yarn
+.yarn
+.yarnrc
+yarn.lock
