@@ -122,11 +122,16 @@ function JsonViewer(props: any) {
   }
 
   function updateJsonUrlParam(text: string): void {
-    const encodedText: string = compressToEncodedURIComponent(text);
-    if (encodedText.length <= MAX_QUERY_PARAM_LENGTH) {
-      insertUrlParam(JSON_QUERY_PARAM, encodedText);
+    if (!text) {
+      removeUrlParameter(JSON_QUERY_PARAM); // remove query param if text is empty
     } else {
-      removeUrlParameter(JSON_QUERY_PARAM);
+      const encodedText: string = compressToEncodedURIComponent(text);
+      if (encodedText.length <= MAX_QUERY_PARAM_LENGTH) {
+        //TODO: validate raw test instead of parsed text?
+        insertUrlParam(JSON_QUERY_PARAM, encodedText);
+      } else {
+        removeUrlParameter(JSON_QUERY_PARAM);
+      }
     }
   }
 
