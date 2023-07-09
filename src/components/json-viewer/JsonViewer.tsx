@@ -18,7 +18,7 @@ function JsonViewer(props: any) {
   // constants
   const JSON_QUERY_PARAM: string = "json";
   const DEFAULT_TEXT: string = "Paste your JSON text here!";
-  const MAX_QUERY_PARAM_LENGTH: number = 1800;
+  const MAX_QUERY_PARAM_LENGTH: number = 20000;
 
   const [currentView, switchView] = useState<ViewType>("edit");
   const getSelectedClass = (view: ViewType) =>
@@ -125,6 +125,8 @@ function JsonViewer(props: any) {
     const encodedText: string = compressToEncodedURIComponent(text);
     if (encodedText.length <= MAX_QUERY_PARAM_LENGTH) {
       insertUrlParam(JSON_QUERY_PARAM, encodedText);
+    } else {
+      removeUrlParameter(JSON_QUERY_PARAM);
     }
   }
 
