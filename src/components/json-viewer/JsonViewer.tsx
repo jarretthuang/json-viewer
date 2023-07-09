@@ -6,14 +6,29 @@ import { ReactNotificationOptions } from "react-notifications-component";
 import JsonViewerTree from "./JsonViewerTree";
 import Head from "next/head";
 import JsonViewerEditor from "./JsonViewerEditor";
+import {
+  compressToEncodedURIComponent,
+  decompressFromEncodedURIComponent,
+} from "lz-string";
+import { useSearchParams } from "next/navigation";
 
 function JsonViewer(props: any) {
   type ViewType = "view" | "edit";
+
+  // constants
+  const JSON_QUERY_PARAM: string = "json";
+  const DEFAULT_TEXT: string = "Paste your JSON text here!";
+  const MAX_QUERY_PARAM_LENGTH: number = 1800;
+
   const [currentView, switchView] = useState<ViewType>("edit");
   const getSelectedClass = (view: ViewType) =>
     currentView === view ? "selected " : "";
-  const defaultText = "Paste your JSON text here!";
-  const [currentText, updateText] = useState(defaultText);
+
+  const initialQueryParams = useSearchParams();
+  const initialJsonQueryParam = initialQueryParams.get(JSON_QUERY_PARAM);
+  const initialText = decodeUrlParam(initialJsonQueryParam) ?? DEFAULT_TEXT;
+
+  const [currentText, updateText] = useState(initialText);
   const [notification, createNotification] = useState<
     ReactNotificationOptions | undefined
   >(undefined);
@@ -61,8 +76,8 @@ function JsonViewer(props: any) {
       <div className="json-viewer-container" hidden={hide}>
         <JsonViewerEditor
           currentText={currentText}
-          isDefaultText={currentText == defaultText}
-          updateText={updateText}
+          isDefaultText={currentText === DEFAULT_TEXT}
+          updateText={handleUpdateText}
           handleCopy={handleCopy}
           parseJson={parseJson}
         />
@@ -100,6 +115,45 @@ function JsonViewer(props: any) {
       switchView("view");
     }
   };
+
+  function handleUpdateText(s: string): void {
+    updateText(s);
+    updateJsonUrlParam(s);
+  }
+
+  function updateJsonUrlParam(text: string): void {
+    const encodedText: string = compressToEncodedURIComponent(text);
+    if (encodedText.length <= MAX_QUERY_PARAM_LENGTH) {
+      insertUrlParam(JSON_QUERY_PARAM, encodedText);
+    }
+  }
+
+  function insertUrlParam(key: string, value: string): void {
+    if (window.history.pushState) {
+      const searchParams = new URLSearchParams(window.location.search);
+      searchParams.set(key, value);
+      const newUrl =
+        window.location.protocol +
+        "//" +
+        window.location.host +
+        window.location.pathname +
+        "?" +
+        searchParams.toString();
+      window.history.pushState({ path: newUrl }, "", newUrl);
+    }
+  }
+
+  function decodeUrlParam(param: string | null): string | undefined {
+    return param ? decompressFromEncodedURIComponent(param) : undefined;
+  }
+
+  function removeUrlParameter(paramKey: string) {
+    const url = window.location.href;
+    const urlObject = new URL(url);
+    urlObject.searchParams.delete(paramKey);
+    const newUrl = urlObject.href;
+    window.history.pushState({ path: newUrl }, "", newUrl);
+  }
 
   return (
     <div className="JsonViewer">
