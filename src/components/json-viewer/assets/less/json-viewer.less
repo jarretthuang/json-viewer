@@ -64,50 +64,6 @@
   }
 }
 
-.tool-bar {
-  height: 1.5rem;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  padding-left: 1rem;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-  overflow-y: hidden;
-
-  .tool-bar-button {
-    width: min-content;
-    height: min-content;
-    font-size: 0.6rem;
-    font-weight: 500;
-    border: none;
-    border-radius: 5px;
-    text-align: center;
-    cursor: pointer;
-    user-select: none;
-    color: darken(@powder-blue, 50%);
-    margin: 0 5px 0 5px;
-    text-transform: uppercase;
-    padding: 0.1rem 0.5rem 0.1rem 0.5rem;
-
-    &:hover {
-      background-color: darken(@powder-blue, 20%);
-      color: @almost-white;
-    }
-  }
-}
-
-.main-textarea {
-  height: calc(100% - 1.5rem);
-  width: 100%;
-  background: none;
-  border: none;
-  border-radius: 1rem;
-  font-size: 2vmin;
-  resize: none;
-  padding: 0.5rem 1rem 1rem 0.5rem;
-  outline: none;
-  .font-code();
-}
-
 .json-viewer-container {
   border: solid 2px transparent;
   &:has(.main-textarea:focus) {

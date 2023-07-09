@@ -4,8 +4,8 @@ import "./assets/css/json-viewer.css";
 import Notification from "../notification/Notification";
 import { ReactNotificationOptions } from "react-notifications-component";
 import JsonViewerTree from "./JsonViewerTree";
-import { sampleJson } from "./assets/sample";
 import Head from "next/head";
+import JsonViewerEditor from "./JsonViewerEditor";
 
 function JsonViewer(props: any) {
   type ViewType = "view" | "edit";
@@ -45,28 +45,6 @@ function JsonViewer(props: any) {
     }
   };
 
-  const clearDefaultText = () => {
-    if (currentText === defaultText) {
-      updateText("");
-    }
-  };
-
-  const formatJson = (text: string) => {
-    const parsedJson = parseJson(text);
-    if (parsedJson) {
-      const formattedJsonString = JSON.stringify(parsedJson, null, 2);
-      updateText(formattedJsonString);
-    }
-  };
-
-  const minimizeJson = (text: string) => {
-    const parsedJson = parseJson(text);
-    if (parsedJson) {
-      const formattedJsonString = JSON.stringify(parsedJson, null);
-      updateText(formattedJsonString);
-    }
-  };
-
   const handleCopy = (text: string) => {
     navigator.clipboard.writeText(text);
     const notification: ReactNotificationOptions = {
@@ -81,49 +59,13 @@ function JsonViewer(props: any) {
   const renderEditView = (hide: boolean) => {
     return (
       <div className="json-viewer-container" hidden={hide}>
-        <div className="tool-bar">
-          <div
-            className="tool-bar-button"
-            onClick={() => handleCopy(currentText)}
-          >
-            Copy
-          </div>
-          <div
-            className="tool-bar-button"
-            onClick={() =>
-              navigator.clipboard.readText().then((text) => updateText(text))
-            }
-          >
-            Paste
-          </div>
-          <div
-            className="tool-bar-button"
-            onClick={() => formatJson(currentText)}
-          >
-            Format
-          </div>
-          <div
-            className="tool-bar-button"
-            onClick={() => minimizeJson(currentText)}
-          >
-            Minimize
-          </div>
-          <div className="tool-bar-button" onClick={() => updateText("")}>
-            Clear
-          </div>
-          <div
-            className="tool-bar-button"
-            onClick={() => updateText(JSON.stringify(sampleJson))}
-          >
-            Example
-          </div>
-        </div>
-        <textarea
-          className="main-textarea"
-          value={currentText}
-          onClick={clearDefaultText}
-          onChange={(e) => updateText(e.target.value)}
-        ></textarea>
+        <JsonViewerEditor
+          currentText={currentText}
+          isDefaultText={currentText == defaultText}
+          updateText={updateText}
+          handleCopy={handleCopy}
+          parseJson={parseJson}
+        />
       </div>
     );
   };
