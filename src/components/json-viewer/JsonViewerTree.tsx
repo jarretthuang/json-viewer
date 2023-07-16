@@ -8,8 +8,12 @@ import _ from "lodash";
 import JsonViewerTreeItemLabel, {
   JsonValueType,
 } from "./JsonViewerTreeItemLabel";
+import { useState } from "react";
 
 function JsonViewerTree(props: any) {
+  let expandedSet: Set<string> = new Set<string>();
+  const [expanded, setExpanded]: [string[], any] = useState([]);
+
   const populateTree = (json: Object) => {
     return (
       <TreeView
@@ -17,11 +21,22 @@ function JsonViewerTree(props: any) {
         defaultCollapseIcon={<ExpandMoreIcon />}
         defaultExpandIcon={<ChevronRightIcon />}
         sx={{ flexGrow: 1, overflowY: "auto" }}
+        expanded={expanded}
       >
         {populateTreeItems(json)}
       </TreeView>
     );
   };
+
+  function handleItemClick(nodeId: string): void {
+    if (expandedSet.has(nodeId)) {
+      expandedSet.delete(nodeId);
+      setExpanded(Array.from(expandedSet));
+    } else {
+      expandedSet = expandedSet.add(nodeId);
+      setExpanded(Array.from(expandedSet));
+    }
+  }
 
   const populateTreeItems = (
     json: any,
@@ -35,6 +50,7 @@ function JsonViewerTree(props: any) {
         <JsonViewerTreeItem
           nodeId={nodeId}
           key={nodeId}
+          onItemClick={handleItemClick}
           label={
             <JsonViewerTreeItemLabel
               type="value"
@@ -52,6 +68,7 @@ function JsonViewerTree(props: any) {
           <JsonViewerTreeItem
             nodeId={nodeId}
             key={nodeId}
+            onItemClick={handleItemClick}
             label={<JsonViewerTreeItemLabel type="array" name={key} />}
           >
             {json.map((itemInArray, index) =>
@@ -64,6 +81,7 @@ function JsonViewerTree(props: any) {
           <JsonViewerTreeItem
             nodeId={nodeId}
             key={nodeId}
+            onItemClick={handleItemClick}
             label={<JsonViewerTreeItemLabel type="object" name={key} />}
           >
             {Object.keys(json).map((key: string) =>
@@ -88,6 +106,7 @@ function JsonViewerTree(props: any) {
         <JsonViewerTreeItem
           nodeId={nodeId}
           key={nodeId}
+          onItemClick={handleItemClick}
           label={
             <JsonViewerTreeItemLabel
               type="value"
