@@ -6,6 +6,7 @@ import "./assets/css/NavBar.css";
 import Image from "next/image";
 import { useState } from "react";
 import ReactMarkdown from "react-markdown";
+import "./NavBar.css";
 
 function NavBar(props: NavBarParams) {
   const [expanded, expand] = useState(false);
