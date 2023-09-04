@@ -21,7 +21,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      {/* <meta name = "theme-color" media = "(prefers-color-scheme: dark)" content = "# 171a1c" /> */}
+      <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0a0a0a" />
       <meta name="theme-color" content="#fdfeff" />
       <body className={fontsCssClass}>{children}</body>
     </html>
