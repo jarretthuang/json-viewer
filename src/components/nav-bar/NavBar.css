@@ -3,9 +3,8 @@
 @layer components {
   .NavBar {
     @apply shadow-subtle dark:shadow-subtleWhite;
-  }
-
-  .NavBar.dark-theme {
-    @apply shadow-subtleWhite text-offWhite;
+    @apply dark:text-offWhite;
+    @apply bg-powderBlue-50 dark:bg-gray-950;
+    @apply bg-opacity-75 expanded:bg-opacity-90;
   }
 }

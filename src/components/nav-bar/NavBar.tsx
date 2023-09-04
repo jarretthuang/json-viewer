@@ -33,7 +33,7 @@ export default function NavBar(props: NavBarParams) {
 
   return (
     <nav
-      className="NavBar bg-powderBlue-50/75 data-[expanded=true]:bg-powderBlue-50/85"
+      className="NavBar"
       data-expanded={expanded}
     >
       <ul>

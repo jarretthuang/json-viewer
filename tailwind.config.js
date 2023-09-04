@@ -1,4 +1,6 @@
 /** @type {import('tailwindcss').Config} */
+const plugin = require("tailwindcss/plugin");
+
 module.exports = {
   content: [
     "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
@@ -38,5 +40,10 @@ module.exports = {
     },
   },
   darkMode: "media",
-  plugins: [],
+  plugins: [
+    plugin(function ({ addVariant }) {
+      addVariant("expanded", "&[data-expanded=true]");
+      addVariant("selected", "&[data-selected=true]");
+    }),
+  ],
 };

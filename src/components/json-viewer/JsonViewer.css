@@ -45,7 +45,7 @@
 
   .view-switcher-button {
     @apply shadow-subtle dark:shadow-subtleWhite;
-    @apply data-[selected=true]:text-offWhite data-[selected=true]:bg-powderBlue-400;
+    @apply selected:text-offWhite selected:bg-powderBlue-400;
     @apply text-powderBlue-600 hover:text-offWhite hover:bg-powderBlue-300;
     width: 3rem;
     padding: 0.1rem;
