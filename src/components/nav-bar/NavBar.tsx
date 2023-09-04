@@ -7,14 +7,13 @@ import Image from "next/image";
 import { useState } from "react";
 import ReactMarkdown from "react-markdown";
 import "./NavBar.css";
-import { JSON_VIEWER_APP } from "@/model/application/Application";
+import { jsonViewerAppDescription } from "@/model/appDescriptions";
 
 function NavBar(props: NavBarParams) {
   const [expanded, expand] = useState(false);
   const expandedClass = expanded ? "expanded" : "";
   const allClassName = ["NavBar", expandedClass].join(" ");
 
-  const currentApp = JSON_VIEWER_APP;
   const staticBackgroundColour = "#fdfeff";
 
   const hexPercent75 = "BF";
@@ -28,32 +27,17 @@ function NavBar(props: NavBarParams) {
 
   const backgroundColour = expanded
     ? getColourOrTransparent(staticBackgroundColour, hexPercent85)
-    : getColourOrTransparent(currentApp?.themeColour, hexPercent75);
-
-  const contentPending = () => {
-    return (
-      <div className="content">
-        <span className="title">Coming soon!</span>
-      </div>
-    );
-  };
+    : getColourOrTransparent(staticBackgroundColour, hexPercent75);
 
   const renderContent = () => {
-    const metadata = currentApp?.metadata;
-    if (_.isUndefined(metadata)) {
-      return contentPending();
-    } else {
-      return (
-        <div className="content">
-          <div className="inner-content">
-            <span className="title">{metadata.displayName}</span>
-            <ReactMarkdown>
-              {currentApp?.metadata?.description ?? ""}
-            </ReactMarkdown>
-          </div>
+    return (
+      <div className="content">
+        <div className="inner-content">
+          <span className="title">JSON Viewer</span>
+          <ReactMarkdown>{jsonViewerAppDescription}</ReactMarkdown>
         </div>
-      );
-    }
+      </div>
+    );
   };
 
   const handleLogoClicked = () => {
