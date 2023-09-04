@@ -14,16 +14,9 @@ module.exports = {
       },
       colors: {
         shakespeare: {
-          50: "#fdf8f6",
-          100: "#4eabd1", //normal
-          200: "#eaddd7",
-          300: "#e0cec7",
-          400: "#d2bab0",
-          500: "#bfa094",
-          600: "#a18072",
-          700: "#977669",
-          800: "#846358",
-          900: "#43302b",
+          100: "#4eabd1",
+          200: "#267393",
+          400: "#113442",
         },
         powderBlue: {
           50: "#fdfeff",
@@ -32,9 +25,11 @@ module.exports = {
           250: "#4fbac7",
           300: "#3db2c0",
           400: "#318e99",
+          500: "#246a73",
           600: "#18464c",
         },
         offWhite: "#fafafa",
+        rebel: "#3c1206",
       },
       boxShadow: {
         subtle: "0px 0px 6px rgb(0 0 0 / 30%)",

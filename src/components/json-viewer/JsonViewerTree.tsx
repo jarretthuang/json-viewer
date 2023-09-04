@@ -8,6 +8,7 @@ import _ from "lodash";
 import JsonViewerTreeItemLabel, {
   JsonValueType,
 } from "./JsonViewerTreeItemLabel";
+import "./JsonViewerTree.css";
 
 function JsonViewerTree(props: any) {
   const populateTree = (json: Object) => {

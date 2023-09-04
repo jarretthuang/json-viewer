@@ -1,0 +1,7 @@
+@tailwind components;
+
+@layer components {
+  .tool-bar-button {
+    @apply text-powderBlue-500 hover:text-offWhite hover:bg-powderBlue-200;
+  }
+}

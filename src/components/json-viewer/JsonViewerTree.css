@@ -1,0 +1,11 @@
+@tailwind components;
+
+@layer components {
+    .label-separator {
+        @apply text-shakespeare-400;
+    }
+
+    .label-icon {
+        @apply text-shakespeare-400 hover:text-shakespeare-200;
+    }
+}

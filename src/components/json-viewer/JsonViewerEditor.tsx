@@ -1,6 +1,7 @@
 "use client";
 import { sampleJson } from "./assets/sample";
 import "./assets/css/json-viewer-editor.css";
+import "./JsonViewerEditor.css";
 
 export type JsonViewerEditorProps = {
   currentText: string;

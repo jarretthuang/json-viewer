@@ -11,7 +11,7 @@ function Copyright() {
 
   return (
     <div className="Copyright">
-      <div className="copyright-banner flex flex-row items-center uppercase font-medium shadow-subtle">
+      <div className="copyright-banner flex flex-row items-center uppercase font-medium shadow-subtle bg-white/20">
         <span>
           <span className="copyright-header">Copyright</span> © {currentYear}{" "}
           Jarrett Huang
