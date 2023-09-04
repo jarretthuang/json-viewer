@@ -1,5 +1,4 @@
 import JsonViewer from "@/components/json-viewer/JsonViewer";
-import "./assets/css/App.css";
 import NavBar from "@/components/nav-bar/NavBar";
 import { JSON_VIEWER_APP } from "@/model/application/Application";
 
