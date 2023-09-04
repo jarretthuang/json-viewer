@@ -28,6 +28,8 @@ module.exports = {
         powderBlue: {
           50: "#fdfeff",
           100: "#b0e0e6",
+          200: "#63c2cd",
+          250: "#4fbac7",
           300: "#3db2c0",
           400: "#318e99",
           600: "#18464c",

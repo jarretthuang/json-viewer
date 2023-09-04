@@ -1,7 +1,6 @@
 import "./globals.css";
 import { Ubuntu } from "next/font/google";
 
-// Customize the fonts you want to use here
 const ubuntu = Ubuntu({
   weight: ["300", "400", "500", "700"],
   style: ["normal", "italic"],

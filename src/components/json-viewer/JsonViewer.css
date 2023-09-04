@@ -1,7 +1,6 @@
 @tailwind components;
 
 @layer components {
-    
   .JsonViewer {
     @apply bg-powderBlue-50;
     position: absolute;
@@ -23,6 +22,27 @@
     overflow: hidden;
   }
 
+  .view-switcher {
+    position: absolute;
+    height: 7.5vh;
+    width: 95vw;
+    top: 48px;
+    left: 2.5vw;
+    display: flex;
+  }
+
+  .view-switcher .buttons {
+    margin: auto;
+    font-size: 0.6rem;
+    font-weight: 700;
+    display: flex;
+    flex-direction: row;
+  }
+
+  .view-switcher .buttons b {
+    width: 1rem;
+  }
+
   .view-switcher-button {
     @apply shadow-subtle text-powderBlue-600;
     @apply data-[selected=true]:text-offWhite data-[selected=true]:bg-powderBlue-400;
@@ -33,5 +53,29 @@
     text-align: center;
     cursor: pointer;
     user-select: none;
+  }
+
+  .json-viewer-container {
+    border: solid 2px transparent;
+  }
+
+  .json-viewer-container:has(.main-textarea:focus) {
+    @apply border-powderBlue-250;
+    animation: borderFade 2s ease-in-out infinite;
+  }
+
+  @keyframes borderFade {
+    from,
+    to {
+      border: solid 2px transparent;
+    }
+    50% {
+      @apply border-powderBlue-300;
+    }
+  }
+
+  .readonly-view {
+    height: 100%;
+    width: 100%;
   }
 }
