@@ -44,34 +44,17 @@
   }
 
   .view-switcher-button {
-    @apply shadow-subtle dark:shadow-subtleWhite;
-    @apply selected:text-offWhite selected:bg-powderBlue-400;
-    @apply text-powderBlue-600 hover:text-offWhite hover:bg-powderBlue-300;
+    @apply shadow-subtle;
+    @apply selected:bg-powderBlue-400 dark:selected:bg-powderBlue-600;
+    @apply hover:bg-powderBlue-300 dark:hover:bg-powderBlue-500;
+    @apply text-powderBlue-600 dark:text-slate-200;
+    @apply selected:text-offWhite hover:text-offWhite;
     width: 3rem;
     padding: 0.1rem;
     border-radius: 0.5rem;
     text-align: center;
     cursor: pointer;
     user-select: none;
-  }
-
-  .json-viewer-container {
-    border: solid 2px transparent;
-  }
-
-  .json-viewer-container:has(.main-textarea:focus) {
-    @apply border-powderBlue-250;
-    animation: borderFade 2s ease-in-out infinite;
-  }
-
-  @keyframes borderFade {
-    from,
-    to {
-      border: solid 2px transparent;
-    }
-    50% {
-      @apply border-powderBlue-300;
-    }
   }
 
   .readonly-view {
