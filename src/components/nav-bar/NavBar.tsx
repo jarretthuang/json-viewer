@@ -7,12 +7,15 @@ import Image from "next/image";
 import { useState } from "react";
 import ReactMarkdown from "react-markdown";
 import "./NavBar.css";
+import { JSON_VIEWER_APP } from "@/model/application/Application";
 
 function NavBar(props: NavBarParams) {
   const [expanded, expand] = useState(false);
   const expandedClass = expanded ? "expanded" : "";
-  const darkThemeClass = props.isDarkTheme ? "dark-theme" : "";
-  const allClassName = ["NavBar", expandedClass, darkThemeClass].join(" ");
+  const allClassName = ["NavBar", expandedClass].join(" ");
+
+  const currentApp = JSON_VIEWER_APP;
+  const staticBackgroundColour = "#fdfeff";
 
   const hexPercent75 = "BF";
   const hexPercent85 = "D9";
@@ -24,8 +27,8 @@ function NavBar(props: NavBarParams) {
   };
 
   const backgroundColour = expanded
-    ? getColourOrTransparent(props.backgroundColour, hexPercent85)
-    : getColourOrTransparent(props.currentApp?.themeColour, hexPercent75);
+    ? getColourOrTransparent(staticBackgroundColour, hexPercent85)
+    : getColourOrTransparent(currentApp?.themeColour, hexPercent75);
 
   const contentPending = () => {
     return (
@@ -36,7 +39,7 @@ function NavBar(props: NavBarParams) {
   };
 
   const renderContent = () => {
-    const metadata = props.currentApp?.metadata;
+    const metadata = currentApp?.metadata;
     if (_.isUndefined(metadata)) {
       return contentPending();
     } else {
@@ -45,7 +48,7 @@ function NavBar(props: NavBarParams) {
           <div className="inner-content">
             <span className="title">{metadata.displayName}</span>
             <ReactMarkdown>
-              {props.currentApp?.metadata?.description ?? ""}
+              {currentApp?.metadata?.description ?? ""}
             </ReactMarkdown>
           </div>
         </div>

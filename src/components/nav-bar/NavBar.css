@@ -2,7 +2,7 @@
 
 @layer components {
   .NavBar {
-    @apply shadow-subtle text-rebel;
+    @apply shadow-subtle dark:shadow-subtleWhite;
   }
 
   .NavBar.dark-theme {

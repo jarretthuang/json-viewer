@@ -2,7 +2,7 @@
 
 @layer components {
   .JsonViewer {
-    @apply bg-powderBlue-50;
+    @apply bg-powderBlue-50 dark:bg-gray-950;
     position: absolute;
     left: 0;
     top: 0;
@@ -12,7 +12,7 @@
   }
 
   .json-viewer-container {
-    @apply shadow-subtle;
+    @apply shadow-subtle dark:shadow-subtleWhite;
     position: absolute;
     height: calc(90vh - 48px);
     width: 95vw;
@@ -44,9 +44,9 @@
   }
 
   .view-switcher-button {
-    @apply shadow-subtle text-powderBlue-600;
+    @apply shadow-subtle dark:shadow-subtleWhite;
     @apply data-[selected=true]:text-offWhite data-[selected=true]:bg-powderBlue-400;
-    @apply hover:text-offWhite hover:bg-powderBlue-300;
+    @apply text-powderBlue-600 hover:text-offWhite hover:bg-powderBlue-300;
     width: 3rem;
     padding: 0.1rem;
     border-radius: 0.5rem;
