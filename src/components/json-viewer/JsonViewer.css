@@ -2,7 +2,7 @@
 
 @layer components {
   .JsonViewer {
-    @apply bg-powderBlue-50 dark:bg-gray-950;
+    @apply bg-powderBlue-50 dark:bg-neutral-950;
     position: absolute;
     left: 0;
     top: 0;

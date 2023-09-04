@@ -2,7 +2,12 @@
 
 @layer components {
   .JsonViewerEditor {
-    @apply dark:bg-gray-950;
+    @apply dark:bg-zinc-900 dark:text-cyan-50;
+  }
+
+  .tool-bar {
+    border-bottom: 1px solid;
+    @apply border-b-black/10 dark:border-b-white/10;
   }
 
   .tool-bar-button {
