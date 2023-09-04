@@ -9,25 +9,8 @@ import ReactMarkdown from "react-markdown";
 import "./NavBar.css";
 import { jsonViewerAppDescription } from "@/model/appDescriptions";
 
-function NavBar(props: NavBarParams) {
+export default function NavBar(props: NavBarParams) {
   const [expanded, expand] = useState(false);
-  const expandedClass = expanded ? "expanded" : "";
-  const allClassName = ["NavBar", expandedClass].join(" ");
-
-  const staticBackgroundColour = "#fdfeff";
-
-  const hexPercent75 = "BF";
-  const hexPercent85 = "D9";
-  const getColourOrTransparent = (
-    colour: string | undefined,
-    opacity: string
-  ) => {
-    return _.isUndefined(colour) ? "transparent" : colour + opacity;
-  };
-
-  const backgroundColour = expanded
-    ? getColourOrTransparent(staticBackgroundColour, hexPercent85)
-    : getColourOrTransparent(staticBackgroundColour, hexPercent75);
 
   const renderContent = () => {
     return (
@@ -47,12 +30,11 @@ function NavBar(props: NavBarParams) {
       window.location.assign("https://labs.jhuang.ca");
     }
   };
+
   return (
     <nav
-      className={allClassName}
-      style={{
-        backgroundColor: backgroundColour,
-      }}
+      className="NavBar bg-powderBlue-50/75 data-[expanded=true]:bg-powderBlue-50/85"
+      data-expanded={expanded}
     >
       <ul>
         <li className="jh-logo" onClick={handleLogoClicked}>
@@ -75,5 +57,3 @@ function NavBar(props: NavBarParams) {
     </nav>
   );
 }
-
-export default NavBar;

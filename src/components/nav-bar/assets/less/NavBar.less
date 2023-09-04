@@ -56,7 +56,7 @@
     }
   }
 
-  &.expanded {
+  &[data-expanded=true] {
     box-shadow: none;
     height: 100vh;
 
@@ -147,7 +147,7 @@
 }
 
 @media (max-width: @mobile-screen-width) {
-  .NavBar.expanded {
+  .NavBar[data-expanded=true] {
     li.expanded-content {
       .content {
         font-size: 6vmin;
