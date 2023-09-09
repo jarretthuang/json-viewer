@@ -2,7 +2,7 @@
 
 @layer components {
   .JsonViewerEditor {
-    @apply dark:bg-zinc-900 dark:text-cyan-50;
+    @apply dark:bg-zinc-900 dark:text-blue-100;
   }
 
   .tool-bar {

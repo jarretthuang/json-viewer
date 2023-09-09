@@ -7,7 +7,7 @@
 
   .label-icon {
     @apply text-shakespeare-400 hover:text-shakespeare-200;
-    @apply dark:text-offWhite hover:text-offWhite/80;
+    @apply dark:text-offWhite dark:hover:text-offWhite/80;
   }
 
   .JsonViewerTree {
