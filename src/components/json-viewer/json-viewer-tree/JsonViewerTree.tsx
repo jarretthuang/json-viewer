@@ -10,6 +10,7 @@ import JsonViewerTreeItemLabel, {
 } from "./JsonViewerTreeItemLabel";
 import { useRef, useState } from "react";
 import "./JsonViewerTree.css";
+import JsonViewerToolBar from "../json-viewer-tool-bar/JsonViewerToolBar";
 
 function JsonViewerTree(props: any) {
   const [expanded, setExpanded]: [string[], any] = useState([]);
@@ -18,6 +19,7 @@ function JsonViewerTree(props: any) {
   function populateTree(json: Object) {
     return (
       <TreeView
+        className="main-tree-view"
         aria-label="json viewer tree"
         defaultCollapseIcon={<ExpandMoreIcon />}
         defaultExpandIcon={<ChevronRightIcon />}
@@ -137,7 +139,30 @@ function JsonViewerTree(props: any) {
     }
   }
 
-  return <div className="JsonViewerTree">{populateTree(props.json)}</div>;
+  function renderToolBar() {
+    const options = [
+      {
+        label: "Expand",
+        onClick: () => {
+          console.log("test");
+        },
+      },
+      {
+        label: "Collapse",
+        onClick: () => {
+          console.log("test");
+        },
+      },
+    ];
+    return <JsonViewerToolBar options={options} />;
+  }
+
+  return (
+    <div className="JsonViewerTree">
+      {renderToolBar()}
+      {populateTree(props.json)}
+    </div>
+  );
 }
 
 export default JsonViewerTree;

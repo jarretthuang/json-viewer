@@ -1,4 +1,5 @@
 import { JsonViewerToolBarOption } from "./JsonViewerToolBarOption";
+import "./JsonViewerToolBar.css"
 
 function JsonViewerToolBar(props: { options: JsonViewerToolBarOption[] }) {
   return (
