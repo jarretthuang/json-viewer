@@ -9,6 +9,7 @@ import JsonViewerTreeItemLabel, {
   JsonValueType,
 } from "./JsonViewerTreeItemLabel";
 import { useState } from "react";
+import "./JsonViewerTree.css";
 
 function JsonViewerTree(props: any) {
   let expandedSet: Set<string> = new Set<string>();

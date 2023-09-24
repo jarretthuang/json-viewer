@@ -8,14 +8,7 @@
   height: @nav-bar-height;
   width: 100vw;
   z-index: 1;
-  color: @rebel;
-  .subtle-box-shadow();
   .glass();
-
-  &.dark-theme {
-    color: @almost-white;
-    .subtle-box-shadow-white();
-  }
 
   ul {
     height: 100%;
@@ -63,7 +56,7 @@
     }
   }
 
-  &.expanded {
+  &[data-expanded=true] {
     box-shadow: none;
     height: 100vh;
 
@@ -154,7 +147,7 @@
 }
 
 @media (max-width: @mobile-screen-width) {
-  .NavBar.expanded {
+  .NavBar[data-expanded=true] {
     li.expanded-content {
       .content {
         font-size: 6vmin;

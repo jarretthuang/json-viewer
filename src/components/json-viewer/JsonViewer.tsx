@@ -1,6 +1,6 @@
 "use client";
 import { Fragment, useState } from "react";
-import "./assets/css/json-viewer.css";
+import "./assets/css/json-viewer-mobile.css";
 import Notification from "../notification/Notification";
 import { ReactNotificationOptions } from "react-notifications-component";
 import JsonViewerTree from "./JsonViewerTree";
@@ -11,6 +11,7 @@ import {
   decompressFromEncodedURIComponent,
 } from "lz-string";
 import { useSearchParams } from "next/navigation";
+import "./JsonViewer.css";
 
 function JsonViewer(props: any) {
   type ViewType = "view" | "edit";
@@ -171,18 +172,16 @@ function JsonViewer(props: any) {
       <div className="view-switcher">
         <div className="buttons">
           <div
-            className={
-              "button view-switcher-button " + getSelectedClass("view")
-            }
+            className="button view-switcher-button"
+            data-selected={currentView === "view"}
             onClick={openTreeView}
           >
             View
           </div>
           <b></b>
           <div
-            className={
-              "button view-switcher-button " + getSelectedClass("edit")
-            }
+            className="button view-switcher-button"
+            data-selected={currentView === "edit"}
             onClick={() => switchView("edit")}
           >
             Edit

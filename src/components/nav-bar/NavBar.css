@@ -1,0 +1,10 @@
+@tailwind components;
+
+@layer components {
+  .NavBar {
+    @apply shadow-subtle dark:shadow-subtleWhite;
+    @apply dark:text-offWhite;
+    @apply bg-powderBlue-50 dark:bg-neutral-950;
+    @apply bg-opacity-75 expanded:bg-opacity-90;
+  }
+}

@@ -1,7 +1,6 @@
 import "./globals.css";
 import { Ubuntu } from "next/font/google";
 
-// Customize the fonts you want to use here
 const ubuntu = Ubuntu({
   weight: ["300", "400", "500", "700"],
   style: ["normal", "italic"],
@@ -22,7 +21,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      {/* <meta name = "theme-color" media = "(prefers-color-scheme: dark)" content = "# 171a1c" /> */}
+      <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0a0a0a" />
       <meta name="theme-color" content="#fdfeff" />
       <body className={fontsCssClass}>{children}</body>
     </html>

@@ -1,0 +1,28 @@
+@tailwind components;
+
+@layer components {
+  .label-separator {
+    @apply text-shakespeare-400 dark:text-offWhite;
+  }
+
+  .label-icon {
+    @apply text-shakespeare-400 hover:text-shakespeare-200;
+    @apply dark:text-offWhite dark:hover:text-offWhite/80;
+  }
+
+  .JsonViewerTree {
+    @apply dark:bg-zinc-900 dark:text-cyan-50;
+  }
+
+  .JsonViewerTree .MuiTreeItem-content.Mui-selected {
+    @apply dark:bg-cyan-950;
+  }
+
+  .JsonViewerTree .MuiTreeItem-content {
+    @apply dark:hover:bg-cyan-900;
+  }
+
+  .JsonViewerTree .MuiCollapse-root.MuiTreeItem-group {
+    @apply dark:border-l-zinc-700;
+  }
+}

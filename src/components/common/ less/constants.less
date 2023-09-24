@@ -1,39 +1,11 @@
 // colours
-@shakespeare: #4eabd1; // This colour is actually called "Shakespeare" :)
-@shakespeare-darker-60: darken(@shakespeare, 60%);
-@shakespeare-darker-50: darken(@shakespeare, 50%);
-@shakespeare-darker-40: darken(@shakespeare, 40%);
-@shakespeare-darker-30: darken(@shakespeare, 30%);
-@shakespeare-darker-20: darken(@shakespeare, 20%);
-@shakespeare-lighter-30: lighten(@shakespeare, 30%);
 @mahogany: #4e0606;
-@rebel: #3c1206;
-@almost-white: #fafafa;
-@powder-blue: #b0e0e6;
 @sanguine: #8d3d38;
 @solitaire: #fef8e2;
 @tuna: #353542;
 @swiss: #f46524;
 
-@background-colour-main: @shakespeare-darker-50;
-@block-colour-main: @shakespeare;
-@font-colour-main: @almost-white;
-
 // fonts
-.font-family() {
-  font-family: "Ubuntu", helvetica, san-serif;
-  font-smooth: antialiased;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-rendering: optimizeLegibility;
-}
-
-.font-main() {
-  color: @font-colour-main;
-  .font-family();
-  font-weight: 400;
-  font-size: 4vmin;
-}
 
 .font-code() {
   font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
@@ -44,14 +16,6 @@
 .full-width-and-height() {
   height: 100%;
   width: 100%;
-}
-
-.subtle-box-shadow() {
-  box-shadow: 0px 0px 6px rgb(0 0 0 / 30%);
-}
-
-.subtle-box-shadow-white() {
-  box-shadow: 0 0 3px rgb(250 250 250 / 20%);
 }
 
 .readonly() {
