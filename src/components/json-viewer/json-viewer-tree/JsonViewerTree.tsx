@@ -142,15 +142,15 @@ function JsonViewerTree(props: any) {
   function renderToolBar() {
     const options = [
       {
-        label: "Expand",
+        label: "Expand All",
         onClick: () => {
-          console.log("test");
+          setExpanded(allNodeIds.current);
         },
       },
       {
-        label: "Collapse",
+        label: "Collapse All",
         onClick: () => {
-          console.log("test");
+          setExpanded([]);
         },
       },
     ];
