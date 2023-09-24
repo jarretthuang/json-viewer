@@ -6,7 +6,7 @@ import {
 } from "react-notifications";
 import { ReactNotificationOptions } from "react-notifications-component";
 import "react-notifications/lib/notifications.css";
-import "./assets/css/Notification.css";
+import "./Notification.css";
 
 function Notification(props: any) {
   const [currentNotification, updateNotification] = useState<
