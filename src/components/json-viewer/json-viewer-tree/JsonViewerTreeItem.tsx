@@ -28,13 +28,15 @@ function TransitionComponent(props: TransitionProps) {
   );
 }
 
-const JsonViewerTreeItem = styled(({ onItemClick, ...props }: JsonViewerTreeItemProps) => (
-  <TreeItem
-    {...props}
-    TransitionComponent={TransitionComponent}
-    onClick={() => onItemClick(props.nodeId)}
-  />
-))(({ theme }) => ({
+const JsonViewerTreeItem = styled(
+  ({ onItemClick, ...props }: JsonViewerTreeItemProps) => (
+    <TreeItem
+      {...props}
+      TransitionComponent={TransitionComponent}
+      onClick={() => onItemClick(props.nodeId)}
+    />
+  )
+)(({ theme }) => ({
   [`& .${treeItemClasses.iconContainer}`]: {
     "& .close": {
       opacity: 0.3,

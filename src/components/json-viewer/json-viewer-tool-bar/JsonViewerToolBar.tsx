@@ -1,4 +1,4 @@
-import { JsonViewerToolBarOption } from './JsonViewerToolBarOption'
+import { JsonViewerToolBarOption } from "./JsonViewerToolBarOption";
 
 function JsonViewerToolBar(props: { options: JsonViewerToolBarOption[] }) {
   return (
@@ -9,7 +9,7 @@ function JsonViewerToolBar(props: { options: JsonViewerToolBarOption[] }) {
         </div>
       ))}
     </div>
-  )
+  );
 }
 
-export default JsonViewerToolBar
+export default JsonViewerToolBar;

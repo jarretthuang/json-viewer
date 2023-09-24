@@ -2,7 +2,7 @@
 import TreeView from "@mui/lab/TreeView";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
-import "./assets/css/json-viewer-tree.css";
+import "./../assets/css/json-viewer-tree.css";
 import JsonViewerTreeItem from "./JsonViewerTreeItem";
 import _ from "lodash";
 import JsonViewerTreeItemLabel, {
@@ -27,7 +27,7 @@ function JsonViewerTree(props: any) {
         {renderTreeItems(json)}
       </TreeView>
     );
-  };
+  }
 
   function handleItemClick(nodeId: string): void {
     const expandedSet = new Set(expanded);
@@ -51,7 +51,7 @@ function JsonViewerTree(props: any) {
     json: any,
     key: string,
     nodeIdPrefix: string,
-    nodeIdSet: Set<string>,
+    nodeIdSet: Set<string>
   ) {
     const nodeId: string = nodeIdPrefix + "." + key;
     nodeIdSet.add(nodeId);
@@ -83,7 +83,12 @@ function JsonViewerTree(props: any) {
             label={<JsonViewerTreeItemLabel type="array" name={key} />}
           >
             {json.map((itemInArray, index) =>
-              populateTreeItems(itemInArray, index.toString(), nodeId, nodeIdSet)
+              populateTreeItems(
+                itemInArray,
+                index.toString(),
+                nodeId,
+                nodeIdSet
+              )
             )}
           </JsonViewerTreeItem>
         );
@@ -130,7 +135,7 @@ function JsonViewerTree(props: any) {
         />
       );
     }
-  };
+  }
 
   return <div className="JsonViewerTree">{populateTree(props.json)}</div>;
 }

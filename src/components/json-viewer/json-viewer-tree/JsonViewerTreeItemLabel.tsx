@@ -2,7 +2,7 @@
 import DataObjectIcon from "@mui/icons-material/DataObject";
 import DataArrayIcon from "@mui/icons-material/DataArray";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
-import { Tooltip } from "../tooltip/Tooltip";
+import { Tooltip } from "../../tooltip/Tooltip";
 import { Fragment } from "react";
 import _ from "lodash";
 
