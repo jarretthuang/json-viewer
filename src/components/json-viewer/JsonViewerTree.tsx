@@ -8,14 +8,14 @@ import _ from "lodash";
 import JsonViewerTreeItemLabel, {
   JsonValueType,
 } from "./JsonViewerTreeItemLabel";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import "./JsonViewerTree.css";
 
 function JsonViewerTree(props: any) {
-  let expandedSet: Set<string> = new Set<string>();
   const [expanded, setExpanded]: [string[], any] = useState([]);
+  const allNodeIds = useRef<string[]>([]);
 
-  const populateTree = (json: Object) => {
+  function populateTree(json: Object) {
     return (
       <TreeView
         aria-label="json viewer tree"
@@ -24,27 +24,37 @@ function JsonViewerTree(props: any) {
         sx={{ flexGrow: 1, overflowY: "auto" }}
         expanded={expanded}
       >
-        {populateTreeItems(json)}
+        {renderTreeItems(json)}
       </TreeView>
     );
   };
 
   function handleItemClick(nodeId: string): void {
+    const expandedSet = new Set(expanded);
     if (expandedSet.has(nodeId)) {
       expandedSet.delete(nodeId);
       setExpanded(Array.from(expandedSet));
     } else {
-      expandedSet = expandedSet.add(nodeId);
-      setExpanded(Array.from(expandedSet));
+      const newExpandedSet = expandedSet.add(nodeId);
+      setExpanded(Array.from(newExpandedSet));
     }
   }
 
-  const populateTreeItems = (
+  function renderTreeItems(json: any) {
+    const nodeIdSet = new Set<string>();
+    const result = populateTreeItems(json, "JSON", "", nodeIdSet);
+    allNodeIds.current = Array.from(nodeIdSet);
+    return result;
+  }
+
+  function populateTreeItems(
     json: any,
-    key: string = "JSON",
-    nodeIdPrefix: string = ""
-  ) => {
+    key: string,
+    nodeIdPrefix: string,
+    nodeIdSet: Set<string>,
+  ) {
     const nodeId: string = nodeIdPrefix + "." + key;
+    nodeIdSet.add(nodeId);
 
     if (_.isNull(json) || _.isUndefined(json)) {
       return (
@@ -73,7 +83,7 @@ function JsonViewerTree(props: any) {
             label={<JsonViewerTreeItemLabel type="array" name={key} />}
           >
             {json.map((itemInArray, index) =>
-              populateTreeItems(itemInArray, index.toString(), nodeId)
+              populateTreeItems(itemInArray, index.toString(), nodeId, nodeIdSet)
             )}
           </JsonViewerTreeItem>
         );
@@ -86,7 +96,7 @@ function JsonViewerTree(props: any) {
             label={<JsonViewerTreeItemLabel type="object" name={key} />}
           >
             {Object.keys(json).map((key: string) =>
-              populateTreeItems(json[key], key, nodeId)
+              populateTreeItems(json[key], key, nodeId, nodeIdSet)
             )}
           </JsonViewerTreeItem>
         );
