@@ -11,6 +11,9 @@ import JsonViewerTreeItemLabel, {
 import { useRef, useState } from "react";
 import "./JsonViewerTree.css";
 import JsonViewerToolBar from "../json-viewer-tool-bar/JsonViewerToolBar";
+import { JsonViewerToolBarOption } from "../json-viewer-tool-bar/JsonViewerToolBarOption";
+import UnfoldMoreIcon from '@mui/icons-material/UnfoldMore';
+import UnfoldLessIcon from '@mui/icons-material/UnfoldLess';
 
 function JsonViewerTree(props: any) {
   const [expanded, setExpanded]: [string[], any] = useState([]);
@@ -140,18 +143,20 @@ function JsonViewerTree(props: any) {
   }
 
   function renderToolBar() {
-    const options = [
+    const options: JsonViewerToolBarOption[] = [
       {
         label: "Expand All",
         onClick: () => {
           setExpanded(allNodeIds.current);
         },
+        icon: <UnfoldMoreIcon />,
       },
       {
         label: "Collapse All",
         onClick: () => {
           setExpanded([]);
         },
+        icon: <UnfoldLessIcon />,
       },
     ];
     return <JsonViewerToolBar options={options} />;

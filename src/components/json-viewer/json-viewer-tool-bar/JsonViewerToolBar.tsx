@@ -10,7 +10,10 @@ function JsonViewerToolBar(props: { options: JsonViewerToolBarOption[] }) {
           onClick={option.onClick}
           key={option.label}
         >
+          {option.icon}
+          <div className="tool-bar-button-label">
           {option.label}
+          </div>
         </div>
       ))}
     </div>
