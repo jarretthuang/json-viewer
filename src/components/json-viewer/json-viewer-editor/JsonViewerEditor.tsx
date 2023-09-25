@@ -1,6 +1,5 @@
 "use client";
 import { sampleJson } from "../assets/sample";
-import "./../assets/css/json-viewer-editor.css";
 import "./JsonViewerEditor.css";
 import JsonViewerToolBar from "../json-viewer-tool-bar/JsonViewerToolBar";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
