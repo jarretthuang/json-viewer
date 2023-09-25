@@ -2,49 +2,29 @@
 
 @layer components {
   .JsonViewerToolBar {
-    border-bottom: 1px solid;
+    @apply border-b-[1px];
     @apply border-b-black/10 dark:border-b-white/10;
   }
 
   .JsonViewerToolBar {
-    height: 1.5rem;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    padding-left: 1rem;
-    overflow-y: hidden;
+    @apply flex flex-row overflow-y-hidden overflow-x-auto;
+    @apply items-center pl-4;
+    @apply h-12 md:h-6 mx-4 md:mx-0;
   }
 
   .JsonViewerToolBar .tool-bar-button {
-    margin: 0 5px 0 5px;
-    text-transform: lowercase;
-    padding: 0.1rem 0.5rem 0.1rem 0.5rem;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    @apply border-none rounded text-center cursor-pointer select-none whitespace-nowrap;
+    @apply flex flex-row items-center;
+    @apply border-none rounded px-2 py-[0.1rem];
+    @apply text-center cursor-pointer select-none whitespace-nowrap;
+    @apply mx-[0.5rem] md:mx-[5px];
   }
 
   .JsonViewerToolBar svg {
-    @apply h-2.5 w-min ml-[-0.2rem] mr-[0.1rem];
+    @apply w-min ml-[-0.2rem] mr-[0.1rem];
+    @apply h-3.5 md:h-2.5;
   }
 
   .JsonViewerToolBar .tool-bar-button-label {
-    font-size: 0.6rem;
-    font-weight: 500;
+    @apply font-medium lowercase text-[1rem] md:text-[0.6rem];
   }
-
-  /* mobile */
-  /* .JsonViewerToolBar {
-        height: 3rem;
-        overflow-x: auto;
-        margin: 0 1rem 0 1rem;
-    }
-
-    .JsonViewerToolBar .tool-bar-button {
-        font-size: 1rem;
-        border-radius: 0.5rem;
-        margin: 0 0.5rem 0 0.5rem;
-        text-transform: uppercase;
-    } */
 }
