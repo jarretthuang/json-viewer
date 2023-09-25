@@ -12,8 +12,10 @@ import { useRef, useState } from "react";
 import "./JsonViewerTree.css";
 import JsonViewerToolBar from "../json-viewer-tool-bar/JsonViewerToolBar";
 import { JsonViewerToolBarOption } from "../json-viewer-tool-bar/JsonViewerToolBarOption";
-import UnfoldMoreIcon from '@mui/icons-material/UnfoldMore';
-import UnfoldLessIcon from '@mui/icons-material/UnfoldLess';
+import UnfoldMoreIcon from "@mui/icons-material/UnfoldMore";
+import UnfoldLessIcon from "@mui/icons-material/UnfoldLess";
+import OpenInFullIcon from "@mui/icons-material/OpenInFull";
+import CloseFullscreenIcon from "@mui/icons-material/CloseFullscreen";
 
 function JsonViewerTree(props: any) {
   const [expanded, setExpanded]: [string[], any] = useState([]);
@@ -149,14 +151,14 @@ function JsonViewerTree(props: any) {
         onClick: () => {
           setExpanded(allNodeIds.current);
         },
-        icon: <UnfoldMoreIcon />,
+        icon: <OpenInFullIcon />,
       },
       {
         label: "Collapse All",
         onClick: () => {
           setExpanded([]);
         },
-        icon: <UnfoldLessIcon />,
+        icon: <CloseFullscreenIcon />,
       },
     ];
     return <JsonViewerToolBar options={options} />;
