@@ -3,6 +3,12 @@ import { sampleJson } from "../assets/sample";
 import "./../assets/css/json-viewer-editor.css";
 import "./JsonViewerEditor.css";
 import JsonViewerToolBar from "../json-viewer-tool-bar/JsonViewerToolBar";
+import ContentCopyIcon from "@mui/icons-material/ContentCopy";
+import ContentPasteIcon from "@mui/icons-material/ContentPaste";
+import MinimizeIcon from "@mui/icons-material/Minimize";
+import CleaningServicesIcon from "@mui/icons-material/CleaningServices";
+import FormatAlignRightIcon from "@mui/icons-material/FormatAlignRight";
+import TextSnippetIcon from "@mui/icons-material/TextSnippet";
 
 export type JsonViewerEditorProps = {
   currentText: string;
@@ -46,27 +52,33 @@ function JsonViewerEditor({
       {
         label: "Copy",
         onClick: () => handleCopy(currentText),
+        icon: <ContentCopyIcon />,
       },
       {
         label: "Paste",
         onClick: () =>
           navigator.clipboard.readText().then((text) => updateText(text)),
+        icon: <ContentPasteIcon />,
       },
       {
         label: "Format",
         onClick: () => formatJson(currentText),
+        icon: <FormatAlignRightIcon />,
       },
       {
         label: "Minimize",
         onClick: () => minimizeJson(currentText),
+        icon: <MinimizeIcon />,
       },
       {
         label: "Clear",
         onClick: () => updateText(""),
+        icon: <CleaningServicesIcon />,
       },
       {
         label: "Example",
         onClick: () => updateText(JSON.stringify(sampleJson)),
+        icon: <TextSnippetIcon />,
       },
     ];
     return <JsonViewerToolBar options={options} />;
