@@ -3,9 +3,9 @@ import { Fragment, useState } from "react";
 import "./assets/css/json-viewer-mobile.css";
 import Notification from "../notification/Notification";
 import { ReactNotificationOptions } from "react-notifications-component";
-import JsonViewerTree from "./JsonViewerTree";
+import JsonViewerTree from "./json-viewer-tree/JsonViewerTree";
 import Head from "next/head";
-import JsonViewerEditor from "./JsonViewerEditor";
+import JsonViewerEditor from "./json-viewer-editor/JsonViewerEditor";
 import {
   compressToEncodedURIComponent,
   decompressFromEncodedURIComponent,

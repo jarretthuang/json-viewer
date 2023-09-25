@@ -5,6 +5,10 @@ import Collapse from "@mui/material/Collapse";
 import { useSpring, animated } from "@react-spring/web";
 import { TransitionProps } from "@mui/material/transitions";
 
+export type JsonViewerTreeItemProps = TreeItemProps & {
+  onItemClick: (nodeId: string) => void;
+};
+
 function TransitionComponent(props: TransitionProps) {
   const style = useSpring({
     from: {
@@ -24,9 +28,15 @@ function TransitionComponent(props: TransitionProps) {
   );
 }
 
-const JsonViewerTreeItem = styled((props: TreeItemProps) => (
-  <TreeItem {...props} TransitionComponent={TransitionComponent} />
-))(({ theme }) => ({
+const JsonViewerTreeItem = styled(
+  ({ onItemClick, ...props }: JsonViewerTreeItemProps) => (
+    <TreeItem
+      {...props}
+      TransitionComponent={TransitionComponent}
+      onClick={() => onItemClick(props.nodeId)}
+    />
+  )
+)(({ theme }) => ({
   [`& .${treeItemClasses.iconContainer}`]: {
     "& .close": {
       opacity: 0.3,

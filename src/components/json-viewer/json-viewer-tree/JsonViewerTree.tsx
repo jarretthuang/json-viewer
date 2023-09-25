@@ -2,40 +2,73 @@
 import TreeView from "@mui/lab/TreeView";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
-import "./assets/css/json-viewer-tree.css";
+import "./../assets/css/json-viewer-tree.css";
 import JsonViewerTreeItem from "./JsonViewerTreeItem";
 import _ from "lodash";
 import JsonViewerTreeItemLabel, {
   JsonValueType,
 } from "./JsonViewerTreeItemLabel";
+import { useRef, useState } from "react";
 import "./JsonViewerTree.css";
+import JsonViewerToolBar from "../json-viewer-tool-bar/JsonViewerToolBar";
+import { JsonViewerToolBarOption } from "../json-viewer-tool-bar/JsonViewerToolBarOption";
+import UnfoldMoreIcon from "@mui/icons-material/UnfoldMore";
+import UnfoldLessIcon from "@mui/icons-material/UnfoldLess";
+import OpenInFullIcon from "@mui/icons-material/OpenInFull";
+import CloseFullscreenIcon from "@mui/icons-material/CloseFullscreen";
 
 function JsonViewerTree(props: any) {
-  const populateTree = (json: Object) => {
+  const [expanded, setExpanded]: [string[], any] = useState([]);
+  const allNodeIds = useRef<string[]>([]);
+
+  function populateTree(json: Object) {
     return (
       <TreeView
+        className="main-tree-view"
         aria-label="json viewer tree"
         defaultCollapseIcon={<ExpandMoreIcon />}
         defaultExpandIcon={<ChevronRightIcon />}
         sx={{ flexGrow: 1, overflowY: "auto" }}
+        expanded={expanded}
       >
-        {populateTreeItems(json)}
+        {renderTreeItems(json)}
       </TreeView>
     );
-  };
+  }
 
-  const populateTreeItems = (
+  function handleItemClick(nodeId: string): void {
+    const expandedSet = new Set(expanded);
+    if (expandedSet.has(nodeId)) {
+      expandedSet.delete(nodeId);
+      setExpanded(Array.from(expandedSet));
+    } else {
+      const newExpandedSet = expandedSet.add(nodeId);
+      setExpanded(Array.from(newExpandedSet));
+    }
+  }
+
+  function renderTreeItems(json: any) {
+    const nodeIdSet = new Set<string>();
+    const result = populateTreeItems(json, "JSON", "", nodeIdSet);
+    allNodeIds.current = Array.from(nodeIdSet);
+    return result;
+  }
+
+  function populateTreeItems(
     json: any,
-    key: string = "JSON",
-    nodeIdPrefix: string = ""
-  ) => {
+    key: string,
+    nodeIdPrefix: string,
+    nodeIdSet: Set<string>
+  ) {
     const nodeId: string = nodeIdPrefix + "." + key;
+    nodeIdSet.add(nodeId);
 
     if (_.isNull(json) || _.isUndefined(json)) {
       return (
         <JsonViewerTreeItem
           nodeId={nodeId}
           key={nodeId}
+          onItemClick={handleItemClick}
           label={
             <JsonViewerTreeItemLabel
               type="value"
@@ -53,10 +86,16 @@ function JsonViewerTree(props: any) {
           <JsonViewerTreeItem
             nodeId={nodeId}
             key={nodeId}
+            onItemClick={handleItemClick}
             label={<JsonViewerTreeItemLabel type="array" name={key} />}
           >
             {json.map((itemInArray, index) =>
-              populateTreeItems(itemInArray, index.toString(), nodeId)
+              populateTreeItems(
+                itemInArray,
+                index.toString(),
+                nodeId,
+                nodeIdSet
+              )
             )}
           </JsonViewerTreeItem>
         );
@@ -65,10 +104,11 @@ function JsonViewerTree(props: any) {
           <JsonViewerTreeItem
             nodeId={nodeId}
             key={nodeId}
+            onItemClick={handleItemClick}
             label={<JsonViewerTreeItemLabel type="object" name={key} />}
           >
             {Object.keys(json).map((key: string) =>
-              populateTreeItems(json[key], key, nodeId)
+              populateTreeItems(json[key], key, nodeId, nodeIdSet)
             )}
           </JsonViewerTreeItem>
         );
@@ -89,6 +129,7 @@ function JsonViewerTree(props: any) {
         <JsonViewerTreeItem
           nodeId={nodeId}
           key={nodeId}
+          onItemClick={handleItemClick}
           label={
             <JsonViewerTreeItemLabel
               type="value"
@@ -101,9 +142,34 @@ function JsonViewerTree(props: any) {
         />
       );
     }
-  };
+  }
 
-  return <div className="JsonViewerTree">{populateTree(props.json)}</div>;
+  function renderToolBar() {
+    const options: JsonViewerToolBarOption[] = [
+      {
+        label: "Expand All",
+        onClick: () => {
+          setExpanded(allNodeIds.current);
+        },
+        icon: <OpenInFullIcon />,
+      },
+      {
+        label: "Collapse All",
+        onClick: () => {
+          setExpanded([]);
+        },
+        icon: <CloseFullscreenIcon />,
+      },
+    ];
+    return <JsonViewerToolBar options={options} />;
+  }
+
+  return (
+    <div className="JsonViewerTree">
+      {renderToolBar()}
+      {populateTree(props.json)}
+    </div>
+  );
 }
 
 export default JsonViewerTree;
