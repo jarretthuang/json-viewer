@@ -25,4 +25,9 @@
   .JsonViewerTree .MuiCollapse-root.MuiTreeItem-group {
     @apply dark:border-l-zinc-700;
   }
+
+  .JsonViewerTree .main-tree-view {
+    @apply h-[calc(100%-3rem)] md:h-[calc(100%-1.5rem)];
+    padding: 0.5rem 1rem 1rem 1rem;
+  }
 }

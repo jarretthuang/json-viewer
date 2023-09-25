@@ -1,0 +1,30 @@
+@tailwind components;
+
+@layer components {
+  .JsonViewerToolBar {
+    @apply border-b-[1px];
+    @apply border-b-black/10 dark:border-b-white/10;
+  }
+
+  .JsonViewerToolBar {
+    @apply flex flex-row overflow-y-hidden overflow-x-auto;
+    @apply items-center pl-4;
+    @apply h-12 md:h-6 mx-4 md:mx-0;
+  }
+
+  .JsonViewerToolBar .tool-bar-button {
+    @apply flex flex-row items-center;
+    @apply border-none rounded px-2 py-[0.1rem];
+    @apply text-center cursor-pointer select-none whitespace-nowrap;
+    @apply mx-[0.5rem] md:mx-[5px];
+  }
+
+  .JsonViewerToolBar svg {
+    @apply w-min ml-[-0.2rem] mr-[0.1rem];
+    @apply h-3.5 md:h-2.5;
+  }
+
+  .JsonViewerToolBar .tool-bar-button-label {
+    @apply font-medium lowercase text-[1rem] md:text-[0.6rem];
+  }
+}
