@@ -14,7 +14,7 @@
 </div>
 
 
-### URL - https://json.jhuang.ca
+### URL - https://jsonviewer.io
 
 ### Summary
 The _JSON Viewer_ is a web app designed to validate, format, and visualize JSON texts.
