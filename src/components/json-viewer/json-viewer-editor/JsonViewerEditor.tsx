@@ -1,6 +1,5 @@
 "use client";
 import { sampleJson } from "../assets/sample";
-import "./JsonViewerEditor.css";
 import JsonViewerToolBar from "../json-viewer-tool-bar/JsonViewerToolBar";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import ContentPasteIcon from "@mui/icons-material/ContentPaste";
@@ -8,6 +7,9 @@ import MinimizeIcon from "@mui/icons-material/Minimize";
 import CleaningServicesIcon from "@mui/icons-material/CleaningServices";
 import FormatAlignRightIcon from "@mui/icons-material/FormatAlignRight";
 import TextSnippetIcon from "@mui/icons-material/TextSnippet";
+import ContentEditable from "react-contenteditable";
+import { useState, useEffect, useRef } from "react";
+import _ from "lodash";
 
 export type JsonViewerEditorProps = {
   currentText: string;
@@ -24,6 +26,34 @@ function JsonViewerEditor({
   handleCopy,
   parseJson,
 }: JsonViewerEditorProps) {
+  const [lines, setLines] = useState<number[]>([]);
+  const contentEditableRef = useRef<HTMLDivElement | null>(null);
+
+  const updateLineNumbers = () => {
+    if (contentEditableRef.current) {
+      const contentDiv = contentEditableRef.current;
+      const height: number = contentDiv.offsetHeight ?? 0;
+      const lineHeight: number =
+        _.toNumber(getComputedStyle(contentDiv)?.lineHeight?.slice(0, -2)) ?? 1;
+      const numberOfLines: number = Math.ceil(height / lineHeight);
+      const lines = Array.from(
+        { length: numberOfLines },
+        (_, index) => index + 1
+      );
+      setLines(lines);
+    }
+  };
+
+  useEffect(() => {
+    if (contentEditableRef.current) {
+      updateLineNumbers();
+    }
+    window.addEventListener("resize", updateLineNumbers);
+    return () => {
+      window.removeEventListener("resize", updateLineNumbers);
+    };
+  }, [currentText]);
+
   const clearDefaultText = () => {
     if (isDefaultText) {
       updateText("");
@@ -84,14 +114,24 @@ function JsonViewerEditor({
   }
 
   return (
-    <div className="JsonViewerEditor">
+    <div className="JsonViewerEditor h-full w-full dark:bg-zinc-900 dark:text-blue-100">
       {renderToolBar()}
-      <textarea
-        className="main-textarea"
-        value={currentText}
-        onClick={clearDefaultText}
-        onChange={(e) => updateText(e.target.value)}
-      ></textarea>
+      <div className="flex h-[calc(100%-3rem)] w-full flex-row overflow-y-auto p-2 font-mono text-[1rem] md:h-[calc(100%-1.5rem)] md:text-[2vmin]">
+        <div className="line-numbers px-1 font-bold text-powderBlue-400 dark:text-zinc-500">
+          {lines.map((line) => (
+            <div key={line} className="line-number">
+              {line}
+            </div>
+          ))}
+        </div>
+        <ContentEditable
+          className="h-fit grow resize-none overflow-hidden whitespace-pre-wrap bg-transparent px-1 outline-none"
+          innerRef={contentEditableRef}
+          html={currentText}
+          onChange={(e) => updateText(e.target.value)}
+          onClick={clearDefaultText}
+        />
+      </div>
     </div>
   );
 }
