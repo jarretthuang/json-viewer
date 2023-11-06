@@ -28,9 +28,9 @@ export default function NavBar(props: NavBarParams) {
 
   function renderHeaderIcon() {
     if (expanded) {
-      return <CloseIcon className="handle-symbol h-[30px]" />;
+      return <CloseIcon className="handle-symbol" />;
     } else {
-      return <MoreHorizIcon className="handle-symbol h-[35px]" />;
+      return <MoreHorizIcon className="handle-symbol" />;
     }
   }
 
