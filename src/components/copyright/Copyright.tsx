@@ -23,6 +23,7 @@ function Copyright() {
         >
           <GitHubIcon
             className="h-4 hover:opacity-80 md:h-3"
+            height="1rem"
             onClick={() =>
               window.open("https://github.com/jarretthuang/json-viewer")
             }
@@ -36,6 +37,7 @@ function Copyright() {
         >
           <CoffeeIcon
             className="ml-[-10px] h-4 hover:opacity-80 md:h-3"
+            height="1rem"
             onClick={() =>
               window.open("https://www.buymeacoffee.com/jarretthuang")
             }
