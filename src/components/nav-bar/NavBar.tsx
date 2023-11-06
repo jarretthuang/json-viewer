@@ -23,21 +23,10 @@ export default function NavBar(props: NavBarParams) {
     );
   };
 
-  const handleLogoClicked = () => {
-    if (props.goHome) {
-      props.goHome();
-    } else {
-      window.location.assign("https://labs.jhuang.ca");
-    }
-  };
-
   return (
-    <nav
-      className="NavBar"
-      data-expanded={expanded}
-    >
+    <nav className="NavBar" data-expanded={expanded}>
       <ul>
-        <li className="jh-logo" onClick={handleLogoClicked}>
+        <li className="jh-logo">
           <Image
             src="/logoBW.png"
             alt="JH"
@@ -45,6 +34,7 @@ export default function NavBar(props: NavBarParams) {
             width={36}
             height={36}
           />
+          <span className="p-1 text-[20px] font-bold">jsonviewer.io</span>
         </li>
         <li className="handle" onClick={() => expand(!expanded)}>
           <span className="handle-symbol">+</span>

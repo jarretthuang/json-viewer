@@ -36,12 +36,6 @@
       }
     }
 
-    &.jh-logo {
-      .jh-logo-bw {
-        height: 36px;
-      }
-    }
-
     &.handle {
       font-size: 32px;
       align-self: flex-start;
@@ -56,7 +50,7 @@
     }
   }
 
-  &[data-expanded=true] {
+  &[data-expanded="true"] {
     box-shadow: none;
     height: 100vh;
 
@@ -147,7 +141,7 @@
 }
 
 @media (max-width: @mobile-screen-width) {
-  .NavBar[data-expanded=true] {
+  .NavBar[data-expanded="true"] {
     li.expanded-content {
       .content {
         font-size: 6vmin;
