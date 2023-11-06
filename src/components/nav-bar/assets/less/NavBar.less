@@ -70,16 +70,12 @@
       &.handle {
         display: flex;
         justify-content: flex-end;
-
-        .handle-symbol {
-          transform: rotate(45deg);
-        }
       }
 
       &.expanded-content {
         display: flex;
         flex-direction: column;
-        height: calc(100% - @nav-bar-height);
+        flex-grow: 1;
         width: 100%;
         overflow: hidden;
 

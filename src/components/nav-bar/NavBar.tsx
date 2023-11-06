@@ -8,6 +8,9 @@ import { useState } from "react";
 import ReactMarkdown from "react-markdown";
 import "./NavBar.css";
 import { jsonViewerAppDescription } from "@/model/appDescriptions";
+import InfoIcon from "@mui/icons-material/Info";
+import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
+import CloseIcon from "@mui/icons-material/Close";
 
 export default function NavBar(props: NavBarParams) {
   const [expanded, expand] = useState(false);
@@ -23,8 +26,16 @@ export default function NavBar(props: NavBarParams) {
     );
   };
 
+  function renderHeaderIcon() {
+    if (expanded) {
+      return <CloseIcon className="handle-symbol h-[30px]" />;
+    } else {
+      return <MoreHorizIcon className="handle-symbol h-[35px]" />;
+    }
+  }
+
   return (
-    <nav className="NavBar" data-expanded={expanded}>
+    <nav className="NavBar group" data-expanded={expanded}>
       <ul>
         <li className="jh-logo">
           <Image
@@ -36,8 +47,11 @@ export default function NavBar(props: NavBarParams) {
           />
           <span className="p-1 text-[20px] font-bold">jsonviewer.io</span>
         </li>
-        <li className="handle" onClick={() => expand(!expanded)}>
-          <span className="handle-symbol">+</span>
+        <li
+          className="handle group-data-[expanded=true]:mt-4"
+          onClick={() => expand(!expanded)}
+        >
+          {renderHeaderIcon()}
         </li>
         <li className="expanded-content">
           {renderContent()}
