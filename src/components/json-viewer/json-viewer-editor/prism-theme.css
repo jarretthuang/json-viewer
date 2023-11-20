@@ -154,4 +154,8 @@
     outline: 0.4em solid #896724;
     outline-offset: 0.4em;
   }
+
+  textarea::selection {
+    @apply bg-slate-300/30 dark:bg-cyan-500/50;
+  }
 }
