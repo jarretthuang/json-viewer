@@ -10,6 +10,10 @@ import TextSnippetIcon from "@mui/icons-material/TextSnippet";
 import { useState, useEffect } from "react";
 import _ from "lodash";
 import Editor from "react-simple-code-editor";
+import { highlight, languages } from "prismjs/components/prism-core";
+import "prismjs/components/prism-clike";
+import "prismjs/components/prism-javascript";
+import "./prism-theme.css";
 
 export type JsonViewerEditorProps = {
   currentText: string;
@@ -134,10 +138,10 @@ function JsonViewerEditor({
         </div>
         <Editor
           textareaId={TEXT_AREA_ELEMENT_ID}
-          className="h-fit grow resize-none overflow-hidden whitespace-pre-wrap bg-transparent px-1 [&>textarea]:outline-none"
+          className="editor h-fit grow resize-none overflow-hidden whitespace-pre-wrap bg-transparent px-1 [&>textarea]:outline-none"
           value={currentText}
           onValueChange={(code) => updateText(code)}
-          highlight={(code) => code}
+          highlight={(code) => highlight(code, languages.js)}
           onClick={clearDefaultText}
         />
       </div>

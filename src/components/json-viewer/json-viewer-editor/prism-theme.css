@@ -1,0 +1,157 @@
+@tailwind components;
+@layer components {
+  code[class*="language-"],
+  pre[class*="language-"] {
+    font-family: Consolas, Menlo, Monaco, "Andale Mono WT", "Andale Mono",
+      "Lucida Console", "Lucida Sans Typewriter", "DejaVu Sans Mono",
+      "Bitstream Vera Sans Mono", "Liberation Mono", "Nimbus Mono L",
+      "Courier New", Courier, monospace;
+    font-size: 14px;
+    line-height: 1.375;
+    direction: ltr;
+    text-align: left;
+    white-space: pre;
+    word-spacing: normal;
+    word-break: normal;
+
+    -moz-tab-size: 4;
+    -o-tab-size: 4;
+    tab-size: 4;
+
+    -webkit-hyphens: none;
+    -moz-hyphens: none;
+    -ms-hyphens: none;
+    hyphens: none;
+    background: #faf8f5;
+    @apply text-[#728fcb] dark:text-offWhite;
+  }
+
+  pre > code[class*="language-"] {
+    font-size: 1em;
+  }
+
+  pre[class*="language-"]::-moz-selection,
+  pre[class*="language-"] ::-moz-selection,
+  code[class*="language-"]::-moz-selection,
+  code[class*="language-"] ::-moz-selection {
+    text-shadow: none;
+    background: #faf8f5;
+  }
+
+  pre[class*="language-"]::selection,
+  pre[class*="language-"] ::selection,
+  code[class*="language-"]::selection,
+  code[class*="language-"] ::selection {
+    text-shadow: none;
+    background: #faf8f5;
+  }
+
+  /* Code blocks */
+  pre[class*="language-"] {
+    padding: 1em;
+    margin: 0.5em 0;
+    overflow: auto;
+  }
+
+  /* Inline code */
+  :not(pre) > code[class*="language-"] {
+    padding: 0.1em;
+    border-radius: 0.3em;
+  }
+
+  .token.comment,
+  .token.prolog,
+  .token.doctype,
+  .token.cdata {
+    @apply text-[#b6ad9a] dark:text-[#91889b];
+  }
+
+  .token.punctuation {
+    @apply text-[#b6ad9a] dark:text-[#7b6995];
+  }
+
+  .token.namespace {
+    opacity: 0.7;
+  }
+
+  .token.tag,
+  .token.operator,
+  .token.number {
+    @apply text-[#063289] dark:text-offWhite;
+  }
+
+  .token.property,
+  .token.function {
+    @apply font-bold text-[#b29762] dark:text-shakespeare-100;
+  }
+
+  .token.tag-id,
+  .token.selector,
+  .token.atrule-id {
+    @apply text-[#2d2006] dark:text-[#b381c5];
+  }
+
+  code.language-javascript,
+  .token.attr-name {
+    @apply text-[#896724] dark:text-[#eb64b9];
+  }
+
+  code.language-css,
+  code.language-scss,
+  .token.string,
+  .token.entity,
+  .token.url,
+  .language-css .token.string,
+  .language-scss .token.string,
+  .style .token.string,
+  .token.attr-value,
+  .token.keyword,
+  .token.control,
+  .token.directive,
+  .token.unit,
+  .token.statement,
+  .token.regex,
+  .token.atrule {
+    @apply text-sky-800 dark:text-cyan-200;
+  }
+
+  .token.boolean {
+    @apply text-slate-800 dark:text-lime-100;
+  }
+
+  .token.placeholder,
+  .token.variable {
+    @apply text-[#93abdc] dark:text-white;
+  }
+
+  .token.deleted {
+    text-decoration: line-through;
+  }
+
+  .token.inserted {
+    border-bottom: 1px dotted #2d2006;
+    text-decoration: none;
+  }
+
+  .token.italic {
+    font-style: italic;
+  }
+
+  .token.important,
+  .token.bold {
+    font-weight: bold;
+  }
+
+  .token.important {
+    @apply text-[#896724] dark:text-[#40b4c4];
+  }
+
+  .token.entity {
+    cursor: help;
+  }
+
+  pre > code.highlight {
+    outline: 0.4em solid #896724;
+    outline-offset: 0.4em;
+  }
+}
