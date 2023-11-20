@@ -7,9 +7,9 @@ import MinimizeIcon from "@mui/icons-material/Minimize";
 import CleaningServicesIcon from "@mui/icons-material/CleaningServices";
 import FormatAlignRightIcon from "@mui/icons-material/FormatAlignRight";
 import TextSnippetIcon from "@mui/icons-material/TextSnippet";
-import ContentEditable from "react-contenteditable";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import _ from "lodash";
+import Editor from "react-simple-code-editor";
 
 export type JsonViewerEditorProps = {
   currentText: string;
@@ -27,14 +27,22 @@ function JsonViewerEditor({
   parseJson,
 }: JsonViewerEditorProps) {
   const [lines, setLines] = useState<number[]>([]);
-  const contentEditableRef = useRef<HTMLDivElement | null>(null);
+  const TEXT_AREA_ELEMENT_ID = "json-viewer-editor-textarea";
+  let textareaElement: HTMLElement | null = null;
+
+  useEffect(() => {
+    if (!textareaElement) {
+      textareaElement = document?.getElementById(TEXT_AREA_ELEMENT_ID);
+    }
+  });
 
   const updateLineNumbers = () => {
-    if (contentEditableRef.current) {
-      const contentDiv = contentEditableRef.current;
-      const height: number = contentDiv.offsetHeight ?? 0;
+    if (textareaElement) {
+      const height: number = textareaElement.offsetHeight ?? 0;
       const lineHeight: number =
-        _.toNumber(getComputedStyle(contentDiv)?.lineHeight?.slice(0, -2)) ?? 1;
+        _.toNumber(
+          getComputedStyle(textareaElement)?.lineHeight?.slice(0, -2)
+        ) ?? 1;
       const numberOfLines: number = Math.ceil(height / lineHeight);
       const lines = Array.from(
         { length: numberOfLines },
@@ -45,7 +53,7 @@ function JsonViewerEditor({
   };
 
   useEffect(() => {
-    if (contentEditableRef.current) {
+    if (textareaElement) {
       updateLineNumbers();
     }
     window.addEventListener("resize", updateLineNumbers);
@@ -124,11 +132,12 @@ function JsonViewerEditor({
             </div>
           ))}
         </div>
-        <ContentEditable
-          className="h-fit grow resize-none overflow-hidden whitespace-pre-wrap bg-transparent px-1 outline-none"
-          innerRef={contentEditableRef}
-          html={currentText}
-          onChange={(e) => updateText(e.target.value)}
+        <Editor
+          textareaId={TEXT_AREA_ELEMENT_ID}
+          className="h-fit grow resize-none overflow-hidden whitespace-pre-wrap bg-transparent px-1 [&>textarea]:outline-none"
+          value={currentText}
+          onValueChange={(code) => updateText(code)}
+          highlight={(code) => code}
           onClick={clearDefaultText}
         />
       </div>
