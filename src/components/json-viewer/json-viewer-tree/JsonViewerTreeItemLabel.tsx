@@ -79,7 +79,7 @@ function JsonViewerTreeItemLabel(props: JsonViewerTreeItemLabelProps) {
   function renderIconForUnescapedContent() {
     if (props.isUnescapedContent && props.type !== "value") {
       return (
-        <Tooltip title="💡 This is parsed from a nested JSON string via Unescape.">
+        <Tooltip title="💡 This is parsed from a nested JSON string via [unescape].">
           <CodeOffIcon className="label-icon" />
         </Tooltip>
       );
@@ -88,10 +88,14 @@ function JsonViewerTreeItemLabel(props: JsonViewerTreeItemLabelProps) {
 
   return (
     <div className="JsonViewerTreeItemLabel">
-      <div className="label-content font-sans">
-        <div className="label-name font-medium">{props.name}</div>
+      <div className="label-content">
+        <div className="label-name text-slate-800 dark:text-offWhite">
+          {props.name}
+        </div>
         {renderSeparator()}
-        <div className="label-value">{getDisplayValue()}</div>
+        <div className="label-value text-gray-700 dark:text-powderBlue-100">
+          {getDisplayValue()}
+        </div>
         {renderIcon()}
         {renderIconForUnescapedContent()}
       </div>
