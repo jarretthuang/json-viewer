@@ -12,13 +12,13 @@ import { useRef, useState } from "react";
 import "./JsonViewerTree.css";
 import JsonViewerToolBar from "../json-viewer-tool-bar/JsonViewerToolBar";
 import { JsonViewerToolBarOption } from "../json-viewer-tool-bar/JsonViewerToolBarOption";
-import UnfoldMoreIcon from "@mui/icons-material/UnfoldMore";
-import UnfoldLessIcon from "@mui/icons-material/UnfoldLess";
 import OpenInFullIcon from "@mui/icons-material/OpenInFull";
 import CloseFullscreenIcon from "@mui/icons-material/CloseFullscreen";
+import CodeOffIcon from "@mui/icons-material/CodeOff";
 
 function JsonViewerTree(props: any) {
   const [expanded, setExpanded]: [string[], any] = useState([]);
+  const [unescaped, setUnescaped] = useState<boolean>(false);
   const allNodeIds = useRef<string[]>([]);
 
   function populateTree(json: Object) {
@@ -31,7 +31,7 @@ function JsonViewerTree(props: any) {
         sx={{ flexGrow: 1, overflowY: "auto" }}
         expanded={expanded}
       >
-        {renderTreeItems(json)}
+        {renderTreeItems(json, unescaped)}
       </TreeView>
     );
   }
@@ -47,9 +47,15 @@ function JsonViewerTree(props: any) {
     }
   }
 
-  function renderTreeItems(json: any) {
+  function renderTreeItems(json: any, shouldUnescape: boolean) {
     const nodeIdSet = new Set<string>();
-    const result = populateTreeItems(json, "JSON", "", nodeIdSet);
+    const result = populateTreeItems(
+      json,
+      "JSON",
+      "",
+      nodeIdSet,
+      shouldUnescape
+    );
     allNodeIds.current = Array.from(nodeIdSet);
     return result;
   }
@@ -58,7 +64,8 @@ function JsonViewerTree(props: any) {
     json: any,
     key: string,
     nodeIdPrefix: string,
-    nodeIdSet: Set<string>
+    nodeIdSet: Set<string>,
+    shouldUnescape: boolean
   ) {
     const nodeId: string = nodeIdPrefix + "." + key;
     nodeIdSet.add(nodeId);
@@ -81,38 +88,7 @@ function JsonViewerTree(props: any) {
         />
       );
     } else if (typeof json === "object") {
-      if (Array.isArray(json)) {
-        return (
-          <JsonViewerTreeItem
-            nodeId={nodeId}
-            key={nodeId}
-            onItemClick={handleItemClick}
-            label={<JsonViewerTreeItemLabel type="array" name={key} />}
-          >
-            {json.map((itemInArray, index) =>
-              populateTreeItems(
-                itemInArray,
-                index.toString(),
-                nodeId,
-                nodeIdSet
-              )
-            )}
-          </JsonViewerTreeItem>
-        );
-      } else {
-        return (
-          <JsonViewerTreeItem
-            nodeId={nodeId}
-            key={nodeId}
-            onItemClick={handleItemClick}
-            label={<JsonViewerTreeItemLabel type="object" name={key} />}
-          >
-            {Object.keys(json).map((key: string) =>
-              populateTreeItems(json[key], key, nodeId, nodeIdSet)
-            )}
-          </JsonViewerTreeItem>
-        );
-      }
+      return populateObject(json, key, nodeId, nodeIdSet, shouldUnescape);
     } else {
       const stringValue: string = json.toString();
       let valueType: JsonValueType = "unknown";
@@ -123,6 +99,21 @@ function JsonViewerTree(props: any) {
         case "number":
           valueType = "number";
           break;
+      }
+
+      if (valueType == "string" && shouldUnescape) {
+        try {
+          const possibleJson = JSON.parse(stringValue);
+          if (typeof possibleJson === "object") {
+            return populateObject(
+              possibleJson,
+              key,
+              nodeId,
+              nodeIdSet,
+              shouldUnescape
+            );
+          }
+        } catch (e) {}
       }
 
       return (
@@ -144,6 +135,48 @@ function JsonViewerTree(props: any) {
     }
   }
 
+  function populateObject(
+    json: object,
+    key: string,
+    nodeId: string,
+    nodeIdSet: Set<string>,
+    shouldUnescape: boolean
+  ) {
+    if (Array.isArray(json)) {
+      return (
+        <JsonViewerTreeItem
+          nodeId={nodeId}
+          key={nodeId}
+          onItemClick={handleItemClick}
+          label={<JsonViewerTreeItemLabel type="array" name={key} />}
+        >
+          {json.map((itemInArray, index) =>
+            populateTreeItems(
+              itemInArray,
+              index.toString(),
+              nodeId,
+              nodeIdSet,
+              shouldUnescape
+            )
+          )}
+        </JsonViewerTreeItem>
+      );
+    } else {
+      return (
+        <JsonViewerTreeItem
+          nodeId={nodeId}
+          key={nodeId}
+          onItemClick={handleItemClick}
+          label={<JsonViewerTreeItemLabel type="object" name={key} />}
+        >
+          {Object.keys(json).map((key: string) =>
+            populateTreeItems(json[key], key, nodeId, nodeIdSet, shouldUnescape)
+          )}
+        </JsonViewerTreeItem>
+      );
+    }
+  }
+
   function renderToolBar() {
     const options: JsonViewerToolBarOption[] = [
       {
@@ -159,6 +192,13 @@ function JsonViewerTree(props: any) {
           setExpanded([]);
         },
         icon: <CloseFullscreenIcon />,
+      },
+      {
+        label: "Unescape All",
+        onClick: () => {
+          setUnescaped(true);
+        },
+        icon: <CodeOffIcon />,
       },
     ];
     return <JsonViewerToolBar options={options} />;

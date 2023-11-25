@@ -5,6 +5,7 @@ import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import { Tooltip } from "../../tooltip/Tooltip";
 import { Fragment } from "react";
 import _ from "lodash";
+import { withDiagnostics } from "react-diagnostics";
 
 export type JsonViewerTreeItemLabelType = "object" | "array" | "value";
 export type JsonValueType =
@@ -22,9 +23,7 @@ export type JsonViewerTreeItemLabelProps = {
   handleCopy?: (text: string) => void;
 };
 
-export default function JsonViewerTreeItemLabel(
-  props: JsonViewerTreeItemLabelProps
-) {
+function JsonViewerTreeItemLabel(props: JsonViewerTreeItemLabelProps) {
   const renderIcon = () => {
     if (props.type === "object") {
       return (
@@ -87,3 +86,5 @@ export default function JsonViewerTreeItemLabel(
     </div>
   );
 }
+
+export default withDiagnostics.detailed(JsonViewerTreeItemLabel);
