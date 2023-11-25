@@ -156,6 +156,6 @@
   }
 
   textarea::selection {
-    @apply bg-slate-300/30 dark:bg-cyan-500/30;
+    @apply bg-cyan-600/30 dark:bg-cyan-500/30;
   }
 }

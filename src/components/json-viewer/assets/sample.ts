@@ -94,9 +94,10 @@ export const sampleJson = {
       fileServlet: "/static/*",
       cofaxTools: "/tools/*",
     },
-    taglib: {
-      "taglib-uri": "cofax.tld",
-      "taglib-location": "/WEB-INF/tlds/cofax.tld",
-    },
+    taglib:
+      '{"taglib-uri":"cofax.tld","taglib-location":"/WEB-INF/tlds/cofax.tld"}',
+    accessList: '["access_part_one", "access_part_two"]',
+    "multi-nested":
+      '{"cofaxCDS":"/","cofaxEmail":"/cofaxutil/aemail/*","cofaxAdmin":["/admin/*","/admin/*"],"fileServlet":{"test":"test1234","taglib":"{\\"taglib-uri\\":\\"cofax.tld\\",\\"taglib-location\\":\\"/WEB-INF/tlds/cofax.tld\\"}","accessList":"[\\"access_part_one\\", \\"access_part_two\\"]"},"cofaxTools":"/tools/*"}',
   },
 };
