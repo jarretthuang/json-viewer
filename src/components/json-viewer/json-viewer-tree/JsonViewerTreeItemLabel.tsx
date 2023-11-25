@@ -6,6 +6,7 @@ import { Tooltip } from "../../tooltip/Tooltip";
 import { Fragment } from "react";
 import _ from "lodash";
 import { withDiagnostics } from "react-diagnostics";
+import CodeOffIcon from "@mui/icons-material/CodeOff";
 
 export type JsonViewerTreeItemLabelType = "object" | "array" | "value";
 export type JsonValueType =
@@ -21,19 +22,20 @@ export type JsonViewerTreeItemLabelProps = {
   value?: string;
   valueType?: JsonValueType;
   handleCopy?: (text: string) => void;
+  isUnescapedContent?: boolean;
 };
 
 function JsonViewerTreeItemLabel(props: JsonViewerTreeItemLabelProps) {
   const renderIcon = () => {
     if (props.type === "object") {
       return (
-        <Tooltip title="Object">
+        <Tooltip title="Object" placement="top">
           <DataObjectIcon className="label-icon" />
         </Tooltip>
       );
     } else if (props.type === "array") {
       return (
-        <Tooltip title="Array">
+        <Tooltip title="Array" placement="top">
           <DataArrayIcon className="label-icon" />
         </Tooltip>
       );
@@ -74,13 +76,24 @@ function JsonViewerTreeItemLabel(props: JsonViewerTreeItemLabelProps) {
     }
   }
 
+  function renderIconForUnescapedContent() {
+    if (props.isUnescapedContent && props.type !== "value") {
+      return (
+        <Tooltip title="💡 This is parsed from a nested JSON string via Unescape.">
+          <CodeOffIcon className="label-icon" />
+        </Tooltip>
+      );
+    }
+  }
+
   return (
     <div className="JsonViewerTreeItemLabel">
-      <div className="label-content">
-        <div className="label-name">{props.name}</div>
+      <div className="label-content font-sans">
+        <div className="label-name font-medium">{props.name}</div>
         {renderSeparator()}
         <div className="label-value">{getDisplayValue()}</div>
         {renderIcon()}
+        {renderIconForUnescapedContent()}
       </div>
       <div className="label-actions">{renderActions()}</div>
     </div>

@@ -15,6 +15,7 @@ import { JsonViewerToolBarOption } from "../json-viewer-tool-bar/JsonViewerToolB
 import OpenInFullIcon from "@mui/icons-material/OpenInFull";
 import CloseFullscreenIcon from "@mui/icons-material/CloseFullscreen";
 import CodeOffIcon from "@mui/icons-material/CodeOff";
+import UndoIcon from "@mui/icons-material/Undo";
 
 function JsonViewerTree(props: any) {
   const [expanded, setExpanded]: [string[], any] = useState([]);
@@ -65,7 +66,8 @@ function JsonViewerTree(props: any) {
     key: string,
     nodeIdPrefix: string,
     nodeIdSet: Set<string>,
-    shouldUnescape: boolean
+    shouldUnescape: boolean,
+    isUnescapedContent: boolean = false
   ) {
     const nodeId: string = nodeIdPrefix + "." + key;
     nodeIdSet.add(nodeId);
@@ -83,12 +85,20 @@ function JsonViewerTree(props: any) {
               value="null"
               valueType="null"
               handleCopy={props.handleCopy}
+              isUnescapedContent={isUnescapedContent}
             />
           }
         />
       );
     } else if (typeof json === "object") {
-      return populateObject(json, key, nodeId, nodeIdSet, shouldUnescape);
+      return populateObject(
+        json,
+        key,
+        nodeId,
+        nodeIdSet,
+        shouldUnescape,
+        isUnescapedContent
+      );
     } else {
       const stringValue: string = json.toString();
       let valueType: JsonValueType = "unknown";
@@ -110,7 +120,8 @@ function JsonViewerTree(props: any) {
               key,
               nodeId,
               nodeIdSet,
-              shouldUnescape
+              shouldUnescape,
+              true
             );
           }
         } catch (e) {}
@@ -128,6 +139,7 @@ function JsonViewerTree(props: any) {
               value={stringValue}
               valueType={valueType}
               handleCopy={props.handleCopy}
+              isUnescapedContent={isUnescapedContent}
             />
           }
         />
@@ -140,7 +152,8 @@ function JsonViewerTree(props: any) {
     key: string,
     nodeId: string,
     nodeIdSet: Set<string>,
-    shouldUnescape: boolean
+    shouldUnescape: boolean,
+    isUnescapedContent: boolean = false
   ) {
     if (Array.isArray(json)) {
       return (
@@ -148,7 +161,13 @@ function JsonViewerTree(props: any) {
           nodeId={nodeId}
           key={nodeId}
           onItemClick={handleItemClick}
-          label={<JsonViewerTreeItemLabel type="array" name={key} />}
+          label={
+            <JsonViewerTreeItemLabel
+              type="array"
+              name={key}
+              isUnescapedContent={isUnescapedContent}
+            />
+          }
         >
           {json.map((itemInArray, index) =>
             populateTreeItems(
@@ -156,7 +175,8 @@ function JsonViewerTree(props: any) {
               index.toString(),
               nodeId,
               nodeIdSet,
-              shouldUnescape
+              shouldUnescape,
+              isUnescapedContent
             )
           )}
         </JsonViewerTreeItem>
@@ -167,10 +187,23 @@ function JsonViewerTree(props: any) {
           nodeId={nodeId}
           key={nodeId}
           onItemClick={handleItemClick}
-          label={<JsonViewerTreeItemLabel type="object" name={key} />}
+          label={
+            <JsonViewerTreeItemLabel
+              type="object"
+              name={key}
+              isUnescapedContent={isUnescapedContent}
+            />
+          }
         >
           {Object.keys(json).map((key: string) =>
-            populateTreeItems(json[key], key, nodeId, nodeIdSet, shouldUnescape)
+            populateTreeItems(
+              json[key],
+              key,
+              nodeId,
+              nodeIdSet,
+              shouldUnescape,
+              isUnescapedContent
+            )
           )}
         </JsonViewerTreeItem>
       );
@@ -180,25 +213,36 @@ function JsonViewerTree(props: any) {
   function renderToolBar() {
     const options: JsonViewerToolBarOption[] = [
       {
-        label: "Expand All",
+        label: "Expand",
         onClick: () => {
           setExpanded(allNodeIds.current);
         },
         icon: <OpenInFullIcon />,
+        disabled: expanded.length === allNodeIds.current.length,
       },
       {
-        label: "Collapse All",
+        label: "Collapse",
         onClick: () => {
           setExpanded([]);
         },
         icon: <CloseFullscreenIcon />,
+        disabled: expanded.length === 0,
       },
       {
-        label: "Unescape All",
+        label: "Unescape",
         onClick: () => {
           setUnescaped(true);
         },
         icon: <CodeOffIcon />,
+        hidden: unescaped,
+      },
+      {
+        label: "Undo Unescape",
+        onClick: () => {
+          setUnescaped(false);
+        },
+        icon: <UndoIcon />,
+        hidden: !unescaped,
       },
     ];
     return <JsonViewerToolBar options={options} />;
