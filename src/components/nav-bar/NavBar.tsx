@@ -8,7 +8,8 @@ import { useState } from "react";
 import ReactMarkdown from "react-markdown";
 import "./NavBar.css";
 import { jsonViewerAppDescription } from "@/model/appDescriptions";
-import InfoIcon from "@mui/icons-material/Info";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import CloseIcon from "@mui/icons-material/Close";
 
@@ -26,18 +27,38 @@ export default function NavBar(props: NavBarParams) {
     );
   };
 
-  function renderHeaderIcon() {
+  function renderHeaderIcons() {
     if (expanded) {
-      return <CloseIcon className="handle-symbol" />;
+      return (
+        <CloseIcon
+          className="h-full p-0 opacity-50 hover:opacity-60 md:p-0.5"
+          onClick={() => expand(!expanded)}
+        />
+      );
     } else {
-      return <MoreHorizIcon className="handle-symbol" />;
+      return (
+        <>
+          <ArrowBackIcon
+            className="h-5/6 p-0.5 opacity-50 hover:opacity-60"
+            onClick={() => window.history.back()}
+          />
+          <ArrowForwardIcon
+            className="h-5/6 p-0.5 opacity-50 hover:opacity-60"
+            onClick={() => window.history.forward()}
+          />
+          <MoreHorizIcon
+            className="h-full p-0 opacity-50 hover:opacity-60"
+            onClick={() => expand(!expanded)}
+          />
+        </>
+      );
     }
   }
 
   return (
     <nav className="NavBar group" data-expanded={expanded}>
       <ul>
-        <li className="jh-logo">
+        <li className="jh-logo opacity-50 hover:opacity-60">
           <Image
             src="/logoBW.png"
             alt="JH"
@@ -47,11 +68,8 @@ export default function NavBar(props: NavBarParams) {
           />
           <span className="p-1 text-[20px] font-bold">jsonviewer.io</span>
         </li>
-        <li
-          className="handle group-data-[expanded=true]:mt-4"
-          onClick={() => expand(!expanded)}
-        >
-          {renderHeaderIcon()}
+        <li className="handle group-data-[expanded=true]:mt-4">
+          {renderHeaderIcons()}
         </li>
         <li className="expanded-content">
           {renderContent()}

@@ -26,25 +26,10 @@
     user-select: none;
     display: flex;
     align-items: center;
-    height: 100%;
-
-    &:not(.expanded-content) {
-      opacity: 0.5;
-
-      &:hover {
-        opacity: 0.6;
-      }
-    }
 
     &.handle {
       font-size: 32px;
       align-self: flex-start;
-
-      .handle-symbol {
-        transition: transform ease 0.5s;
-        height: 35px;
-      }
-    }
 
     &.expanded-content {
       display: none;
