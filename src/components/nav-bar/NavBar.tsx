@@ -31,24 +31,28 @@ export default function NavBar(props: NavBarParams) {
     if (expanded) {
       return (
         <CloseIcon
-          className="h-full p-0 opacity-50 hover:opacity-60 md:p-0.5"
+          className="p-0 opacity-50 hover:opacity-60 md:p-0.5"
           onClick={() => expand(!expanded)}
+          style={{ height: "100%" }}
         />
       );
     } else {
       return (
         <>
           <ArrowBackIcon
-            className="h-5/6 p-0.5 opacity-50 hover:opacity-60"
+            className="p-0.5 opacity-50 hover:opacity-60"
             onClick={() => window.history.back()}
+            style={{ height: "85%" }}
           />
           <ArrowForwardIcon
-            className="h-5/6 p-0.5 opacity-50 hover:opacity-60"
+            className="p-0.5 opacity-50 hover:opacity-60"
             onClick={() => window.history.forward()}
+            style={{ height: "85%" }}
           />
           <MoreHorizIcon
-            className="h-full p-0 opacity-50 hover:opacity-60"
+            className="p-0 opacity-50 hover:opacity-60"
             onClick={() => expand(!expanded)}
+            style={{ height: "100%" }}
           />
         </>
       );
