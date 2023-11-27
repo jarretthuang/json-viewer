@@ -7,6 +7,10 @@
   @apply dark:[color-scheme:dark];
 }
 
+:root {
+  height: 100svh;
+}
+
 html {
   font-family: "Ubuntu", helvetica, san-serif;
   font-smooth: antialiased;
@@ -15,6 +19,7 @@ html {
   text-rendering: optimizeLegibility;
   font-weight: 400;
   font-size: 4vmin;
+  height: 100svh;
 }
 
 body {
