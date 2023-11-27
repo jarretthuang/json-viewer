@@ -67,7 +67,7 @@ export default function NavBar(props: NavBarParams) {
         </ul>
       </nav>
       {expanded && (
-        <div className="expanded-content absolute z-10 flex h-[100svh] w-[100dvw] flex-col overflow-hidden">
+        <div className="expanded-content absolute top-0 left-0 z-10 flex h-[100svh] w-[100dvw] flex-col overflow-hidden">
           <div className="flex w-full justify-end pr-5 pt-5">
             <CloseIcon
               className="cursor-pointer opacity-50 hover:opacity-60 md:p-0.5"
