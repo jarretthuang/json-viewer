@@ -7,15 +7,6 @@
   @apply dark:[color-scheme:dark];
 }
 
-:root {
-  position: absolute;
-  left: 0;
-  top: 0;
-  height: 100dvh;
-  width: 100dvw;
-  overflow-x: hidden;
-}
-
 html {
   font-family: "Ubuntu", helvetica, san-serif;
   font-smooth: antialiased;
@@ -28,6 +19,12 @@ html {
 
 body {
   @apply text-slate-950 dark:text-offWhite;
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100svh;
+  width: 100dvw;
+  overflow: hidden;
 }
 
 code {
