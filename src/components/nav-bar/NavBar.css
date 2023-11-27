@@ -7,4 +7,9 @@
     @apply bg-powderBlue-50 dark:bg-neutral-950;
     @apply bg-opacity-75 expanded:bg-opacity-90;
   }
+
+  .expanded-content {
+    @apply bg-powderBlue-50 dark:bg-neutral-950;
+    @apply bg-opacity-75 expanded:bg-opacity-90;
+  }
 }

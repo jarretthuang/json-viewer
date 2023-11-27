@@ -18,9 +18,9 @@ export default function NavBar(props: NavBarParams) {
 
   const renderContent = () => {
     return (
-      <div className="content">
-        <div className="inner-content">
-          <span className="title">JSON Viewer</span>
+      <div className="content items-center overflow-hidden">
+        <span className="title w-min whitespace-nowrap">JSON Viewer</span>
+        <div className="inner-content overflow-auto px-10">
           <ReactMarkdown>{jsonViewerAppDescription}</ReactMarkdown>
         </div>
       </div>
@@ -28,58 +28,56 @@ export default function NavBar(props: NavBarParams) {
   };
 
   function renderHeaderIcons() {
-    if (expanded) {
-      return (
-        <CloseIcon
-          className="p-0 opacity-50 hover:opacity-60 md:p-0.5"
+    return (
+      <>
+        <ArrowBackIcon
+          className="mx-2 p-[0.1rem] opacity-50 hover:opacity-60 md:mx-1"
+          onClick={() => window.history.back()}
+          style={{ height: "85%" }}
+        />
+        <ArrowForwardIcon
+          className="mx-2 p-[0.1rem] opacity-50 hover:opacity-60 md:mx-1"
+          onClick={() => window.history.forward()}
+          style={{ height: "85%" }}
+        />
+        <MoreHorizIcon
+          className="mx-2 p-[0.1rem] opacity-50 hover:opacity-60 md:mx-1"
           onClick={() => expand(!expanded)}
           style={{ height: "100%" }}
         />
-      );
-    } else {
-      return (
-        <>
-          <ArrowBackIcon
-            className="p-0.5 opacity-50 hover:opacity-60"
-            onClick={() => window.history.back()}
-            style={{ height: "85%" }}
-          />
-          <ArrowForwardIcon
-            className="p-0.5 opacity-50 hover:opacity-60"
-            onClick={() => window.history.forward()}
-            style={{ height: "85%" }}
-          />
-          <MoreHorizIcon
-            className="p-0 opacity-50 hover:opacity-60"
-            onClick={() => expand(!expanded)}
-            style={{ height: "100%" }}
-          />
-        </>
-      );
-    }
+      </>
+    );
   }
 
   return (
-    <nav className="NavBar group" data-expanded={expanded}>
-      <ul>
-        <li className="jh-logo opacity-50 hover:opacity-60">
-          <Image
-            src="/logoBW.png"
-            alt="JH"
-            className="object-contain"
-            width={36}
-            height={36}
-          />
-          <span className="p-1 text-[20px] font-bold">jsonviewer.io</span>
-        </li>
-        <li className="handle group-data-[expanded=true]:mt-4">
-          {renderHeaderIcons()}
-        </li>
-        <li className="expanded-content">
+    <>
+      <nav className="NavBar group h-12 md:h-6" data-expanded={expanded}>
+        <ul className="flex h-full w-full items-center justify-between">
+          <li className="jh-logo p-2 opacity-50 hover:opacity-60">
+            <Image
+              src="/logoBW.png"
+              alt="JH"
+              className="object-contain"
+              width={36}
+              height={36}
+            />
+            <span className="p-1 text-[25px] font-bold">jsonviewer.io</span>
+          </li>
+          <li className="flex h-full justify-end p-1">{renderHeaderIcons()}</li>
+        </ul>
+      </nav>
+      {expanded && (
+        <div className="expanded-content absolute z-10 flex h-[100dvh] w-[100dvw] flex-col overflow-hidden">
+          <div className="flex w-full justify-end pr-5 pt-5">
+            <CloseIcon
+              className="cursor-pointer opacity-50 hover:opacity-60 md:p-0.5"
+              onClick={() => expand(!expanded)}
+            />
+          </div>
           {renderContent()}
           <Copyright />
-        </li>
-      </ul>
-    </nav>
+        </div>
+      )}
+    </>
   );
 }

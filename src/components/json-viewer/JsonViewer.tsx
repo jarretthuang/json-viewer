@@ -1,5 +1,5 @@
 "use client";
-import { Fragment, useState } from "react";
+import { useState } from "react";
 import "./assets/css/json-viewer-mobile.css";
 import Notification from "../notification/Notification";
 import { ReactNotificationOptions } from "react-notifications-component";
@@ -72,40 +72,28 @@ function JsonViewer(props: any) {
     createNotification(notification);
   };
 
-  const renderEditView = (hide: boolean) => {
-    return (
-      <div className="json-viewer-container" hidden={hide}>
-        <JsonViewerEditor
-          currentText={currentText}
-          isDefaultText={currentText === DEFAULT_TEXT}
-          updateText={handleUpdateText}
-          handleCopy={handleCopy}
-          parseJson={parseJson}
-        />
-      </div>
-    );
-  };
-
-  const renderTreeView = (hide: boolean) => {
-    return (
-      <div className="json-viewer-container" hidden={hide}>
-        <div className="readonly-view">
-          <JsonViewerTree
-            json={jsonObject}
-            handleCopy={handleCopy}
-          ></JsonViewerTree>
-        </div>
-      </div>
-    );
-  };
-
   const renderView = (viewType: ViewType) => {
     const isInEditView = viewType === "edit";
     return (
-      <Fragment>
-        {renderEditView(!isInEditView)}
-        {renderTreeView(isInEditView)}
-      </Fragment>
+      <>
+        <div className="relative flex-1 overflow-hidden rounded-xl shadow-subtle dark:shadow-subtleWhite">
+          <div className="absolute h-full w-full" hidden={!isInEditView}>
+            <JsonViewerEditor
+              currentText={currentText}
+              isDefaultText={currentText === DEFAULT_TEXT}
+              updateText={handleUpdateText}
+              handleCopy={handleCopy}
+              parseJson={parseJson}
+            />
+          </div>
+          <div className="absolute h-full w-full" hidden={isInEditView}>
+            <JsonViewerTree
+              json={jsonObject}
+              handleCopy={handleCopy}
+            ></JsonViewerTree>
+          </div>
+        </div>
+      </>
     );
   };
 
@@ -164,12 +152,13 @@ function JsonViewer(props: any) {
   }
 
   return (
-    <div className="JsonViewer">
+    <div className="JsonViewer flex w-full flex-1 flex-col bg-powderBlue-50 px-2 pb-2 dark:bg-neutral-950">
       <Head>
         <title>JSON Viewer - JH Labs</title>
         <meta name="theme-color" content="#fdfeff" />
       </Head>
-      <div className="view-switcher">
+      <Notification notification={notification}></Notification>
+      <div className="view-switcher flex h-14 w-full md:h-8">
         <div className="buttons">
           <div
             className="button view-switcher-button"
@@ -178,7 +167,7 @@ function JsonViewer(props: any) {
           >
             View
           </div>
-          <b></b>
+          <b className="w-4"></b>
           <div
             className="button view-switcher-button"
             data-selected={currentView === "edit"}
@@ -189,7 +178,6 @@ function JsonViewer(props: any) {
         </div>
       </div>
       {renderView(currentView)}
-      <Notification notification={notification}></Notification>
     </div>
   );
 }
