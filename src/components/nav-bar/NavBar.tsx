@@ -31,17 +31,17 @@ export default function NavBar(props: NavBarParams) {
     return (
       <>
         <ArrowBackIcon
-          className="mx-2 p-[0.1rem] opacity-50 hover:opacity-60 md:mx-1"
+          className="mx-2 opacity-50 hover:opacity-60 md:mx-1"
           onClick={() => window.history.back()}
           style={{ height: "85%" }}
         />
         <ArrowForwardIcon
-          className="mx-2 p-[0.1rem] opacity-50 hover:opacity-60 md:mx-1"
+          className="mx-2 opacity-50 hover:opacity-60 md:mx-1"
           onClick={() => window.history.forward()}
           style={{ height: "85%" }}
         />
         <MoreHorizIcon
-          className="mx-2 p-[0.1rem] opacity-50 hover:opacity-60 md:mx-1"
+          className="mx-2 opacity-50 hover:opacity-60 md:mx-1"
           onClick={() => expand(!expanded)}
           style={{ height: "100%" }}
         />
