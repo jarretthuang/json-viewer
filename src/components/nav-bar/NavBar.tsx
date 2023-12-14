@@ -12,9 +12,11 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import CloseIcon from "@mui/icons-material/Close";
+import ShareIcon from "@mui/icons-material/Share";
 
 export default function NavBar(props: NavBarParams) {
   const [expanded, expand] = useState(false);
+  const canShare: boolean = Boolean(navigator?.share);
 
   const renderContent = () => {
     return (
@@ -40,6 +42,14 @@ export default function NavBar(props: NavBarParams) {
           onClick={() => window.history.forward()}
           style={{ height: "85%" }}
         />
+        {canShare && (
+          <ShareIcon
+            className="mx-2 opacity-50 hover:opacity-60 md:mx-1"
+            onClick={() => navigator.share({ url: window.location.href })}
+            style={{ height: "75%" }}
+          />
+        )}
+
         <MoreHorizIcon
           className="mx-2 opacity-50 hover:opacity-60 md:mx-1"
           onClick={() => expand(!expanded)}
@@ -67,7 +77,7 @@ export default function NavBar(props: NavBarParams) {
         </ul>
       </nav>
       {expanded && (
-        <div className="expanded-content absolute top-0 left-0 z-10 flex h-[100svh] w-[100dvw] flex-col overflow-hidden">
+        <div className="expanded-content absolute left-0 top-0 z-10 flex h-[100svh] w-[100dvw] flex-col overflow-hidden">
           <div className="flex w-full justify-end pr-5 pt-5">
             <CloseIcon
               className="cursor-pointer opacity-50 hover:opacity-60 md:p-0.5"
