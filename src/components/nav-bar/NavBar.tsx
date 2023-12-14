@@ -4,7 +4,7 @@ import Copyright from "../copyright/Copyright";
 import { NavBarParams } from "./NavBarParams";
 import "./assets/css/NavBar.css";
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import "./NavBar.css";
 import { jsonViewerAppDescription } from "@/model/appDescriptions";
@@ -16,7 +16,22 @@ import ShareIcon from "@mui/icons-material/Share";
 
 export default function NavBar(props: NavBarParams) {
   const [expanded, expand] = useState(false);
-  const canShare: boolean = Boolean(navigator?.share);
+  const [pageURL, setPageURL] = useState("");
+  const [hasNativeShare, setHasNativeShare] = useState(false);
+  const [onShare, setOnShare] = useState({});
+
+  useEffect(() => {
+    setPageURL(window.location.href);
+    if (Boolean(navigator?.share)) {
+      setHasNativeShare(true);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (pageURL && hasNativeShare) {
+      navigator.share({ url: pageURL });
+    }
+  }, [onShare]);
 
   const renderContent = () => {
     return (
@@ -42,14 +57,13 @@ export default function NavBar(props: NavBarParams) {
           onClick={() => window.history.forward()}
           style={{ height: "85%" }}
         />
-        {canShare && (
+        {hasNativeShare && (
           <ShareIcon
             className="mx-2 opacity-50 hover:opacity-60 md:mx-1"
-            onClick={() => navigator.share({ url: window.location.href })}
+            onClick={() => setOnShare({})}
             style={{ height: "75%" }}
           />
         )}
-
         <MoreHorizIcon
           className="mx-2 opacity-50 hover:opacity-60 md:mx-1"
           onClick={() => expand(!expanded)}
