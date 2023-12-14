@@ -21,7 +21,7 @@ export default function NavBar(props: NavBarParams) {
   const [onShare, setOnShare] = useState({});
 
   useEffect(() => {
-    setPageURL(window.location.href);
+    setPageURL(window.location.href + window.location.search);
     if (Boolean(navigator?.share)) {
       setHasNativeShare(true);
     }
