@@ -1,5 +1,5 @@
 "use client";
-import TreeView from "@mui/lab/TreeView";
+import { TreeView } from "@mui/x-tree-view";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import "./../assets/css/json-viewer-tree.css";

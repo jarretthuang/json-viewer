@@ -1,5 +1,6 @@
 "use client";
-import TreeItem, { TreeItemProps, treeItemClasses } from "@mui/lab/TreeItem";
+import { TreeItemProps, treeItemClasses } from "@mui/lab/TreeItem";
+import { TreeItem } from "@mui/x-tree-view";
 import { alpha, styled } from "@mui/material/styles";
 import Collapse from "@mui/material/Collapse";
 import { useSpring, animated } from "@react-spring/web";
