@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import "./assets/css/json-viewer-mobile.css";
-import Notification from "../notification/Notification";
+
 import { ReactNotificationOptions } from "react-notifications-component";
 import JsonViewerTree from "./json-viewer-tree/JsonViewerTree";
 import Head from "next/head";
@@ -12,8 +12,10 @@ import {
 } from "lz-string";
 import { useSearchParams } from "next/navigation";
 import "./JsonViewer.css";
+import { WithNotification } from "../notification/Notification";
+import { copyTextToClipboard } from "@/utils/handleCopy";
 
-function JsonViewer(props: any) {
+function JsonViewer({ createNotification }: WithNotification) {
   type ViewType = "view" | "edit";
 
   // constants
@@ -22,17 +24,12 @@ function JsonViewer(props: any) {
   const MAX_QUERY_PARAM_LENGTH: number = 20000;
 
   const [currentView, switchView] = useState<ViewType>("edit");
-  const getSelectedClass = (view: ViewType) =>
-    currentView === view ? "selected " : "";
 
   const initialQueryParams = useSearchParams();
   const initialJsonQueryParam = initialQueryParams.get(JSON_QUERY_PARAM);
   const initialText = decodeUrlParam(initialJsonQueryParam) ?? DEFAULT_TEXT;
 
   const [currentText, updateText] = useState(initialText);
-  const [notification, createNotification] = useState<
-    ReactNotificationOptions | undefined
-  >(undefined);
   const [jsonObject, updateJsonObject] = useState(undefined);
 
   const parseJson = (text: string, notify: boolean = true) => {
@@ -61,16 +58,8 @@ function JsonViewer(props: any) {
     }
   };
 
-  const handleCopy = (text: string) => {
-    navigator.clipboard.writeText(text);
-    const notification: ReactNotificationOptions = {
-      title: "Copied to clipboard",
-      type: "success",
-      container: "top-center",
-      message: "Content has been successfully copied into your clipboard!",
-    };
-    createNotification(notification);
-  };
+  const handleCopy = (text: string) =>
+    copyTextToClipboard(text, createNotification);
 
   const renderView = (viewType: ViewType) => {
     const isInEditView = viewType === "edit";
@@ -157,7 +146,6 @@ function JsonViewer(props: any) {
         <title>JSON Viewer - JH Labs</title>
         <meta name="theme-color" content="#fdfeff" />
       </Head>
-      <Notification notification={notification}></Notification>
       <div className="view-switcher flex h-14 w-full md:h-8">
         <div className="buttons">
           <div

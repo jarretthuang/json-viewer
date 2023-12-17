@@ -8,6 +8,10 @@ import { ReactNotificationOptions } from "react-notifications-component";
 import "react-notifications/lib/notifications.css";
 import "./Notification.css";
 
+export type WithNotification = {
+  createNotification: (o: ReactNotificationOptions) => void;
+};
+
 function Notification(props: any) {
   const [currentNotification, updateNotification] = useState<
     ReactNotificationOptions | undefined

@@ -1,39 +1,39 @@
-"use client";
 import _ from "lodash";
 import Copyright from "../copyright/Copyright";
-import { NavBarParams } from "./NavBarParams";
 import "./assets/css/NavBar.css";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import "./NavBar.css";
-import { jsonViewerAppDescription } from "@/model/appDescriptions";
+import { jsonViewerAppDescription } from "@/models/appDescriptions";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import CloseIcon from "@mui/icons-material/Close";
 import ShareIcon from "@mui/icons-material/Share";
+import { WithNotification } from "../notification/Notification";
+import { copyTextToClipboard } from "@/utils/handleCopy";
 
-export default function NavBar(props: NavBarParams) {
+export default function NavBar({ createNotification }: WithNotification) {
   const [expanded, expand] = useState(false);
-  const [pageURL, setPageURL] = useState("");
-  const [hasNativeShare, setHasNativeShare] = useState(false);
-  const [onShare, setOnShare] = useState({});
+  const [onShare, setOnShare] = useState<number | undefined>(undefined);
 
   useEffect(() => {
-    setPageURL(window.location.href + window.location.search);
-    if (Boolean(navigator?.share)) {
-      setHasNativeShare(true);
+    if (!onShare) {
+      return;
     }
-  }, []);
-
-  useEffect(() => {
-    if (pageURL && hasNativeShare) {
-      navigator.share({ url: pageURL });
+    const currentUrl = window.location.href + window.location.search;
+    if (!currentUrl) {
+      return;
+    }
+    if (Boolean(navigator?.share)) {
+      navigator.share({ url: currentUrl });
+    } else {
+      copyTextToClipboard(currentUrl, createNotification, "A shareable URL");
     }
   }, [onShare]);
 
-  const renderContent = () => {
+  const renderExpandedContent = () => {
     return (
       <div className="content items-center overflow-hidden">
         <span className="title w-min whitespace-nowrap">JSON Viewer</span>
@@ -57,13 +57,13 @@ export default function NavBar(props: NavBarParams) {
           onClick={() => window.history.forward()}
           style={{ height: "85%" }}
         />
-        {hasNativeShare && (
-          <ShareIcon
-            className="mx-2 opacity-50 hover:opacity-60 md:mx-1"
-            onClick={() => setOnShare({})}
-            style={{ height: "75%" }}
-          />
-        )}
+        <ShareIcon
+          className="mx-2 opacity-50 hover:opacity-60 md:mx-1"
+          onClick={() => {
+            setOnShare(Date.now());
+          }}
+          style={{ height: "75%" }}
+        />
         <MoreHorizIcon
           className="mx-2 opacity-50 hover:opacity-60 md:mx-1"
           onClick={() => expand(!expanded)}
@@ -98,7 +98,7 @@ export default function NavBar(props: NavBarParams) {
               onClick={() => expand(!expanded)}
             />
           </div>
-          {renderContent()}
+          {renderExpandedContent()}
           <Copyright />
         </div>
       )}
