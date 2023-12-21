@@ -1,6 +1,6 @@
 {
-  "name": "",
-  "short_name": "",
+  "name": "JSON Viewer",
+  "short_name": "JSON Viewer",
   "icons": [
     {
       "src": "/android-chrome-192x192.png",
