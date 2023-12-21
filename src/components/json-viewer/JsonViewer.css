@@ -10,7 +10,7 @@
     @apply hover:bg-powderBlue-300 dark:hover:bg-powderBlue-500;
     @apply text-powderBlue-600 dark:text-slate-200;
     @apply hover:text-offWhite selected:text-offWhite;
-    @apply w-[5rem] rounded-2xl p-[0.2rem] text-lg md:w-[3rem] md:rounded-lg md:p-[0.1rem] md:text-xs;
+    @apply w-[5rem] rounded-2xl p-[0.2rem] text-lg md:w-[3rem] md:p-[0.1rem] md:text-xs;
 
     text-align: center;
     cursor: pointer;
