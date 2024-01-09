@@ -14,7 +14,15 @@ function JsonViewerToolBar(props: { options: JsonViewerToolBarOption[] }) {
               disabled={option.disabled}
             >
               {option.icon}
-              <div className="tool-bar-button-label">{option.label}</div>
+              <div className="tool-bar-button-label relative inline-flex">
+                <div>{option.label}</div>
+                {option.ping && (
+                  <span className="absolute right-[-0.5rem] top-0 flex h-2 w-2 md:right-[-0.3rem] md:h-1 md:w-1">
+                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-powderBlue-300 opacity-75 dark:bg-slate-200"></span>
+                    <span className="relative inline-flex h-2 w-2 rounded-full bg-powderBlue-400 dark:bg-slate-300 md:h-1 md:w-1"></span>
+                  </span>
+                )}
+              </div>
             </button>
           )
       )}

@@ -6,7 +6,7 @@ import ContentPasteIcon from "@mui/icons-material/ContentPaste";
 import MinimizeIcon from "@mui/icons-material/Minimize";
 import CleaningServicesIcon from "@mui/icons-material/CleaningServices";
 import FormatAlignRightIcon from "@mui/icons-material/FormatAlignRight";
-import TextSnippetIcon from "@mui/icons-material/TextSnippet";
+import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
 import { useState, useEffect } from "react";
 import _ from "lodash";
 import Editor from "react-simple-code-editor";
@@ -91,6 +91,12 @@ function JsonViewerEditor({
   function renderToolBar() {
     const options = [
       {
+        label: "Example",
+        onClick: () => updateText(JSON.stringify(sampleJson)),
+        icon: <DescriptionOutlinedIcon />,
+        ping: isDefaultText,
+      },
+      {
         label: "Copy",
         onClick: () => handleCopy(currentText),
         icon: <ContentCopyIcon />,
@@ -115,11 +121,6 @@ function JsonViewerEditor({
         label: "Clear",
         onClick: () => updateText(""),
         icon: <CleaningServicesIcon />,
-      },
-      {
-        label: "Example",
-        onClick: () => updateText(JSON.stringify(sampleJson)),
-        icon: <TextSnippetIcon />,
       },
     ];
     return <JsonViewerToolBar options={options} />;

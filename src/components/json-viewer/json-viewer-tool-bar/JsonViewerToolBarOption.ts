@@ -6,4 +6,5 @@ export type JsonViewerToolBarOption = {
   icon?: ReactElement;
   hidden?: boolean;
   disabled?: boolean;
+  ping?: boolean;
 };
