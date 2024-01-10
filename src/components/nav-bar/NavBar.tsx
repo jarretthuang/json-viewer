@@ -87,9 +87,11 @@ export default function NavBar({ createNotification }: WithNotification) {
                 height={40}
               />
             </a>
-            <span className="p-1 text-[25px] font-bold opacity-50">
-              jsonviewer.io
-            </span>
+            <a href="/" className="flex">
+              <span className="p-1 text-[25px] font-bold opacity-50 hover:opacity-60">
+                jsonviewer.io
+              </span>
+            </a>
           </li>
           <li className="flex h-full justify-end p-1">{renderHeaderIcons()}</li>
         </ul>
