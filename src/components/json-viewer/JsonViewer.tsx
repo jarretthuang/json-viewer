@@ -32,6 +32,7 @@ function JsonViewer({ createNotification }: WithNotification) {
   const [currentText, updateText] = useState(initialText);
   const [jsonObject, updateJsonObject] = useState(undefined);
 
+  const isDefaultText = currentText === DEFAULT_TEXT;
   const textSize = currentText.length;
 
   const parseJson = (text: string, notify: boolean = true) => {
@@ -71,7 +72,7 @@ function JsonViewer({ createNotification }: WithNotification) {
           <div className="absolute h-full w-full" hidden={!isInEditView}>
             <JsonViewerEditor
               currentText={currentText}
-              isDefaultText={currentText === DEFAULT_TEXT}
+              isDefaultText={isDefaultText}
               updateText={handleUpdateText}
               handleCopy={handleCopy}
               parseJson={parseJson}
@@ -165,9 +166,11 @@ function JsonViewer({ createNotification }: WithNotification) {
           >
             Edit
           </div>
-          <div className="invisible absolute bottom-0 right-0 text-[1rem] font-normal text-powderBlue-600 opacity-50 dark:text-slate-200 md:visible md:text-[0.5rem]">
-            {textSize.toLocaleString()} chars
-          </div>
+          {!isDefaultText && (
+            <div className="invisible absolute bottom-0 right-0 text-[1rem] font-normal text-powderBlue-600 opacity-50 dark:text-slate-200 md:visible md:text-[0.5rem]">
+              {textSize.toLocaleString()} characters
+            </div>
+          )}
         </div>
       </div>
       {renderView(currentView)}
