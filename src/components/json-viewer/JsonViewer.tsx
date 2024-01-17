@@ -167,8 +167,9 @@ function JsonViewer({ createNotification }: WithNotification) {
             Edit
           </div>
           {!isDefaultText && (
-            <div className="invisible absolute bottom-0 right-0 text-[1rem] font-normal text-powderBlue-600 opacity-50 dark:text-slate-200 md:visible md:text-[0.5rem]">
-              {textSize.toLocaleString()} characters
+            <div className="invisible absolute bottom-0 right-0 whitespace-nowrap text-[1rem] font-normal text-powderBlue-600 opacity-50 dark:text-slate-200 md:visible md:text-[0.5rem]">
+              {textSize.toLocaleString()}
+              <span className="select-none"> characters</span>
             </div>
           )}
         </div>
