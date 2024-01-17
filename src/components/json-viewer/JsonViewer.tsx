@@ -32,6 +32,8 @@ function JsonViewer({ createNotification }: WithNotification) {
   const [currentText, updateText] = useState(initialText);
   const [jsonObject, updateJsonObject] = useState(undefined);
 
+  const textSize = currentText.length;
+
   const parseJson = (text: string, notify: boolean = true) => {
     try {
       return JSON.parse(text);
@@ -147,7 +149,7 @@ function JsonViewer({ createNotification }: WithNotification) {
         <meta name="theme-color" content="#fdfeff" />
       </Head>
       <div className="view-switcher flex h-14 w-full md:h-8">
-        <div className="buttons">
+        <div className="buttons relative w-full justify-center">
           <div
             className="button view-switcher-button"
             data-selected={currentView === "view"}
@@ -162,6 +164,9 @@ function JsonViewer({ createNotification }: WithNotification) {
             onClick={() => switchView("edit")}
           >
             Edit
+          </div>
+          <div className="invisible absolute bottom-0 right-0 text-[1rem] font-normal text-powderBlue-600 opacity-50 dark:text-slate-200 md:visible md:text-[0.5rem]">
+            {textSize.toLocaleString()} chars
           </div>
         </div>
       </div>
