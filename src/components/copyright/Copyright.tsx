@@ -1,7 +1,6 @@
-import { Tooltip } from "../tooltip/Tooltip";
 import "./assets/css/Copyright.css";
 import GitHubIcon from "@mui/icons-material/GitHub";
-import CoffeeIcon from "@mui/icons-material/Coffee";
+import LocalCafeIcon from "@mui/icons-material/LocalCafe";
 
 function Copyright() {
   const currentYear = new Date().getFullYear();
@@ -14,33 +13,21 @@ function Copyright() {
           <span className="hidden md:inline">Jarrett Huang</span>
           <span className="inline md:hidden">JH</span>
         </span>
+        <div className="flex gap-1 pb-0.5 pl-0.5 pr-1 md:pb-0 md:pl-0">
+          <a href="https://github.com/jarretthuang/json-viewer" target="_blank">
+            <GitHubIcon
+              className="copyright-icon ml-1 w-[20px] hover:opacity-70 md:w-2"
+              fontSize="small"
+            />
+          </a>
 
-        <Tooltip
-          title="🎉 JSON Viewer is now open-source!"
-          placement="top-start"
-          fontSize="0.4rem"
-          padding="0.3rem"
-        >
-          <GitHubIcon
-            className="copyright-icon ml-1 hover:opacity-80 md:ml-0"
-            onClick={() =>
-              window.open("https://github.com/jarretthuang/json-viewer")
-            }
-          />
-        </Tooltip>
-        <Tooltip
-          title="☕ Buy me a coffee"
-          placement="top-start"
-          fontSize="0.4rem"
-          padding="0.3rem"
-        >
-          <CoffeeIcon
-            className="copyright-icon hover:opacity-80 md:ml-[-10px]"
-            onClick={() =>
-              window.open("https://www.buymeacoffee.com/jarretthuang")
-            }
-          />
-        </Tooltip>
+          <a href="https://www.buymeacoffee.com/jarretthuang" target="_blank">
+            <LocalCafeIcon
+              className="copyright-icon w-[22px] hover:opacity-70 md:w-2"
+              fontSize="small"
+            />
+          </a>
+        </div>
       </div>
     </div>
   );
