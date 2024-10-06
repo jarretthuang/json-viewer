@@ -78,7 +78,7 @@ export default function NavBar({ createNotification }: WithNotification) {
       <nav className="NavBar group h-12 md:h-6" data-expanded={expanded}>
         <ul className="flex h-full w-full items-center justify-between">
           <li className="jh-logo p-2">
-            <a href="https://labs.jhuang.ca" target="_blank">
+            <a href="https://jhuang.ca" target="_blank">
               <Image
                 src="/logoBW.png"
                 alt="JH"
