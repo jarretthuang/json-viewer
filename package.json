@@ -24,8 +24,8 @@
     "autoprefixer": "10.4.14",
     "lodash": "^4.17.21",
     "lz-string": "^1.5.0",
-    "next": "^16.1.1",
-    "postcss": "^8.5.6",
+    "next": "13.3.1",
+    "postcss": "8.4.23",
     "prismjs": "^1.29.0",
     "react": "18.2.0",
     "react-dom": "18.2.0",
@@ -33,7 +33,7 @@
     "react-notifications": "^1.7.4",
     "react-simple-code-editor": "^0.13.1",
     "tailwindcss": "3.3.1",
-    "typescript": "^5.9.3"
+    "typescript": "5.0.4"
   },
   "devDependencies": {
     "prettier": "^3.0.3",
