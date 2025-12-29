@@ -8,7 +8,7 @@ import _ from "lodash";
 import JsonViewerTreeItemLabel, {
   JsonValueType,
 } from "./JsonViewerTreeItemLabel";
-import { useRef, useState } from "react";
+import { useState } from "react";
 import "./JsonViewerTree.css";
 import JsonViewerToolBar from "../json-viewer-tool-bar/JsonViewerToolBar";
 import { JsonViewerToolBarOption } from "../json-viewer-tool-bar/JsonViewerToolBarOption";
@@ -20,7 +20,6 @@ import UndoIcon from "@mui/icons-material/Undo";
 function JsonViewerTree(props: any) {
   const [expanded, setExpanded]: [string[], any] = useState([]);
   const [unescaped, setUnescaped] = useState<boolean>(false);
-  const allNodeIds = useRef<string[]>([]);
 
   function handleValueChange(path: (string | number)[], newValue: any) {
     if (!props.onJsonUpdate) return;
@@ -54,21 +53,6 @@ function JsonViewerTree(props: any) {
     props.onJsonUpdate(newJson);
   }
 
-  function populateTree(json: Object) {
-    return (
-      <TreeView
-        className="main-tree-view"
-        aria-label="json viewer tree"
-        defaultCollapseIcon={<ExpandMoreIcon />}
-        defaultExpandIcon={<ChevronRightIcon />}
-        sx={{ flexGrow: 1, overflowY: "auto" }}
-        expanded={expanded}
-      >
-        {renderTreeItems(json, unescaped)}
-      </TreeView>
-    );
-  }
-
   function handleItemClick(nodeId: string): void {
     const expandedSet = new Set(expanded);
     if (expandedSet.has(nodeId)) {
@@ -78,22 +62,6 @@ function JsonViewerTree(props: any) {
       const newExpandedSet = expandedSet.add(nodeId);
       setExpanded(Array.from(newExpandedSet));
     }
-  }
-
-  function renderTreeItems(json: any, shouldUnescape: boolean) {
-    const nodeIdSet = new Set<string>();
-    const result = populateTreeItems(
-      json,
-      "JSON", // Root Key Name
-      "",
-      nodeIdSet,
-      shouldUnescape,
-      false,
-      [],
-      false // Root key not editable
-    );
-    allNodeIds.current = Array.from(nodeIdSet);
-    return result;
   }
 
   function populateTreeItems(
@@ -155,7 +123,7 @@ function JsonViewerTree(props: any) {
           break;
       }
 
-      if (valueType == "string" && shouldUnescape) {
+      if (valueType === "string" && shouldUnescape) {
         try {
           const possibleJson = JSON.parse(stringValue);
           if (typeof possibleJson === "object") {
@@ -273,15 +241,32 @@ function JsonViewerTree(props: any) {
     }
   }
 
+  function generateTreeData(json: any, shouldUnescape: boolean) {
+    const nodeIdSet = new Set<string>();
+    const nodes = populateTreeItems(
+      json,
+      "JSON", // Root Key Name
+      "",
+      nodeIdSet,
+      shouldUnescape,
+      false,
+      [],
+      false // Root key not editable
+    );
+    return { nodes, allIds: Array.from(nodeIdSet) };
+  }
+
+  const { nodes: treeNodes, allIds } = generateTreeData(props.json, unescaped);
+
   function renderToolBar() {
     const options: JsonViewerToolBarOption[] = [
       {
         label: "Expand",
         onClick: () => {
-          setExpanded(allNodeIds.current);
+          setExpanded(allIds);
         },
         icon: <OpenInFullIcon />,
-        disabled: expanded.length === allNodeIds.current.length,
+        disabled: expanded.length === allIds.length,
       },
       {
         label: "Collapse",
@@ -314,7 +299,16 @@ function JsonViewerTree(props: any) {
   return (
     <div className="JsonViewerTree">
       {renderToolBar()}
-      {populateTree(props.json)}
+      <TreeView
+        className="main-tree-view"
+        aria-label="json viewer tree"
+        defaultCollapseIcon={<ExpandMoreIcon />}
+        defaultExpandIcon={<ChevronRightIcon />}
+        sx={{ flexGrow: 1, overflowY: "auto" }}
+        expanded={expanded}
+      >
+        {treeNodes}
+      </TreeView>
     </div>
   );
 }
