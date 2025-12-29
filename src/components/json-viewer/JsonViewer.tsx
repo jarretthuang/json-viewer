@@ -82,6 +82,7 @@ function JsonViewer({ createNotification }: WithNotification) {
             <JsonViewerTree
               json={jsonObject}
               handleCopy={handleCopy}
+              onJsonUpdate={handleJsonUpdate}
             ></JsonViewerTree>
           </div>
         </div>
@@ -95,6 +96,13 @@ function JsonViewer({ createNotification }: WithNotification) {
       updateJsonObject(parsedJson);
       switchView("view");
     }
+  };
+
+  const handleJsonUpdate = (newJson: any) => {
+    updateJsonObject(newJson);
+    const newText = JSON.stringify(newJson, null, 2);
+    updateText(newText);
+    updateJsonUrlParam(newText);
   };
 
   function handleUpdateText(s: string): void {

@@ -22,6 +22,38 @@ function JsonViewerTree(props: any) {
   const [unescaped, setUnescaped] = useState<boolean>(false);
   const allNodeIds = useRef<string[]>([]);
 
+  function handleValueChange(path: (string | number)[], newValue: any) {
+    if (!props.onJsonUpdate) return;
+    const newJson = _.cloneDeep(props.json);
+    if (path.length === 0) {
+      props.onJsonUpdate(newValue);
+    } else {
+      _.set(newJson, path, newValue);
+      props.onJsonUpdate(newJson);
+    }
+  }
+
+  function handleKeyChange(
+    path: (string | number)[],
+    oldKey: string,
+    newKey: string
+  ) {
+    if (!props.onJsonUpdate) return;
+    if (oldKey === newKey) return;
+    const newJson = _.cloneDeep(props.json);
+    const parentPath = path.slice(0, -1);
+    const parentObj =
+      parentPath.length === 0 ? newJson : _.get(newJson, parentPath);
+
+    if (Array.isArray(parentObj)) return;
+
+    const value = parentObj[oldKey];
+    delete parentObj[oldKey];
+    parentObj[newKey] = value;
+
+    props.onJsonUpdate(newJson);
+  }
+
   function populateTree(json: Object) {
     return (
       <TreeView
@@ -52,10 +84,13 @@ function JsonViewerTree(props: any) {
     const nodeIdSet = new Set<string>();
     const result = populateTreeItems(
       json,
-      "JSON",
+      "JSON", // Root Key Name
       "",
       nodeIdSet,
-      shouldUnescape
+      shouldUnescape,
+      false,
+      [],
+      false // Root key not editable
     );
     allNodeIds.current = Array.from(nodeIdSet);
     return result;
@@ -67,7 +102,9 @@ function JsonViewerTree(props: any) {
     nodeIdPrefix: string,
     nodeIdSet: Set<string>,
     shouldUnescape: boolean,
-    isUnescapedContent: boolean = false
+    isUnescapedContent: boolean = false,
+    path: (string | number)[] = [],
+    isKeyEditable: boolean = false
   ) {
     const nodeId: string = nodeIdPrefix + "." + key;
     nodeIdSet.add(nodeId);
@@ -86,6 +123,11 @@ function JsonViewerTree(props: any) {
               valueType="null"
               handleCopy={props.handleCopy}
               isUnescapedContent={isUnescapedContent}
+              path={path}
+              onKeyChange={handleKeyChange}
+              onValueChange={handleValueChange}
+              isKeyEditable={isKeyEditable && !isUnescapedContent}
+              isValueEditable={!isUnescapedContent}
             />
           }
         />
@@ -97,7 +139,9 @@ function JsonViewerTree(props: any) {
         nodeId,
         nodeIdSet,
         shouldUnescape,
-        isUnescapedContent
+        isUnescapedContent,
+        path,
+        isKeyEditable
       );
     } else {
       const stringValue: string = json.toString();
@@ -121,7 +165,9 @@ function JsonViewerTree(props: any) {
               nodeId,
               nodeIdSet,
               shouldUnescape,
-              true
+              true,
+              [], // Path lost for unescaped content
+              false // Not editable
             );
           }
         } catch (e) {}
@@ -140,6 +186,11 @@ function JsonViewerTree(props: any) {
               valueType={valueType}
               handleCopy={props.handleCopy}
               isUnescapedContent={isUnescapedContent}
+              path={path}
+              onKeyChange={handleKeyChange}
+              onValueChange={handleValueChange}
+              isKeyEditable={isKeyEditable && !isUnescapedContent}
+              isValueEditable={!isUnescapedContent}
             />
           }
         />
@@ -148,12 +199,14 @@ function JsonViewerTree(props: any) {
   }
 
   function populateObject(
-    json: object,
+    json: any,
     key: string,
     nodeId: string,
     nodeIdSet: Set<string>,
     shouldUnescape: boolean,
-    isUnescapedContent: boolean = false
+    isUnescapedContent: boolean = false,
+    path: (string | number)[] = [],
+    isKeyEditable: boolean = false
   ) {
     if (Array.isArray(json)) {
       return (
@@ -166,6 +219,9 @@ function JsonViewerTree(props: any) {
               type="array"
               name={key}
               isUnescapedContent={isUnescapedContent}
+              path={path}
+              onKeyChange={handleKeyChange}
+              isKeyEditable={isKeyEditable && !isUnescapedContent}
             />
           }
         >
@@ -176,7 +232,9 @@ function JsonViewerTree(props: any) {
               nodeId,
               nodeIdSet,
               shouldUnescape,
-              isUnescapedContent
+              isUnescapedContent,
+              [...path, index],
+              false // Array keys (indices) are not editable
             )
           )}
         </JsonViewerTreeItem>
@@ -192,6 +250,9 @@ function JsonViewerTree(props: any) {
               type="object"
               name={key}
               isUnescapedContent={isUnescapedContent}
+              path={path}
+              onKeyChange={handleKeyChange}
+              isKeyEditable={isKeyEditable && !isUnescapedContent}
             />
           }
         >
@@ -202,7 +263,9 @@ function JsonViewerTree(props: any) {
               nodeId,
               nodeIdSet,
               shouldUnescape,
-              isUnescapedContent
+              isUnescapedContent,
+              [...path, key],
+              true // Object keys are editable
             )
           )}
         </JsonViewerTreeItem>

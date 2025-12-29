@@ -67,12 +67,14 @@
       }
 
       &:hover {
-        .label-content {
-          width: calc(100% - 3rem);
-        }
+        .JsonViewerTreeItemLabel[data-is-editing="false"] {
+          .label-content {
+            width: calc(100% - 3rem);
+          }
 
-        .label-actions {
-          display: flex;
+          .label-actions {
+            display: flex;
+          }
         }
       }
     }
