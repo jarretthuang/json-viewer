@@ -1,6 +1,5 @@
 import _ from "lodash";
 import Copyright from "../copyright/Copyright";
-import "./assets/css/NavBar.css";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import ReactMarkdown from "react-markdown";

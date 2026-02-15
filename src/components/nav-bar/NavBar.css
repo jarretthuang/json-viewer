@@ -2,14 +2,89 @@
 
 @layer components {
   .NavBar {
-    @apply shadow-subtle dark:shadow-subtleWhite;
-    @apply dark:text-offWhite;
-    @apply bg-powderBlue-50 dark:bg-neutral-950;
-    @apply bg-opacity-75 expanded:bg-opacity-90;
+    @apply shadow-subtle bg-powderBlue-50 bg-opacity-75 dark:bg-neutral-950 dark:text-offWhite dark:shadow-subtleWhite;
+
+    z-index: 1;
+    backdrop-filter: blur(5px);
+  }
+
+  .NavBar ul {
+    list-style-type: none;
+  }
+
+  .NavBar li {
+    cursor: pointer;
+    user-select: none;
+    display: flex;
+    align-items: center;
   }
 
   .expanded-content {
-    @apply bg-powderBlue-50 dark:bg-neutral-950;
-    @apply bg-opacity-75 expanded:bg-opacity-90;
+    @apply bg-powderBlue-50 bg-opacity-75 dark:bg-neutral-950;
+
+    backdrop-filter: blur(5px);
+    flex-direction: column;
+  }
+
+  .expanded-content .content {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+    height: calc(100% - 3rem);
+    overflow-y: auto;
+    font-size: 3vmin;
+  }
+
+  .expanded-content .content .title {
+    font-size: 6vmin;
+    font-weight: 500;
+  }
+
+  .expanded-content .content .inner-content {
+    display: flex;
+    flex-direction: column;
+    margin: auto;
+    max-width: 1170px;
+  }
+
+  .expanded-content .content .inner-content a {
+    color: inherit;
+  }
+
+  .expanded-content .content .inner-content a:hover {
+    opacity: 0.5;
+  }
+
+  .expanded-content .content code {
+    white-space: break-spaces;
+    font-size: 2.5vmin;
+    user-select: text;
+    cursor: auto;
+  }
+
+  .expanded-content .content p {
+    display: block;
+    margin-block-start: 1em;
+    margin-block-end: 1em;
+    margin-inline-start: 0;
+    margin-inline-end: 0;
+  }
+
+  @media (max-width: 800px) {
+    .expanded-content .content {
+      font-size: 6vmin;
+      height: calc(100% - 6rem);
+      text-align: center;
+    }
+
+    .expanded-content .content .title {
+      font-size: 8vmin;
+    }
+
+    .expanded-content .content code {
+      font-size: 5vmin;
+      text-align: left;
+    }
   }
 }

@@ -1,4 +1,3 @@
-import "./assets/css/Copyright.css";
 
 function Copyright() {
   return (
