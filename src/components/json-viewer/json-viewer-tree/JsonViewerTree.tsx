@@ -2,7 +2,6 @@
 import { TreeView } from "@mui/x-tree-view";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
-import "./../assets/css/json-viewer-tree.css";
 import JsonViewerTreeItem from "./JsonViewerTreeItem";
 import _ from "lodash";
 import JsonViewerTreeItemLabel, {

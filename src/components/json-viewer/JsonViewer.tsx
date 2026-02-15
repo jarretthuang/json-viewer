@@ -1,6 +1,5 @@
 "use client";
 import { useState } from "react";
-import "./assets/css/json-viewer-mobile.css";
 
 import { ReactNotificationOptions } from "react-notifications-component";
 import JsonViewerTree from "./json-viewer-tree/JsonViewerTree";

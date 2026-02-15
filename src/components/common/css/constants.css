@@ -1,1 +1,0 @@
-.visible-on-hover-parent{transition-duration:1s}.visible-on-hover-parent .visible-on-hover{display:none}.visible-on-hover-parent:hover .visible-on-hover{display:initial}.mobile-only{display:none}.desktop-only{display:initial}@media (max-width:800px){.mobile-only{display:initial}.desktop-only{display:none}}

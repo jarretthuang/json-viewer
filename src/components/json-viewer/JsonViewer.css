@@ -1,19 +1,61 @@
 @tailwind components;
+
 @layer components {
   .view-switcher .buttons {
     @apply m-auto flex flex-row font-bold;
   }
 
   .view-switcher-button {
-    @apply shadow-subtle dark:shadow-none;
-    @apply selected:bg-powderBlue-400 dark:selected:bg-powderBlue-600;
-    @apply hover:bg-powderBlue-300 dark:hover:bg-powderBlue-500;
-    @apply text-powderBlue-600 dark:text-slate-200;
-    @apply hover:text-offWhite selected:text-offWhite;
-    @apply w-[5rem] rounded-2xl p-[0.2rem] text-lg md:w-[3rem] md:p-[0.1rem] md:text-xs;
+    @apply shadow-subtle w-[5rem] cursor-pointer select-none rounded-2xl p-[0.2rem] text-center text-lg text-powderBlue-600 hover:bg-powderBlue-300 hover:text-offWhite dark:text-slate-200 dark:shadow-none dark:hover:bg-powderBlue-500 md:w-[3rem] md:p-[0.1rem] md:text-xs;
+    @apply selected:bg-powderBlue-400 selected:text-offWhite dark:selected:bg-powderBlue-600;
+  }
 
-    text-align: center;
-    cursor: pointer;
-    user-select: none;
+  @media (max-width: 800px) {
+    .JsonViewer {
+      font-size: 1rem;
+    }
+
+    .JsonViewer .JsonViewerTree > ul {
+      overflow-x: scroll;
+      padding-bottom: 0.5rem;
+    }
+
+    .JsonViewer .JsonViewerTree > ul > li {
+      width: max-content;
+      max-width: 130dvw;
+      min-width: 100%;
+    }
+
+    .JsonViewer .JsonViewerTree > ul .MuiTreeItem-content {
+      border-radius: 0.4rem;
+      min-height: 2rem;
+      padding-top: 0.2rem;
+      padding-bottom: 0.2rem;
+    }
+
+    .JsonViewer .JsonViewerTree > ul .MuiTreeItem-iconContainer {
+      padding: 0 0.5rem;
+    }
+
+    .JsonViewer .JsonViewerTree > ul .MuiTreeItem-iconContainer svg {
+      font-size: 1rem;
+    }
+
+    .JsonViewer .JsonViewerTree > ul .MuiTreeItem-label {
+      font-size: 1rem;
+    }
+
+    .JsonViewer .JsonViewerTree > ul .MuiTreeItem-label .JsonViewerTreeItemLabel .label-icon {
+      font-size: 1rem;
+      padding: 0;
+    }
+
+    .JsonViewer .JsonViewerTree > ul .MuiTreeItem-label .JsonViewerTreeItemLabel .label-actions {
+      width: 3rem;
+    }
+
+    .JsonViewer .JsonViewerTree > ul .MuiTreeItem-label .JsonViewerTreeItemLabel:hover .label-content {
+      width: calc(100% - 4rem);
+    }
   }
 }

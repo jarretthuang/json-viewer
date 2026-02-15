@@ -6,12 +6,14 @@
   }
 
   .label-icon {
-    @apply text-shakespeare-400 hover:text-shakespeare-200;
-    @apply dark:text-offWhite dark:hover:text-offWhite/80;
+    @apply text-shakespeare-400 hover:text-shakespeare-200 dark:text-offWhite dark:hover:text-offWhite/80;
   }
 
   .JsonViewerTree {
     @apply dark:bg-zinc-900 dark:text-cyan-50;
+
+    height: 100%;
+    width: 100%;
   }
 
   .JsonViewerTree .MuiTreeItem-content.Mui-selected {
@@ -28,6 +30,76 @@
 
   .JsonViewerTree .main-tree-view {
     @apply h-[calc(100%-3rem)] md:h-[calc(100%-1.5rem)];
-    padding: 0.5rem 1rem 1rem 1rem;
+    padding: 0.5rem 1rem 1rem;
+  }
+
+  .JsonViewerTree > ul {
+    height: 100%;
+    overflow-x: hidden;
+    padding-right: 0.5rem;
+  }
+
+  .JsonViewerTree > ul .MuiTreeItem-content {
+    border-radius: 0.2rem;
+    margin: 0.1rem 0;
+    align-items: center;
+    min-height: 1rem;
+    height: fit-content;
+  }
+
+  .JsonViewerTree > ul .MuiTreeItem-iconContainer svg {
+    font-size: 0.6rem;
+  }
+
+  .JsonViewerTree > ul .MuiTreeItem-label {
+    font-size: 0.5rem;
+    padding: 2px 0.6rem 0 0.1rem;
+    text-align: start;
+  }
+
+  .JsonViewerTree > ul .MuiTreeItem-label .JsonViewerTreeItemLabel {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .JsonViewerTree > ul .MuiTreeItem-label .JsonViewerTreeItemLabel .label-content {
+    display: flex;
+    width: 100%;
+  }
+
+  .JsonViewerTree > ul .MuiTreeItem-label .JsonViewerTreeItemLabel .label-content .label-separator {
+    cursor: pointer;
+    user-select: none;
+    margin: 0 0.2rem;
+  }
+
+  .JsonViewerTree > ul .MuiTreeItem-label .JsonViewerTreeItemLabel .label-content .label-value {
+    text-overflow: ellipsis;
+    overflow: hidden;
+  }
+
+  .JsonViewerTree > ul .MuiTreeItem-label .JsonViewerTreeItemLabel .label-content .label-name {
+    white-space: nowrap;
+  }
+
+  .JsonViewerTree > ul .MuiTreeItem-label .JsonViewerTreeItemLabel .label-actions {
+    width: 2rem;
+    padding: 0 0.5rem;
+    display: none;
+    align-items: center;
+  }
+
+  .JsonViewerTree > ul .MuiTreeItem-label .JsonViewerTreeItemLabel .label-icon {
+    align-self: center;
+    margin-left: 0.2rem;
+    font-size: 0.6rem;
+  }
+
+  .JsonViewerTree > ul .MuiTreeItem-label:hover .JsonViewerTreeItemLabel[data-is-editing="false"] .label-content {
+    width: calc(100% - 3rem);
+  }
+
+  .JsonViewerTree > ul .MuiTreeItem-label:hover .JsonViewerTreeItemLabel[data-is-editing="false"] .label-actions {
+    display: flex;
   }
 }
