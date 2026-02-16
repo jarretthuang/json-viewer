@@ -2,6 +2,7 @@
 import DataObjectIcon from "@mui/icons-material/DataObject";
 import DataArrayIcon from "@mui/icons-material/DataArray";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
+import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import { Tooltip } from "../../tooltip/Tooltip";
 import { Fragment, useState, useEffect } from "react";
 import _ from "lodash";
@@ -32,6 +33,8 @@ export type JsonViewerTreeItemLabelProps = {
   onValueChange?: (path: (string | number)[], newValue: any) => void;
   isKeyEditable?: boolean;
   isValueEditable?: boolean;
+  canDelete?: boolean;
+  onDelete?: (path: (string | number)[]) => void;
 };
 
 function JsonViewerTreeItemLabel(props: JsonViewerTreeItemLabelProps) {
@@ -119,11 +122,19 @@ function JsonViewerTreeItemLabel(props: JsonViewerTreeItemLabelProps) {
     }
   };
 
+  const handleDelete = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (props.canDelete && props.path && props.onDelete) {
+      props.onDelete(props.path);
+    }
+  };
+
   const renderActions = () => {
     if (isEditingKey || isEditingValue) return null;
-    if (props.type === "value") {
-      return (
-        <Fragment>
+
+    return (
+      <Fragment>
+        {props.type === "value" && (
           <Tooltip
             title="Copy"
             placement="top"
@@ -131,9 +142,14 @@ function JsonViewerTreeItemLabel(props: JsonViewerTreeItemLabelProps) {
           >
             <ContentCopyIcon className="label-icon" />
           </Tooltip>
-        </Fragment>
-      );
-    }
+        )}
+        {props.canDelete && (
+          <Tooltip title="Delete" placement="top" onClick={handleDelete}>
+            <DeleteOutlineIcon className="label-icon" />
+          </Tooltip>
+        )}
+      </Fragment>
+    );
   };
 
   function getLabelValueAsText(): string {

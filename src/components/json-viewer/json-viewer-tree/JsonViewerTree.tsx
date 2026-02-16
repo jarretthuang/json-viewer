@@ -53,6 +53,32 @@ function JsonViewerTree(props: any) {
     props.onJsonUpdate(newJson);
   }
 
+  function handleDeleteAtPath(path: (string | number)[]) {
+    if (!props.onJsonUpdate) return;
+    if (path.length === 0) return;
+
+    const confirmed = window.confirm("Delete this item?");
+    if (!confirmed) return;
+
+    const newJson = _.cloneDeep(props.json);
+    const parentPath = path.slice(0, -1);
+    const keyToDelete = path[path.length - 1];
+    const parent = parentPath.length === 0 ? newJson : _.get(newJson, parentPath);
+
+    if (Array.isArray(parent)) {
+      const index = Number(keyToDelete);
+      if (!Number.isNaN(index) && index >= 0 && index < parent.length) {
+        parent.splice(index, 1);
+      }
+    } else if (parent && typeof parent === "object") {
+      delete parent[keyToDelete as keyof typeof parent];
+    } else {
+      return;
+    }
+
+    props.onJsonUpdate(newJson);
+  }
+
   function populateTree(json: Object) {
     return (
       <TreeView
@@ -127,6 +153,8 @@ function JsonViewerTree(props: any) {
               onValueChange={handleValueChange}
               isKeyEditable={isKeyEditable && !isUnescapedContent}
               isValueEditable={!isUnescapedContent}
+              canDelete={!isUnescapedContent && path.length > 0}
+              onDelete={handleDeleteAtPath}
             />
           }
         />
@@ -190,6 +218,8 @@ function JsonViewerTree(props: any) {
               onValueChange={handleValueChange}
               isKeyEditable={isKeyEditable && !isUnescapedContent}
               isValueEditable={!isUnescapedContent}
+              canDelete={!isUnescapedContent && path.length > 0}
+              onDelete={handleDeleteAtPath}
             />
           }
         />
@@ -221,6 +251,8 @@ function JsonViewerTree(props: any) {
               path={path}
               onKeyChange={handleKeyChange}
               isKeyEditable={isKeyEditable && !isUnescapedContent}
+              canDelete={!isUnescapedContent && path.length > 0}
+              onDelete={handleDeleteAtPath}
             />
           }
         >
@@ -252,6 +284,8 @@ function JsonViewerTree(props: any) {
               path={path}
               onKeyChange={handleKeyChange}
               isKeyEditable={isKeyEditable && !isUnescapedContent}
+              canDelete={!isUnescapedContent && path.length > 0}
+              onDelete={handleDeleteAtPath}
             />
           }
         >
