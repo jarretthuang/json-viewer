@@ -8,6 +8,14 @@
   .view-switcher-button {
     @apply shadow-subtle w-[5rem] cursor-pointer select-none rounded-2xl p-[0.2rem] text-center text-lg text-powderBlue-600 hover:bg-powderBlue-300 hover:text-offWhite dark:text-slate-200 dark:shadow-none dark:hover:bg-powderBlue-500 md:w-[3rem] md:p-[0.1rem] md:text-xs;
     @apply selected:bg-powderBlue-400 selected:text-offWhite dark:selected:bg-powderBlue-600;
+
+    border: none;
+    background: transparent;
+  }
+
+  .view-switcher-button:focus-visible {
+    outline: 2px solid var(--focus-ring-color);
+    outline-offset: 2px;
   }
 
   @media (max-width: 800px) {

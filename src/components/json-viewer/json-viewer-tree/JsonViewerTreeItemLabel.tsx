@@ -44,8 +44,16 @@ function JsonViewerTreeItemLabel(props: JsonViewerTreeItemLabelProps) {
     setEditedKey(props.name);
   }, [props.name]);
 
+  const startEditingKey = (e: React.MouseEvent) => {
+    if (!props.isKeyEditable) return;
+    if (e.detail === 0) return;
+    e.stopPropagation();
+    setIsEditingKey(true);
+  };
+
   const startEditingValue = (e: React.MouseEvent) => {
     if (!props.isValueEditable) return;
+    if (e.detail === 0) return;
     e.stopPropagation();
 
     // Prepare value for editing (add quotes if string)
@@ -101,13 +109,13 @@ function JsonViewerTreeItemLabel(props: JsonViewerTreeItemLabelProps) {
     if (props.type === "object") {
       return (
         <Tooltip title="Object" placement="top">
-          <DataObjectIcon className="label-icon" />
+          <DataObjectIcon className="label-icon" aria-hidden="true" />
         </Tooltip>
       );
     } else if (props.type === "array") {
       return (
         <Tooltip title="Array" placement="top">
-          <DataArrayIcon className="label-icon" />
+          <DataArrayIcon className="label-icon" aria-hidden="true" />
         </Tooltip>
       );
     }
@@ -124,12 +132,18 @@ function JsonViewerTreeItemLabel(props: JsonViewerTreeItemLabelProps) {
     if (props.type === "value") {
       return (
         <Fragment>
-          <Tooltip
-            title="Copy"
-            placement="top"
-            onClick={() => props?.handleCopy?.(getLabelValueAsText())}
-          >
-            <ContentCopyIcon className="label-icon" />
+          <Tooltip title="Copy" placement="top">
+            <button
+              type="button"
+              className="label-action-button"
+              onClick={(e) => {
+                e.stopPropagation();
+                props?.handleCopy?.(getLabelValueAsText());
+              }}
+              aria-label={`Copy \"${props.name}\" value`}
+            >
+              <ContentCopyIcon className="label-icon" aria-hidden="true" />
+            </button>
           </Tooltip>
         </Fragment>
       );
@@ -151,8 +165,8 @@ function JsonViewerTreeItemLabel(props: JsonViewerTreeItemLabelProps) {
   function renderIconForUnescapedContent() {
     if (props.isUnescapedContent && props.type !== "value") {
       return (
-        <Tooltip title="💡 This is parsed from a nested JSON string via [unescape].">
-          <CodeOffIcon className="label-icon" />
+        <Tooltip title="This value was parsed from nested JSON string content.">
+          <CodeOffIcon className="label-icon" aria-hidden="true" />
         </Tooltip>
       );
     }
@@ -166,13 +180,14 @@ function JsonViewerTreeItemLabel(props: JsonViewerTreeItemLabelProps) {
       <div className="label-content">
         {isEditingKey ? (
           <input
+            aria-label={`Edit key ${props.name}`}
             className="rounded border border-gray-300 bg-white px-1 text-black outline-none dark:border-gray-600 dark:bg-neutral-800 dark:text-white"
             value={editedKey}
             onChange={(e) => setEditedKey(e.target.value)}
             onKeyDown={(e) => {
               if (e.key === "Enter") commitKeyEdit();
               if (e.key === "Escape") cancelKeyEdit();
-              e.stopPropagation(); // Avoid tree navigation on arrow keys?
+              e.stopPropagation();
             }}
             onClick={(e) => e.stopPropagation()}
             onBlur={commitKeyEdit}
@@ -183,14 +198,15 @@ function JsonViewerTreeItemLabel(props: JsonViewerTreeItemLabelProps) {
             className={`label-name text-slate-800 dark:text-offWhite ${
               props.isKeyEditable
                 ? "cursor-pointer hover:rounded hover:bg-black/5 hover:dark:bg-white/10"
-                : ""
+                : "cursor-default"
             }`}
-            onClick={(e) => {
-              if (props.isKeyEditable) {
-                e.stopPropagation();
-                setIsEditingKey(true);
-              }
-            }}
+            role={props.isKeyEditable ? "button" : undefined}
+            aria-label={
+              props.isKeyEditable
+                ? `Edit key ${props.name}`
+                : `Key ${props.name}`
+            }
+            onClick={startEditingKey}
           >
             {props.name}
           </div>
@@ -201,7 +217,8 @@ function JsonViewerTreeItemLabel(props: JsonViewerTreeItemLabelProps) {
         {!_.isUndefined(props.value) &&
           (isEditingValue ? (
             <input
-              className="flex-1 ml-1 rounded border border-gray-300 bg-white px-1 text-black outline-none dark:border-gray-600 dark:bg-neutral-800 dark:text-white"
+              aria-label={`Edit value for ${props.name}`}
+              className="ml-1 flex-1 rounded border border-gray-300 bg-white px-1 text-black outline-none dark:border-gray-600 dark:bg-neutral-800 dark:text-white"
               value={editedValue}
               onChange={(e) => setEditedValue(e.target.value)}
               onKeyDown={(e) => {
@@ -218,8 +235,14 @@ function JsonViewerTreeItemLabel(props: JsonViewerTreeItemLabelProps) {
               className={`label-value text-gray-700 dark:text-powderBlue-100 ${
                 props.isValueEditable
                   ? "cursor-pointer hover:rounded hover:bg-black/5 hover:dark:bg-white/10"
-                  : ""
+                  : "cursor-default"
               }`}
+              role={props.isValueEditable ? "button" : undefined}
+              aria-label={
+                props.isValueEditable
+                  ? `Edit value for ${props.name}`
+                  : `Value for ${props.name}`
+              }
               onClick={startEditingValue}
             >
               {getDisplayValue()}

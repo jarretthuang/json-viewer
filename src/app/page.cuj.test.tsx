@@ -10,7 +10,7 @@ describe('CUJ regression coverage', () => {
     expect(screen.getByText('jsonviewer.io')).toBeInTheDocument();
 
     await user.click(screen.getByRole('button', { name: /example/i }));
-    await user.click(screen.getByText('View'));
+    await user.click(screen.getByRole('tab', { name: /^view$/i }));
 
     expect(await screen.findByLabelText(/json viewer tree/i)).toBeInTheDocument();
     expect(screen.getByText('JSON')).toBeInTheDocument();
@@ -21,7 +21,7 @@ describe('CUJ regression coverage', () => {
     render(<App />);
 
     await user.click(screen.getByRole('button', { name: /example/i }));
-    await user.click(screen.getByText('View'));
+    await user.click(screen.getByRole('tab', { name: /^view$/i }));
 
     const tree = await screen.findByLabelText(/json viewer tree/i);
 
@@ -39,7 +39,7 @@ describe('CUJ regression coverage', () => {
     render(<App />);
 
     await user.click(screen.getByRole('button', { name: /example/i }));
-    await user.click(screen.getByText('View'));
+    await user.click(screen.getByRole('tab', { name: /^view$/i }));
     await user.click(screen.getByRole('button', { name: /expand/i }));
 
     expect(screen.queryByText('taglib-uri')).not.toBeInTheDocument();
@@ -53,16 +53,62 @@ describe('CUJ regression coverage', () => {
     });
   });
 
+  test('tree Enter/Space toggles expansion and does not start inline edit', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+
+    await user.click(screen.getByRole('button', { name: /example/i }));
+    await user.click(screen.getByRole('tab', { name: /^view$/i }));
+
+    await user.click(screen.getByText('JSON'));
+    await user.keyboard('{Enter}');
+
+    expect(await screen.findByText('web-app')).toBeInTheDocument();
+    expect(screen.queryByLabelText(/edit key JSON/i)).not.toBeInTheDocument();
+
+    await user.keyboard(' ');
+    await waitFor(() => {
+      expect(screen.queryByText('web-app')).not.toBeInTheDocument();
+    });
+  });
+
+  test('nav controls expose accessible button labels', () => {
+    render(<App />);
+
+    expect(screen.getByRole('button', { name: /go back/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /go forward/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /share url/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /more options/i })).toBeInTheDocument();
+  });
+
   test('mobile/nav expanded panel visibility toggles', async () => {
     const user = userEvent.setup();
     render(<App />);
 
-    await user.click(screen.getByTestId('MoreHorizIcon'));
-    expect(await screen.findByText('JSON Viewer')).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: /more options/i }));
+    expect(await screen.findByRole('dialog', { name: /json viewer information/i })).toBeInTheDocument();
 
-    await user.click(screen.getByTestId('CloseIcon'));
+    const dialog = screen.getByRole('dialog', { name: /json viewer information/i });
+    const closeButton = screen.getByRole('button', { name: /close information panel/i });
+    expect(dialog).toHaveFocus();
+    expect(closeButton).not.toHaveFocus();
+
+    await user.click(closeButton);
     await waitFor(() => {
-      expect(screen.queryByText('JSON Viewer')).not.toBeInTheDocument();
+      expect(screen.queryByRole('dialog', { name: /json viewer information/i })).not.toBeInTheDocument();
+    });
+  });
+
+  test('overlay closes on Escape key', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+
+    await user.click(screen.getByRole('button', { name: /more options/i }));
+    expect(await screen.findByRole('dialog', { name: /json viewer information/i })).toBeInTheDocument();
+
+    await user.keyboard('{Escape}');
+    await waitFor(() => {
+      expect(screen.queryByRole('dialog', { name: /json viewer information/i })).not.toBeInTheDocument();
     });
   });
 });

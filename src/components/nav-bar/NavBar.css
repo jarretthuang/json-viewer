@@ -13,10 +13,52 @@
   }
 
   .NavBar li {
-    cursor: pointer;
     user-select: none;
     display: flex;
     align-items: center;
+  }
+
+  .nav-icon-button,
+  .nav-close-button {
+    border: none;
+    background: transparent;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+  }
+
+  .NavBar .nav-icon-button {
+    margin: 0 0.5rem;
+    opacity: 0.5;
+  }
+
+  .NavBar .nav-icon-button:hover {
+    opacity: 0.6;
+  }
+
+  .NavBar .nav-icon {
+    font-size: 1.6rem;
+  }
+
+  .nav-icon-button:focus-visible,
+  .nav-close-button:focus-visible,
+  .NavBar a:focus-visible,
+  .expanded-content a:focus-visible {
+    outline: 2px solid var(--focus-ring-color);
+    outline-offset: 2px;
+    border-radius: 0.25rem;
+  }
+
+  @media (min-width: 768px) {
+    .NavBar .nav-icon-button {
+      margin: 0 0.25rem;
+    }
+
+    .NavBar .nav-icon {
+      font-size: 0.9rem;
+    }
   }
 
   .expanded-content {
@@ -24,6 +66,10 @@
 
     backdrop-filter: blur(5px);
     flex-direction: column;
+  }
+
+  .expanded-content:focus {
+    outline: none;
   }
 
   .expanded-content .content {
