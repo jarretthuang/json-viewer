@@ -77,17 +77,17 @@ export default function NavBar({ createNotification }: WithNotification) {
       <nav className="NavBar group h-12 md:h-5" data-expanded={expanded}>
         <ul className="flex h-full w-full items-center justify-between">
           <li className="jh-logo p-2 md:p-1">
-            <a href="https://jhuang.ca" target="_blank">
+            <a href="https://jhuang.ca" target="_blank" className="block">
               <Image
                 src="/logoBW.png"
                 alt="JH"
                 className="h-10 w-10 rounded-full object-contain opacity-50 invert hover:opacity-60 md:h-5 md:w-5 dark:invert-0"
-                width={40}
-                height={40}
+                width={20}
+                height={20}
               />
             </a>
             <a href="/" className="flex">
-              <span className="p-1 text-[25px] font-bold opacity-50 hover:opacity-60 md:p-0 md:text-xs md:font-semibold">
+              <span className="p-1 text-[25px] font-bold opacity-50 hover:opacity-60 md:p-0 md:text-[10px] md:font-semibold">
                 jsonviewer.io
               </span>
             </a>
