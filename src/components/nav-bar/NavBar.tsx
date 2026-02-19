@@ -32,6 +32,23 @@ export default function NavBar({ createNotification }: WithNotification) {
     }
   }, [onShare, createNotification]);
 
+  useEffect(() => {
+    if (!expanded) {
+      return;
+    }
+
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        expand(false);
+      }
+    };
+
+    window.addEventListener("keydown", handleEscape);
+    return () => {
+      window.removeEventListener("keydown", handleEscape);
+    };
+  }, [expanded]);
+
   const renderExpandedContent = () => {
     return (
       <div className="content items-center overflow-hidden">
