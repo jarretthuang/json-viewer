@@ -72,7 +72,7 @@ export default function NavBar({ createNotification }: WithNotification) {
           aria-label="Go back"
           onClick={() => window.history.back()}
         >
-          <ArrowBackIcon className="nav-icon" style={{ height: "85%" }} />
+          <ArrowBackIcon className="nav-icon" />
         </button>
         <button
           type="button"
@@ -80,7 +80,7 @@ export default function NavBar({ createNotification }: WithNotification) {
           aria-label="Go forward"
           onClick={() => window.history.forward()}
         >
-          <ArrowForwardIcon className="nav-icon" style={{ height: "85%" }} />
+          <ArrowForwardIcon className="nav-icon" />
         </button>
         <button
           type="button"
@@ -90,7 +90,7 @@ export default function NavBar({ createNotification }: WithNotification) {
             setOnShare(Date.now());
           }}
         >
-          <ShareIcon className="nav-icon" style={{ height: "75%" }} />
+          <ShareIcon className="nav-icon" />
         </button>
         <button
           type="button"
@@ -100,7 +100,7 @@ export default function NavBar({ createNotification }: WithNotification) {
           aria-controls="navbar-expanded-panel"
           onClick={() => expand(!expanded)}
         >
-          <MoreHorizIcon className="nav-icon" style={{ height: "100%" }} />
+          <MoreHorizIcon className="nav-icon" />
         </button>
       </>
     );
