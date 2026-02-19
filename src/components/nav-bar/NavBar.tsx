@@ -81,13 +81,13 @@ export default function NavBar({ createNotification }: WithNotification) {
               <Image
                 src="/logoBW.png"
                 alt="JH"
-                className="h-10 w-10 rounded-full object-contain opacity-50 invert hover:opacity-60 md:h-6 md:w-6 dark:invert-0"
+                className="h-10 w-10 rounded-full object-contain opacity-50 invert hover:opacity-60 md:h-5 md:w-5 dark:invert-0"
                 width={40}
                 height={40}
               />
             </a>
             <a href="/" className="flex">
-              <span className="p-1 text-[25px] font-bold opacity-50 hover:opacity-60 md:p-0 md:text-sm">
+              <span className="p-1 text-[25px] font-bold opacity-50 hover:opacity-60 md:p-0 md:text-xs md:font-semibold">
                 jsonviewer.io
               </span>
             </a>
