@@ -53,7 +53,7 @@
 
   .JsonViewerTree > ul .MuiTreeItem-label {
     font-size: 0.5rem;
-    padding: 2px 0.6rem 0 0.1rem;
+    padding: 0 0.6rem 0 0.1rem;
     text-align: start;
   }
 
@@ -62,25 +62,53 @@
     justify-content: space-between;
   }
 
-  .JsonViewerTree > ul .MuiTreeItem-label .JsonViewerTreeItemLabel .label-content {
+  .JsonViewerTree
+    > ul
+    .MuiTreeItem-label
+    .JsonViewerTreeItemLabel
+    .label-content {
     display: flex;
     width: 100%;
   }
 
-  .JsonViewerTree > ul .MuiTreeItem-label .JsonViewerTreeItemLabel .label-content .label-separator {
+  .JsonViewerTree
+    > ul
+    .MuiTreeItem-label
+    .JsonViewerTreeItemLabel
+    .label-content
+    .label-separator {
     cursor: pointer;
     user-select: none;
     margin: 0 0.2rem;
   }
 
-  .JsonViewerTree > ul .MuiTreeItem-label .JsonViewerTreeItemLabel .label-content .label-value {
+  .JsonViewerTree
+    > ul
+    .MuiTreeItem-label
+    .JsonViewerTreeItemLabel
+    .label-content
+    .label-value {
     text-overflow: ellipsis;
     overflow: hidden;
   }
 
-  .JsonViewerTree > ul .MuiTreeItem-label .JsonViewerTreeItemLabel .label-content .label-name,
-  .JsonViewerTree > ul .MuiTreeItem-label .JsonViewerTreeItemLabel .label-content .label-value,
-  .JsonViewerTree > ul .MuiTreeItem-label .JsonViewerTreeItemLabel .label-action-button {
+  .JsonViewerTree
+    > ul
+    .MuiTreeItem-label
+    .JsonViewerTreeItemLabel
+    .label-content
+    .label-name,
+  .JsonViewerTree
+    > ul
+    .MuiTreeItem-label
+    .JsonViewerTreeItemLabel
+    .label-content
+    .label-value,
+  .JsonViewerTree
+    > ul
+    .MuiTreeItem-label
+    .JsonViewerTreeItemLabel
+    .label-action-button {
     border: none;
     background: transparent;
     padding: 0;
@@ -88,25 +116,62 @@
     font: inherit;
   }
 
-  .JsonViewerTree > ul .MuiTreeItem-label .JsonViewerTreeItemLabel .label-content .label-name:disabled,
-  .JsonViewerTree > ul .MuiTreeItem-label .JsonViewerTreeItemLabel .label-content .label-value:disabled {
+  .JsonViewerTree
+    > ul
+    .MuiTreeItem-label
+    .JsonViewerTreeItemLabel
+    .label-content
+    .label-name:disabled,
+  .JsonViewerTree
+    > ul
+    .MuiTreeItem-label
+    .JsonViewerTreeItemLabel
+    .label-content
+    .label-value:disabled {
     opacity: 1;
   }
 
-  .JsonViewerTree > ul .MuiTreeItem-label .JsonViewerTreeItemLabel .label-content .label-name {
+  .JsonViewerTree
+    > ul
+    .MuiTreeItem-label
+    .JsonViewerTreeItemLabel
+    .label-content
+    .label-name {
     white-space: nowrap;
   }
 
-  .JsonViewerTree > ul .MuiTreeItem-label .JsonViewerTreeItemLabel .label-content .label-name:focus-visible,
-  .JsonViewerTree > ul .MuiTreeItem-label .JsonViewerTreeItemLabel .label-content .label-value:focus-visible,
-  .JsonViewerTree > ul .MuiTreeItem-label .JsonViewerTreeItemLabel .label-action-button:focus-visible,
-  .JsonViewerTree > ul .MuiTreeItem-label .JsonViewerTreeItemLabel input:focus-visible {
+  .JsonViewerTree
+    > ul
+    .MuiTreeItem-label
+    .JsonViewerTreeItemLabel
+    .label-content
+    .label-name:focus-visible,
+  .JsonViewerTree
+    > ul
+    .MuiTreeItem-label
+    .JsonViewerTreeItemLabel
+    .label-content
+    .label-value:focus-visible,
+  .JsonViewerTree
+    > ul
+    .MuiTreeItem-label
+    .JsonViewerTreeItemLabel
+    .label-action-button:focus-visible,
+  .JsonViewerTree
+    > ul
+    .MuiTreeItem-label
+    .JsonViewerTreeItemLabel
+    input:focus-visible {
     outline: 2px solid var(--focus-ring-color);
     outline-offset: 1px;
     border-radius: 0.2rem;
   }
 
-  .JsonViewerTree > ul .MuiTreeItem-label .JsonViewerTreeItemLabel .label-actions {
+  .JsonViewerTree
+    > ul
+    .MuiTreeItem-label
+    .JsonViewerTreeItemLabel
+    .label-actions {
     width: 2rem;
     padding: 0 0.5rem;
     display: none;
@@ -119,11 +184,19 @@
     font-size: 0.6rem;
   }
 
-  .JsonViewerTree > ul .MuiTreeItem-label:hover .JsonViewerTreeItemLabel[data-is-editing="false"] .label-content {
+  .JsonViewerTree
+    > ul
+    .MuiTreeItem-label:hover
+    .JsonViewerTreeItemLabel[data-is-editing="false"]
+    .label-content {
     width: calc(100% - 3rem);
   }
 
-  .JsonViewerTree > ul .MuiTreeItem-label:hover .JsonViewerTreeItemLabel[data-is-editing="false"] .label-actions {
+  .JsonViewerTree
+    > ul
+    .MuiTreeItem-label:hover
+    .JsonViewerTreeItemLabel[data-is-editing="false"]
+    .label-actions {
     display: flex;
   }
 }
