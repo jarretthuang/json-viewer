@@ -18,8 +18,8 @@
     align-items: center;
   }
 
-  .nav-icon-button,
-  .nav-close-button {
+  .NavBar .nav-icon-button,
+  .NavBar .nav-close-button {
     border: none;
     background: transparent;
     padding: 0;
@@ -29,34 +29,33 @@
     cursor: pointer;
   }
 
-  .nav-icon-button {
+  .NavBar .nav-icon-button {
     margin: 0 0.5rem;
     opacity: 0.5;
   }
 
-  .nav-icon-button:hover {
+  .NavBar .nav-icon-button:hover {
     opacity: 0.6;
   }
 
-  .nav-icon {
+  .NavBar .nav-icon {
     font-size: 1.6rem;
   }
 
-  .nav-icon-button:focus-visible,
-  .nav-close-button:focus-visible,
-  .NavBar a:focus-visible,
-  .expanded-content a:focus-visible {
+  .NavBar .nav-icon-button:focus-visible,
+  .NavBar .nav-close-button:focus-visible,
+  .NavBar a:focus-visible {
     outline: 2px solid var(--focus-ring-color);
     outline-offset: 2px;
     border-radius: 0.25rem;
   }
 
   @media (min-width: 768px) {
-    .nav-icon-button {
+    .NavBar .nav-icon-button {
       margin: 0 0.25rem;
     }
 
-    .nav-icon {
+    .NavBar .nav-icon {
       font-size: 0.9rem;
     }
   }

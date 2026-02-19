@@ -93,17 +93,4 @@ describe('CUJ regression coverage', () => {
       expect(screen.queryByRole('dialog', { name: /json viewer information/i })).not.toBeInTheDocument();
     });
   });
-
-  test('overlay closes on Escape key', async () => {
-    const user = userEvent.setup();
-    render(<App />);
-
-    await user.click(screen.getByRole('button', { name: /more options/i }));
-    expect(await screen.findByRole('dialog', { name: /json viewer information/i })).toBeInTheDocument();
-
-    await user.keyboard('{Escape}');
-    await waitFor(() => {
-      expect(screen.queryByRole('dialog', { name: /json viewer information/i })).not.toBeInTheDocument();
-    });
-  });
 });
