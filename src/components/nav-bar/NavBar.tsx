@@ -1,7 +1,7 @@
 import _ from "lodash";
 import Copyright from "../copyright/Copyright";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import "./NavBar.css";
 import { jsonViewerAppDescription } from "@/models/appDescriptions";
@@ -16,6 +16,7 @@ import { copyTextToClipboard } from "@/utils/handleCopy";
 export default function NavBar({ createNotification }: WithNotification) {
   const [expanded, expand] = useState(false);
   const [onShare, setOnShare] = useState<number | undefined>(undefined);
+  const closeButtonRef = useRef<HTMLButtonElement | null>(null);
 
   useEffect(() => {
     if (!onShare) {
@@ -31,6 +32,25 @@ export default function NavBar({ createNotification }: WithNotification) {
       copyTextToClipboard(currentUrl, createNotification, "A shareable URL");
     }
   }, [onShare, createNotification]);
+
+  useEffect(() => {
+    if (!expanded) {
+      return;
+    }
+
+    closeButtonRef.current?.focus();
+
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        expand(false);
+      }
+    };
+
+    window.addEventListener("keydown", handleEscape);
+    return () => {
+      window.removeEventListener("keydown", handleEscape);
+    };
+  }, [expanded]);
 
   const renderExpandedContent = () => {
     return (
@@ -120,6 +140,7 @@ export default function NavBar({ createNotification }: WithNotification) {
           <div className="flex w-full justify-end pr-5 pt-5">
             <button
               type="button"
+              ref={closeButtonRef}
               className="nav-close-button"
               aria-label="Close information panel"
               onClick={() => expand(!expanded)}

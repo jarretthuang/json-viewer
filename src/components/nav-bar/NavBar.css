@@ -18,8 +18,8 @@
     align-items: center;
   }
 
-  .NavBar .nav-icon-button,
-  .NavBar .nav-close-button {
+  .nav-icon-button,
+  .nav-close-button {
     border: none;
     background: transparent;
     padding: 0;
@@ -42,9 +42,10 @@
     font-size: 1.6rem;
   }
 
-  .NavBar .nav-icon-button:focus-visible,
-  .NavBar .nav-close-button:focus-visible,
-  .NavBar a:focus-visible {
+  .nav-icon-button:focus-visible,
+  .nav-close-button:focus-visible,
+  .NavBar a:focus-visible,
+  .expanded-content a:focus-visible {
     outline: 2px solid var(--focus-ring-color);
     outline-offset: 2px;
     border-radius: 0.25rem;
