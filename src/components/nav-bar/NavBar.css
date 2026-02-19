@@ -68,6 +68,10 @@
     flex-direction: column;
   }
 
+  .expanded-content:focus {
+    outline: none;
+  }
+
   .expanded-content .content {
     width: 100%;
     display: flex;

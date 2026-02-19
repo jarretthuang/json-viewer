@@ -88,8 +88,10 @@ describe('CUJ regression coverage', () => {
     await user.click(screen.getByRole('button', { name: /more options/i }));
     expect(await screen.findByRole('dialog', { name: /json viewer information/i })).toBeInTheDocument();
 
+    const dialog = screen.getByRole('dialog', { name: /json viewer information/i });
     const closeButton = screen.getByRole('button', { name: /close information panel/i });
-    expect(closeButton).toHaveFocus();
+    expect(dialog).toHaveFocus();
+    expect(closeButton).not.toHaveFocus();
 
     await user.click(closeButton);
     await waitFor(() => {

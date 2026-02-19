@@ -16,7 +16,7 @@ import { copyTextToClipboard } from "@/utils/handleCopy";
 export default function NavBar({ createNotification }: WithNotification) {
   const [expanded, expand] = useState(false);
   const [onShare, setOnShare] = useState<number | undefined>(undefined);
-  const closeButtonRef = useRef<HTMLButtonElement | null>(null);
+  const overlayRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     if (!onShare) {
@@ -38,7 +38,7 @@ export default function NavBar({ createNotification }: WithNotification) {
       return;
     }
 
-    closeButtonRef.current?.focus();
+    overlayRef.current?.focus();
 
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
@@ -132,6 +132,8 @@ export default function NavBar({ createNotification }: WithNotification) {
       {expanded && (
         <div
           id="navbar-expanded-panel"
+          ref={overlayRef}
+          tabIndex={-1}
           role="dialog"
           aria-modal="true"
           aria-label="JSON viewer information"
@@ -140,7 +142,6 @@ export default function NavBar({ createNotification }: WithNotification) {
           <div className="flex w-full justify-end pr-5 pt-5">
             <button
               type="button"
-              ref={closeButtonRef}
               className="nav-close-button"
               aria-label="Close information panel"
               onClick={() => expand(!expanded)}
