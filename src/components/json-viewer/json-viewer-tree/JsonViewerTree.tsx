@@ -62,21 +62,13 @@ function JsonViewerTree(props: any) {
         defaultExpandIcon={<ChevronRightIcon />}
         sx={{ flexGrow: 1, overflowY: "auto" }}
         expanded={expanded}
+        onNodeToggle={(_, nodeIds) => {
+          setExpanded(nodeIds);
+        }}
       >
         {renderTreeItems(json, unescaped)}
       </TreeView>
     );
-  }
-
-  function handleItemClick(nodeId: string): void {
-    const expandedSet = new Set(expanded);
-    if (expandedSet.has(nodeId)) {
-      expandedSet.delete(nodeId);
-      setExpanded(Array.from(expandedSet));
-    } else {
-      const newExpandedSet = expandedSet.add(nodeId);
-      setExpanded(Array.from(newExpandedSet));
-    }
   }
 
   function renderTreeItems(json: any, shouldUnescape: boolean) {
@@ -113,7 +105,6 @@ function JsonViewerTree(props: any) {
         <JsonViewerTreeItem
           nodeId={nodeId}
           key={nodeId}
-          onItemClick={handleItemClick}
           label={
             <JsonViewerTreeItemLabel
               type="value"
@@ -176,7 +167,6 @@ function JsonViewerTree(props: any) {
         <JsonViewerTreeItem
           nodeId={nodeId}
           key={nodeId}
-          onItemClick={handleItemClick}
           label={
             <JsonViewerTreeItemLabel
               type="value"
@@ -212,7 +202,6 @@ function JsonViewerTree(props: any) {
         <JsonViewerTreeItem
           nodeId={nodeId}
           key={nodeId}
-          onItemClick={handleItemClick}
           label={
             <JsonViewerTreeItemLabel
               type="array"
@@ -243,7 +232,6 @@ function JsonViewerTree(props: any) {
         <JsonViewerTreeItem
           nodeId={nodeId}
           key={nodeId}
-          onItemClick={handleItemClick}
           label={
             <JsonViewerTreeItemLabel
               type="object"

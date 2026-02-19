@@ -78,8 +78,32 @@
     overflow: hidden;
   }
 
+  .JsonViewerTree > ul .MuiTreeItem-label .JsonViewerTreeItemLabel .label-content .label-name,
+  .JsonViewerTree > ul .MuiTreeItem-label .JsonViewerTreeItemLabel .label-content .label-value,
+  .JsonViewerTree > ul .MuiTreeItem-label .JsonViewerTreeItemLabel .label-action-button {
+    border: none;
+    background: transparent;
+    padding: 0;
+    text-align: left;
+    font: inherit;
+  }
+
+  .JsonViewerTree > ul .MuiTreeItem-label .JsonViewerTreeItemLabel .label-content .label-name:disabled,
+  .JsonViewerTree > ul .MuiTreeItem-label .JsonViewerTreeItemLabel .label-content .label-value:disabled {
+    opacity: 1;
+  }
+
   .JsonViewerTree > ul .MuiTreeItem-label .JsonViewerTreeItemLabel .label-content .label-name {
     white-space: nowrap;
+  }
+
+  .JsonViewerTree > ul .MuiTreeItem-label .JsonViewerTreeItemLabel .label-content .label-name:focus-visible,
+  .JsonViewerTree > ul .MuiTreeItem-label .JsonViewerTreeItemLabel .label-content .label-value:focus-visible,
+  .JsonViewerTree > ul .MuiTreeItem-label .JsonViewerTreeItemLabel .label-action-button:focus-visible,
+  .JsonViewerTree > ul .MuiTreeItem-label .JsonViewerTreeItemLabel input:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 1px;
+    border-radius: 0.2rem;
   }
 
   .JsonViewerTree > ul .MuiTreeItem-label .JsonViewerTreeItemLabel .label-actions {

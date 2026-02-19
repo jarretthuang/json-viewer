@@ -19,6 +19,11 @@
     @apply mx-[0.5rem] md:mx-[5px];
   }
 
+  .JsonViewerToolBar .tool-bar-button:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 2px;
+  }
+
   .JsonViewerToolBar svg {
     @apply ml-[-0.2rem] mr-[0.1rem];
     @apply h-3.5 md:h-2.5;

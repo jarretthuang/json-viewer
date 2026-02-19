@@ -7,7 +7,7 @@ import MinimizeIcon from "@mui/icons-material/Minimize";
 import CleaningServicesIcon from "@mui/icons-material/CleaningServices";
 import FormatAlignRightIcon from "@mui/icons-material/FormatAlignRight";
 import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import _ from "lodash";
 import Editor from "react-simple-code-editor";
 import { highlight, languages } from "prismjs/components/prism-core";
@@ -32,15 +32,22 @@ function JsonViewerEditor({
 }: JsonViewerEditorProps) {
   const [lines, setLines] = useState<number[]>([]);
   const TEXT_AREA_ELEMENT_ID = "json-viewer-editor-textarea";
-  let textareaElement: HTMLElement | null = null;
+  const textareaElementRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
-    if (!textareaElement) {
-      textareaElement = document?.getElementById(TEXT_AREA_ELEMENT_ID);
+    if (!textareaElementRef.current) {
+      textareaElementRef.current = document?.getElementById(TEXT_AREA_ELEMENT_ID);
+    }
+
+    const textareaElement = textareaElementRef.current;
+    if (textareaElement) {
+      textareaElement.setAttribute("aria-label", "JSON editor");
+      textareaElement.setAttribute("spellcheck", "false");
     }
   });
 
   const updateLineNumbers = () => {
+    const textareaElement = textareaElementRef.current;
     if (textareaElement) {
       const height: number = textareaElement.offsetHeight ?? 0;
       const lineHeight: number =
@@ -57,7 +64,7 @@ function JsonViewerEditor({
   };
 
   useEffect(() => {
-    if (textareaElement) {
+    if (textareaElementRef.current) {
       updateLineNumbers();
     }
     window.addEventListener("resize", updateLineNumbers);

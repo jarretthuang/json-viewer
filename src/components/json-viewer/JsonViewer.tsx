@@ -30,9 +30,17 @@ function JsonViewer({ createNotification }: WithNotification) {
 
   const [currentText, updateText] = useState(initialText);
   const [jsonObject, updateJsonObject] = useState(undefined);
+  const [liveMessage, setLiveMessage] = useState("");
 
   const isDefaultText = currentText === DEFAULT_TEXT;
   const textSize = currentText.length;
+
+  const announce = (message: string) => {
+    setLiveMessage("");
+    window.requestAnimationFrame(() => {
+      setLiveMessage(message);
+    });
+  };
 
   const parseJson = (text: string, notify: boolean = true) => {
     try {
@@ -55,13 +63,16 @@ function JsonViewer({ createNotification }: WithNotification) {
           message: error,
         };
         createNotification(notification);
+        announce("Invalid JSON. Please fix syntax errors.");
       }
       return undefined;
     }
   };
 
-  const handleCopy = (text: string) =>
+  const handleCopy = (text: string) => {
     copyTextToClipboard(text, createNotification);
+    announce("Copied to clipboard.");
+  };
 
   const renderView = (viewType: ViewType) => {
     const isInEditView = viewType === "edit";
@@ -94,6 +105,7 @@ function JsonViewer({ createNotification }: WithNotification) {
     if (parsedJson) {
       updateJsonObject(parsedJson);
       switchView("view");
+      announce("Switched to view mode.");
     }
   };
 
@@ -102,6 +114,7 @@ function JsonViewer({ createNotification }: WithNotification) {
     const newText = JSON.stringify(newJson, null, 2);
     updateText(newText);
     updateJsonUrlParam(newText);
+    announce("JSON updated.");
   };
 
   function handleUpdateText(s: string): void {
@@ -157,22 +170,31 @@ function JsonViewer({ createNotification }: WithNotification) {
         <meta name="theme-color" content="#fdfeff" />
       </Head>
       <div className="view-switcher flex h-14 w-full md:h-8">
-        <div className="buttons relative w-full justify-center">
-          <div
+        <div className="buttons relative w-full justify-center" role="tablist" aria-label="JSON viewer mode">
+          <button
+            type="button"
+            role="tab"
+            aria-selected={currentView === "view"}
             className="button view-switcher-button"
             data-selected={currentView === "view"}
             onClick={openTreeView}
           >
             View
-          </div>
+          </button>
           <b className="w-4"></b>
-          <div
+          <button
+            type="button"
+            role="tab"
+            aria-selected={currentView === "edit"}
             className="button view-switcher-button"
             data-selected={currentView === "edit"}
-            onClick={() => switchView("edit")}
+            onClick={() => {
+              switchView("edit");
+              announce("Switched to edit mode.");
+            }}
           >
             Edit
-          </div>
+          </button>
           {!isDefaultText && (
             <div className="invisible absolute bottom-0 right-0 whitespace-nowrap text-[1rem] font-normal text-powderBlue-600 opacity-50 dark:text-slate-200 md:visible md:text-[0.5rem]">
               {textSize.toLocaleString()}
@@ -180,6 +202,9 @@ function JsonViewer({ createNotification }: WithNotification) {
             </div>
           )}
         </div>
+      </div>
+      <div className="sr-only" aria-live="polite" aria-atomic="true">
+        {liveMessage}
       </div>
       {renderView(currentView)}
     </div>

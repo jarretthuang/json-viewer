@@ -30,7 +30,7 @@ export default function NavBar({ createNotification }: WithNotification) {
     } else {
       copyTextToClipboard(currentUrl, createNotification, "A shareable URL");
     }
-  }, [onShare]);
+  }, [onShare, createNotification]);
 
   const renderExpandedContent = () => {
     return (
@@ -46,28 +46,42 @@ export default function NavBar({ createNotification }: WithNotification) {
   function renderHeaderIcons() {
     return (
       <>
-        <ArrowBackIcon
-          className="mx-2 opacity-50 hover:opacity-60 md:mx-1"
+        <button
+          type="button"
+          className="nav-icon-button"
+          aria-label="Go back"
           onClick={() => window.history.back()}
-          style={{ height: "85%" }}
-        />
-        <ArrowForwardIcon
-          className="mx-2 opacity-50 hover:opacity-60 md:mx-1"
+        >
+          <ArrowBackIcon className="nav-icon" style={{ height: "85%" }} />
+        </button>
+        <button
+          type="button"
+          className="nav-icon-button"
+          aria-label="Go forward"
           onClick={() => window.history.forward()}
-          style={{ height: "85%" }}
-        />
-        <ShareIcon
-          className="mx-2 opacity-50 hover:opacity-60 md:mx-1"
+        >
+          <ArrowForwardIcon className="nav-icon" style={{ height: "85%" }} />
+        </button>
+        <button
+          type="button"
+          className="nav-icon-button"
+          aria-label="Share URL"
           onClick={() => {
             setOnShare(Date.now());
           }}
-          style={{ height: "75%" }}
-        />
-        <MoreHorizIcon
-          className="mx-2 opacity-50 hover:opacity-60 md:mx-1"
+        >
+          <ShareIcon className="nav-icon" style={{ height: "75%" }} />
+        </button>
+        <button
+          type="button"
+          className="nav-icon-button"
+          aria-label="More options"
+          aria-expanded={expanded}
+          aria-controls="navbar-expanded-panel"
           onClick={() => expand(!expanded)}
-          style={{ height: "100%" }}
-        />
+        >
+          <MoreHorizIcon className="nav-icon" style={{ height: "100%" }} />
+        </button>
       </>
     );
   }
@@ -77,7 +91,7 @@ export default function NavBar({ createNotification }: WithNotification) {
       <nav className="NavBar group h-12 md:h-6" data-expanded={expanded}>
         <ul className="flex h-full w-full items-center justify-between">
           <li className="jh-logo p-2">
-            <a href="https://jhuang.ca" target="_blank">
+            <a href="https://jhuang.ca" target="_blank" rel="noreferrer" aria-label="Open JH Labs homepage">
               <Image
                 src="/logoBW.png"
                 alt="JH"
@@ -86,7 +100,7 @@ export default function NavBar({ createNotification }: WithNotification) {
                 height={40}
               />
             </a>
-            <a href="/" className="flex">
+            <a href="/" className="flex" aria-label="Go to JSON Viewer home">
               <span className="p-1 text-[25px] font-bold opacity-50 hover:opacity-60">
                 jsonviewer.io
               </span>
@@ -96,12 +110,22 @@ export default function NavBar({ createNotification }: WithNotification) {
         </ul>
       </nav>
       {expanded && (
-        <div className="expanded-content absolute left-0 top-0 z-10 flex h-[100svh] w-[100dvw] flex-col overflow-hidden">
+        <div
+          id="navbar-expanded-panel"
+          role="dialog"
+          aria-modal="true"
+          aria-label="JSON viewer information"
+          className="expanded-content absolute left-0 top-0 z-10 flex h-[100svh] w-[100dvw] flex-col overflow-hidden"
+        >
           <div className="flex w-full justify-end pr-5 pt-5">
-            <CloseIcon
-              className="cursor-pointer opacity-50 hover:opacity-60 md:p-0.5"
+            <button
+              type="button"
+              className="nav-close-button"
+              aria-label="Close information panel"
               onClick={() => expand(!expanded)}
-            />
+            >
+              <CloseIcon className="opacity-50 hover:opacity-60 md:p-0.5" />
+            </button>
           </div>
           {renderExpandedContent()}
           <Copyright />
