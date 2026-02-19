@@ -53,6 +53,25 @@ describe('CUJ regression coverage', () => {
     });
   });
 
+  test('tree Enter/Space toggles expansion and does not start inline edit', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+
+    await user.click(screen.getByRole('button', { name: /example/i }));
+    await user.click(screen.getByRole('tab', { name: /^view$/i }));
+
+    await user.click(screen.getByText('JSON'));
+    await user.keyboard('{Enter}');
+
+    expect(await screen.findByText('web-app')).toBeInTheDocument();
+    expect(screen.queryByLabelText(/edit key JSON/i)).not.toBeInTheDocument();
+
+    await user.keyboard(' ');
+    await waitFor(() => {
+      expect(screen.queryByText('web-app')).not.toBeInTheDocument();
+    });
+  });
+
   test('nav controls expose accessible button labels', () => {
     render(<App />);
 

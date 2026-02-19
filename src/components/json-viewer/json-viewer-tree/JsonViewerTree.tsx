@@ -19,7 +19,9 @@ import UndoIcon from "@mui/icons-material/Undo";
 function JsonViewerTree(props: any) {
   const [expanded, setExpanded]: [string[], any] = useState([]);
   const [unescaped, setUnescaped] = useState<boolean>(false);
+  const [focusedNodeId, setFocusedNodeId] = useState<string | null>(null);
   const allNodeIds = useRef<string[]>([]);
+  const expandableNodeIds = useRef<Set<string>>(new Set());
 
   function handleValueChange(path: (string | number)[], newValue: any) {
     if (!props.onJsonUpdate) return;
@@ -62,8 +64,28 @@ function JsonViewerTree(props: any) {
         defaultExpandIcon={<ChevronRightIcon />}
         sx={{ flexGrow: 1, overflowY: "auto" }}
         expanded={expanded}
+        onNodeFocus={(_, nodeId) => {
+          setFocusedNodeId(nodeId);
+        }}
         onNodeToggle={(_, nodeIds) => {
           setExpanded(nodeIds);
+        }}
+        onKeyDown={(e) => {
+          if ((e.key === "Enter" || e.key === " ") && focusedNodeId) {
+            if (expandableNodeIds.current.has(focusedNodeId)) {
+              e.preventDefault();
+              e.stopPropagation();
+              setExpanded((previous: string[]) => {
+                const expandedSet = new Set(previous);
+                if (expandedSet.has(focusedNodeId)) {
+                  expandedSet.delete(focusedNodeId);
+                } else {
+                  expandedSet.add(focusedNodeId);
+                }
+                return Array.from(expandedSet);
+              });
+            }
+          }
         }}
       >
         {renderTreeItems(json, unescaped)}
@@ -73,6 +95,7 @@ function JsonViewerTree(props: any) {
 
   function renderTreeItems(json: any, shouldUnescape: boolean) {
     const nodeIdSet = new Set<string>();
+    expandableNodeIds.current.clear();
     const result = populateTreeItems(
       json,
       "JSON", // Root Key Name
@@ -197,6 +220,8 @@ function JsonViewerTree(props: any) {
     path: (string | number)[] = [],
     isKeyEditable: boolean = false
   ) {
+    expandableNodeIds.current.add(nodeId);
+
     if (Array.isArray(json)) {
       return (
         <JsonViewerTreeItem

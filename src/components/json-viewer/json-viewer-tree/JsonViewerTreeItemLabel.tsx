@@ -46,12 +46,14 @@ function JsonViewerTreeItemLabel(props: JsonViewerTreeItemLabelProps) {
 
   const startEditingKey = (e: React.MouseEvent) => {
     if (!props.isKeyEditable) return;
+    if (e.detail === 0) return;
     e.stopPropagation();
     setIsEditingKey(true);
   };
 
   const startEditingValue = (e: React.MouseEvent) => {
     if (!props.isValueEditable) return;
+    if (e.detail === 0) return;
     e.stopPropagation();
 
     // Prepare value for editing (add quotes if string)
@@ -192,26 +194,22 @@ function JsonViewerTreeItemLabel(props: JsonViewerTreeItemLabelProps) {
             autoFocus
           />
         ) : (
-          <button
-            type="button"
+          <div
             className={`label-name text-slate-800 dark:text-offWhite ${
               props.isKeyEditable
                 ? "cursor-pointer hover:rounded hover:bg-black/5 hover:dark:bg-white/10"
                 : "cursor-default"
             }`}
-            disabled={!props.isKeyEditable}
-            onClick={startEditingKey}
-            onFocus={(e) => {
-              e.stopPropagation();
-            }}
+            role={props.isKeyEditable ? "button" : undefined}
             aria-label={
               props.isKeyEditable
                 ? `Edit key ${props.name}`
                 : `Key ${props.name}`
             }
+            onClick={startEditingKey}
           >
             {props.name}
-          </button>
+          </div>
         )}
 
         {renderSeparator()}
@@ -233,26 +231,22 @@ function JsonViewerTreeItemLabel(props: JsonViewerTreeItemLabelProps) {
               autoFocus
             />
           ) : (
-            <button
-              type="button"
+            <div
               className={`label-value text-gray-700 dark:text-powderBlue-100 ${
                 props.isValueEditable
                   ? "cursor-pointer hover:rounded hover:bg-black/5 hover:dark:bg-white/10"
                   : "cursor-default"
               }`}
-              disabled={!props.isValueEditable}
-              onClick={startEditingValue}
-              onFocus={(e) => {
-                e.stopPropagation();
-              }}
+              role={props.isValueEditable ? "button" : undefined}
               aria-label={
                 props.isValueEditable
                   ? `Edit value for ${props.name}`
                   : `Value for ${props.name}`
               }
+              onClick={startEditingValue}
             >
               {getDisplayValue()}
-            </button>
+            </div>
           ))}
 
         {renderIcon()}
