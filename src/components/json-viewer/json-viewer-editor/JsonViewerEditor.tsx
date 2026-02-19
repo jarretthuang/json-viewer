@@ -149,6 +149,7 @@ function JsonViewerEditor({
           onValueChange={(code) => updateText(code)}
           highlight={(code) => highlight(code, languages.js)}
           onClick={clearDefaultText}
+          ignoreTabKey
         />
       </div>
     </div>
