@@ -9,6 +9,13 @@
 
 :root {
   height: 100svh;
+  --focus-ring-color: #4fbac7;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --focus-ring-color: #b0e0e6;
+  }
 }
 
 html {
