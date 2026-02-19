@@ -39,7 +39,11 @@
   }
 
   .nav-icon {
-    font-size: 1.6rem;
+    font-size: 24px;
+  }
+
+  .nav-close-button svg {
+    font-size: 24px;
   }
 
   .nav-icon-button:focus-visible,
@@ -57,7 +61,11 @@
     }
 
     .nav-icon {
-      font-size: 0.9rem;
+      font-size: 14px;
+    }
+
+    .nav-close-button svg {
+      font-size: 16px;
     }
   }
 
