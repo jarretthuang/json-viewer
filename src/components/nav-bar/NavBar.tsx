@@ -47,24 +47,24 @@ export default function NavBar({ createNotification }: WithNotification) {
     return (
       <>
         <ArrowBackIcon
-          className="mx-2 opacity-50 hover:opacity-60 md:mx-1"
+          className="mx-2 opacity-50 hover:opacity-60 md:mx-1 md:!text-[18px]"
           onClick={() => window.history.back()}
           style={{ height: "85%" }}
         />
         <ArrowForwardIcon
-          className="mx-2 opacity-50 hover:opacity-60 md:mx-1"
+          className="mx-2 opacity-50 hover:opacity-60 md:mx-1 md:!text-[18px]"
           onClick={() => window.history.forward()}
           style={{ height: "85%" }}
         />
         <ShareIcon
-          className="mx-2 opacity-50 hover:opacity-60 md:mx-1"
+          className="mx-2 opacity-50 hover:opacity-60 md:mx-1 md:!text-[17px]"
           onClick={() => {
             setOnShare(Date.now());
           }}
           style={{ height: "75%" }}
         />
         <MoreHorizIcon
-          className="mx-2 opacity-50 hover:opacity-60 md:mx-1"
+          className="mx-2 opacity-50 hover:opacity-60 md:mx-1 md:!text-[20px]"
           onClick={() => expand(!expanded)}
           style={{ height: "100%" }}
         />
@@ -87,7 +87,7 @@ export default function NavBar({ createNotification }: WithNotification) {
               />
             </a>
             <a href="/" className="flex">
-              <span className="p-1 text-[25px] font-bold opacity-50 hover:opacity-60 md:p-0 md:text-base">
+              <span className="p-1 text-[25px] font-bold opacity-50 hover:opacity-60 md:p-0 md:text-sm">
                 jsonviewer.io
               </span>
             </a>
