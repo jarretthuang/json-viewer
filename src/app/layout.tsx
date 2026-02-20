@@ -12,7 +12,7 @@ const fonts = [ubuntu];
 const fontsCssClass = fonts.map((font) => font.className).join(" ");
 
 export const metadata: Metadata = {
-  title: "JSON Viewer - JH Labs",
+  title: "JSON Viewer",
   description:
     "A web app designed to validate, format, and visualize JSON texts.",
   icons: {
