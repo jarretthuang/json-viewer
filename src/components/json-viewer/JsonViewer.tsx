@@ -3,7 +3,6 @@ import { useState } from "react";
 
 import { ReactNotificationOptions } from "react-notifications-component";
 import JsonViewerTree from "./json-viewer-tree/JsonViewerTree";
-import Head from "next/head";
 import JsonViewerEditor from "./json-viewer-editor/JsonViewerEditor";
 import {
   compressToEncodedURIComponent,
@@ -165,10 +164,6 @@ function JsonViewer({ createNotification }: WithNotification) {
 
   return (
     <div className="JsonViewer flex w-full flex-1 flex-col bg-powderBlue-50 px-2 pb-2 dark:bg-neutral-950">
-      <Head>
-        <title>JSON Viewer - JH Labs</title>
-        <meta name="theme-color" content="#fdfeff" />
-      </Head>
       <div className="view-switcher flex h-14 w-full md:h-8">
         <div className="buttons relative w-full justify-center" role="tablist" aria-label="JSON viewer mode">
           <button
