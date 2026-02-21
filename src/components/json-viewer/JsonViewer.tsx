@@ -11,7 +11,7 @@ import { copyTextToClipboard } from "@/utils/handleCopy";
 import {
   parseJsonTextWithError,
   stringifyJson,
-} from "./domain/jsonDomain";
+} from "./model/jsonModel";
 import {
   buildUrlWithQueryParam,
   buildUrlWithoutQueryParam,
@@ -19,7 +19,7 @@ import {
   encodeJsonQueryParam,
   JSON_QUERY_PARAM,
   MAX_QUERY_PARAM_LENGTH,
-} from "./domain/jsonUrlState";
+} from "./model/jsonUrlModel";
 
 function JsonViewer({ createNotification }: WithNotification) {
   type ViewType = "view" | "edit";
