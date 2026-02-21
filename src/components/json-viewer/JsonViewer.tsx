@@ -4,31 +4,36 @@ import { useState } from "react";
 import { ReactNotificationOptions } from "react-notifications-component";
 import JsonViewerTree from "./json-viewer-tree/JsonViewerTree";
 import JsonViewerEditor from "./json-viewer-editor/JsonViewerEditor";
-import {
-  compressToEncodedURIComponent,
-  decompressFromEncodedURIComponent,
-} from "lz-string";
 import { useSearchParams } from "next/navigation";
 import "./JsonViewer.css";
 import { WithNotification } from "../notification/Notification";
 import { copyTextToClipboard } from "@/utils/handleCopy";
+import {
+  parseJsonTextWithError,
+  stringifyJson,
+} from "./utils/jsonUtils";
+import {
+  buildUrlWithQueryParam,
+  buildUrlWithoutQueryParam,
+  decodeJsonQueryParam,
+  encodeJsonQueryParam,
+  JSON_QUERY_PARAM,
+  MAX_QUERY_PARAM_LENGTH,
+} from "./utils/jsonUrlUtils";
 
 function JsonViewer({ createNotification }: WithNotification) {
   type ViewType = "view" | "edit";
 
-  // constants
-  const JSON_QUERY_PARAM: string = "json";
   const DEFAULT_TEXT: string = "Paste your JSON text here!";
-  const MAX_QUERY_PARAM_LENGTH: number = 20000;
 
   const [currentView, switchView] = useState<ViewType>("edit");
 
   const initialQueryParams = useSearchParams();
   const initialJsonQueryParam = initialQueryParams.get(JSON_QUERY_PARAM);
-  const initialText = decodeUrlParam(initialJsonQueryParam) ?? DEFAULT_TEXT;
+  const initialText = decodeJsonQueryParam(initialJsonQueryParam) ?? DEFAULT_TEXT;
 
   const [currentText, updateText] = useState(initialText);
-  const [jsonObject, updateJsonObject] = useState(undefined);
+  const [jsonObject, updateJsonObject] = useState<unknown>(undefined);
   const [liveMessage, setLiveMessage] = useState("");
 
   const isDefaultText = currentText === DEFAULT_TEXT;
@@ -42,30 +47,24 @@ function JsonViewer({ createNotification }: WithNotification) {
   };
 
   const parseJson = (text: string, notify: boolean = true) => {
-    try {
-      return JSON.parse(text);
-    } catch (e) {
-      console.log(e);
-      if (notify) {
-        let error: string;
-        if (typeof e === "string") {
-          error = e.toUpperCase(); // works, `e` narrowed to string
-        } else if (e instanceof Error) {
-          error = e.message; // works, `e` narrowed to Error
-        } else {
-          error = "";
-        }
-        const notification: ReactNotificationOptions = {
-          title: "Invalid JSON",
-          type: "info",
-          container: "top-center",
-          message: error,
-        };
-        createNotification(notification);
-        announce("Invalid JSON. Please fix syntax errors.");
-      }
-      return undefined;
+    const { parsed, errorMessage } = parseJsonTextWithError(text);
+
+    if (parsed !== undefined) {
+      return parsed;
     }
+
+    if (notify) {
+      const notification: ReactNotificationOptions = {
+        title: "Invalid JSON",
+        type: "info",
+        container: "top-center",
+        message: errorMessage,
+      };
+      createNotification(notification);
+      announce("Invalid JSON. Please fix syntax errors.");
+    }
+
+    return undefined;
   };
 
   const handleCopy = (text: string) => {
@@ -110,7 +109,7 @@ function JsonViewer({ createNotification }: WithNotification) {
 
   const handleJsonUpdate = (newJson: any) => {
     updateJsonObject(newJson);
-    const newText = JSON.stringify(newJson, null, 2);
+    const newText = stringifyJson(newJson);
     updateText(newText);
     updateJsonUrlParam(newText);
     announce("JSON updated.");
@@ -122,43 +121,11 @@ function JsonViewer({ createNotification }: WithNotification) {
   }
 
   function updateJsonUrlParam(text: string): void {
-    if (!text) {
-      removeUrlParameter(JSON_QUERY_PARAM); // remove query param if text is empty
-    } else {
-      const encodedText: string = compressToEncodedURIComponent(text);
-      if (encodedText.length <= MAX_QUERY_PARAM_LENGTH) {
-        //TODO: validate raw test instead of parsed text?
-        insertUrlParam(JSON_QUERY_PARAM, encodedText);
-      } else {
-        removeUrlParameter(JSON_QUERY_PARAM);
-      }
-    }
-  }
+    const encodedText = encodeJsonQueryParam(text, MAX_QUERY_PARAM_LENGTH);
+    const newUrl = encodedText
+      ? buildUrlWithQueryParam(window.location.href, JSON_QUERY_PARAM, encodedText)
+      : buildUrlWithoutQueryParam(window.location.href, JSON_QUERY_PARAM);
 
-  function insertUrlParam(key: string, value: string): void {
-    if (window.history.pushState) {
-      const searchParams = new URLSearchParams(window.location.search);
-      searchParams.set(key, value);
-      const newUrl =
-        window.location.protocol +
-        "//" +
-        window.location.host +
-        window.location.pathname +
-        "?" +
-        searchParams.toString();
-      window.history.pushState({ path: newUrl }, "", newUrl);
-    }
-  }
-
-  function decodeUrlParam(param: string | null): string | undefined {
-    return param ? decompressFromEncodedURIComponent(param) : undefined;
-  }
-
-  function removeUrlParameter(paramKey: string) {
-    const url = window.location.href;
-    const urlObject = new URL(url);
-    urlObject.searchParams.delete(paramKey);
-    const newUrl = urlObject.href;
     window.history.pushState({ path: newUrl }, "", newUrl);
   }
 
