@@ -3,9 +3,9 @@ import {
   buildUrlWithoutQueryParam,
   decodeJsonQueryParam,
   encodeJsonQueryParam,
-} from "./jsonUrlModel";
+} from "./jsonUrlUtils";
 
-describe("jsonUrlModel", () => {
+describe("jsonUrlUtils", () => {
   test("encodeJsonQueryParam encodes text and decodeJsonQueryParam restores it", () => {
     const source = '{"hello":"world"}';
     const encoded = encodeJsonQueryParam(source);

@@ -3,9 +3,9 @@ import {
   parseJsonText,
   parseJsonTextWithError,
   stringifyJson,
-} from "./jsonModel";
+} from "./jsonUtils";
 
-describe("jsonModel", () => {
+describe("jsonUtils", () => {
   test("parseJsonText returns parsed object for valid JSON", () => {
     expect(parseJsonText('{"a":1}')).toEqual({ a: 1 });
   });
