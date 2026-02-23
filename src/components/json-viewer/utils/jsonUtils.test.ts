@@ -3,7 +3,7 @@ import {
   parseJsonText,
   parseJsonTextWithError,
   stringifyJson,
-  removeArrayItemAtPath,
+  removeJsonItemAtPath,
 } from "./jsonUtils";
 
 describe("jsonUtils", () => {
@@ -40,31 +40,41 @@ describe("jsonUtils", () => {
     expect(getJsonParseErrorMessage({})).toBe("");
   });
 
-  test("removeArrayItemAtPath removes an array element by path", () => {
+  test("removeJsonItemAtPath removes a value or container by path", () => {
     const input = {
       list: ["a", "b", "c"],
-      nested: { values: [{ id: 1 }, { id: 2 }] },
+      nested: { values: [{ id: 1 }, { id: 2 }], keep: true },
     };
 
-    expect(removeArrayItemAtPath(input, ["list", 1])).toEqual({
+    expect(removeJsonItemAtPath(input, ["list", 1])).toEqual({
       list: ["a", "c"],
+      nested: { values: [{ id: 1 }, { id: 2 }], keep: true },
+    });
+
+    expect(removeJsonItemAtPath(input, ["nested", "values", 0])).toEqual({
+      list: ["a", "b", "c"],
+      nested: { values: [{ id: 2 }], keep: true },
+    });
+
+    expect(removeJsonItemAtPath(input, ["nested", "keep"])).toEqual({
+      list: ["a", "b", "c"],
       nested: { values: [{ id: 1 }, { id: 2 }] },
     });
 
-    expect(removeArrayItemAtPath(input, ["nested", "values", 0])).toEqual({
+    expect(removeJsonItemAtPath(input, ["nested", "values"])).toEqual({
       list: ["a", "b", "c"],
-      nested: { values: [{ id: 2 }] },
+      nested: { keep: true },
     });
 
     // Ensure original input is unchanged.
     expect(input.list).toEqual(["a", "b", "c"]);
   });
 
-  test("removeArrayItemAtPath no-ops for invalid paths", () => {
+  test("removeJsonItemAtPath no-ops for invalid paths", () => {
     const input = { list: ["a", "b"] };
 
-    expect(removeArrayItemAtPath(input, ["list", 3])).toEqual(input);
-    expect(removeArrayItemAtPath(input, ["list", "1"])).toEqual(input);
-    expect(removeArrayItemAtPath(input, ["missing", 0])).toEqual(input);
+    expect(removeJsonItemAtPath(input, ["list", 3])).toEqual(input);
+    expect(removeJsonItemAtPath(input, ["list", "1"])).toEqual(input);
+    expect(removeJsonItemAtPath(input, ["missing", 0])).toEqual(input);
   });
 });
