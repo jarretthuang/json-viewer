@@ -154,7 +154,7 @@ function JsonViewerTreeItemLabel(props: JsonViewerTreeItemLabelProps) {
         )}
 
         {canRemove && (
-          <Tooltip title="Remove item" placement="top">
+          <Tooltip title="Remove" placement="top">
             <button
               type="button"
               className="label-action-button"
