@@ -3,6 +3,7 @@ import {
   parseJsonText,
   parseJsonTextWithError,
   stringifyJson,
+  removeJsonItemAtPath,
 } from "./jsonUtils";
 
 describe("jsonUtils", () => {
@@ -37,5 +38,43 @@ describe("jsonUtils", () => {
     expect(getJsonParseErrorMessage("oops")).toBe("OOPS");
     expect(getJsonParseErrorMessage(new Error("bad json"))).toBe("bad json");
     expect(getJsonParseErrorMessage({})).toBe("");
+  });
+
+  test("removeJsonItemAtPath removes a value or container by path", () => {
+    const input = {
+      list: ["a", "b", "c"],
+      nested: { values: [{ id: 1 }, { id: 2 }], keep: true },
+    };
+
+    expect(removeJsonItemAtPath(input, ["list", 1])).toEqual({
+      list: ["a", "c"],
+      nested: { values: [{ id: 1 }, { id: 2 }], keep: true },
+    });
+
+    expect(removeJsonItemAtPath(input, ["nested", "values", 0])).toEqual({
+      list: ["a", "b", "c"],
+      nested: { values: [{ id: 2 }], keep: true },
+    });
+
+    expect(removeJsonItemAtPath(input, ["nested", "keep"])).toEqual({
+      list: ["a", "b", "c"],
+      nested: { values: [{ id: 1 }, { id: 2 }] },
+    });
+
+    expect(removeJsonItemAtPath(input, ["nested", "values"])).toEqual({
+      list: ["a", "b", "c"],
+      nested: { keep: true },
+    });
+
+    // Ensure original input is unchanged.
+    expect(input.list).toEqual(["a", "b", "c"]);
+  });
+
+  test("removeJsonItemAtPath no-ops for invalid paths", () => {
+    const input = { list: ["a", "b"] };
+
+    expect(removeJsonItemAtPath(input, ["list", 3])).toEqual(input);
+    expect(removeJsonItemAtPath(input, ["list", "1"])).toEqual(input);
+    expect(removeJsonItemAtPath(input, ["missing", 0])).toEqual(input);
   });
 });

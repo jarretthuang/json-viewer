@@ -15,6 +15,7 @@ import OpenInFullIcon from "@mui/icons-material/OpenInFull";
 import CloseFullscreenIcon from "@mui/icons-material/CloseFullscreen";
 import CodeOffIcon from "@mui/icons-material/CodeOff";
 import UndoIcon from "@mui/icons-material/Undo";
+import { removeJsonItemAtPath } from "../utils/jsonUtils";
 
 function JsonViewerTree(props: any) {
   const [expanded, setExpanded]: [string[], any] = useState([]);
@@ -53,6 +54,12 @@ function JsonViewerTree(props: any) {
     parentObj[newKey] = value;
 
     props.onJsonUpdate(newJson);
+  }
+
+  function handleItemRemove(path: (string | number)[]) {
+    if (!props.onJsonUpdate) return;
+    const nextJson = removeJsonItemAtPath(props.json, path);
+    props.onJsonUpdate(nextJson);
   }
 
   function populateTree(json: Object) {
@@ -120,6 +127,7 @@ function JsonViewerTree(props: any) {
     path: (string | number)[] = [],
     isKeyEditable: boolean = false
   ) {
+    const isItemRemovable = path.length > 0 && !isUnescapedContent;
     const nodeId: string = nodeIdPrefix + "." + key;
     nodeIdSet.add(nodeId);
 
@@ -141,6 +149,8 @@ function JsonViewerTree(props: any) {
               onValueChange={handleValueChange}
               isKeyEditable={isKeyEditable && !isUnescapedContent}
               isValueEditable={!isUnescapedContent}
+              isRemovable={isItemRemovable}
+              onRemove={handleItemRemove}
             />
           }
         />
@@ -203,6 +213,8 @@ function JsonViewerTree(props: any) {
               onValueChange={handleValueChange}
               isKeyEditable={isKeyEditable && !isUnescapedContent}
               isValueEditable={!isUnescapedContent}
+              isRemovable={isItemRemovable}
+              onRemove={handleItemRemove}
             />
           }
         />
@@ -235,6 +247,8 @@ function JsonViewerTree(props: any) {
               path={path}
               onKeyChange={handleKeyChange}
               isKeyEditable={isKeyEditable && !isUnescapedContent}
+              isRemovable={path.length > 0 && !isUnescapedContent}
+              onRemove={handleItemRemove}
             />
           }
         >
@@ -265,6 +279,8 @@ function JsonViewerTree(props: any) {
               path={path}
               onKeyChange={handleKeyChange}
               isKeyEditable={isKeyEditable && !isUnescapedContent}
+              isRemovable={path.length > 0 && !isUnescapedContent}
+              onRemove={handleItemRemove}
             />
           }
         >

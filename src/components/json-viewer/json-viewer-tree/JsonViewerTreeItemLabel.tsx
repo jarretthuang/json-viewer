@@ -7,6 +7,7 @@ import { Fragment, useState, useEffect } from "react";
 import _ from "lodash";
 import { withDiagnostics } from "react-diagnostics";
 import CodeOffIcon from "@mui/icons-material/CodeOff";
+import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 
 export type JsonViewerTreeItemLabelType = "object" | "array" | "value";
 export type JsonValueType =
@@ -32,6 +33,8 @@ export type JsonViewerTreeItemLabelProps = {
   onValueChange?: (path: (string | number)[], newValue: any) => void;
   isKeyEditable?: boolean;
   isValueEditable?: boolean;
+  isRemovable?: boolean;
+  onRemove?: (path: (string | number)[]) => void;
 };
 
 function JsonViewerTreeItemLabel(props: JsonViewerTreeItemLabelProps) {
@@ -129,9 +132,12 @@ function JsonViewerTreeItemLabel(props: JsonViewerTreeItemLabelProps) {
 
   const renderActions = () => {
     if (isEditingKey || isEditingValue) return null;
-    if (props.type === "value") {
-      return (
-        <Fragment>
+
+    const canRemove = props.isRemovable && props.path && props.onRemove;
+
+    return (
+      <Fragment>
+        {props.type === "value" && (
           <Tooltip title="Copy" placement="top">
             <button
               type="button"
@@ -145,9 +151,25 @@ function JsonViewerTreeItemLabel(props: JsonViewerTreeItemLabelProps) {
               <ContentCopyIcon className="label-icon" aria-hidden="true" />
             </button>
           </Tooltip>
-        </Fragment>
-      );
-    }
+        )}
+
+        {canRemove && (
+          <Tooltip title="Remove" placement="top">
+            <button
+              type="button"
+              className="label-action-button"
+              onClick={(e) => {
+                e.stopPropagation();
+                props.onRemove?.(props.path!);
+              }}
+              aria-label={`Remove item ${props.name}`}
+            >
+              <DeleteOutlineIcon className="label-icon" aria-hidden="true" />
+            </button>
+          </Tooltip>
+        )}
+      </Fragment>
+    );
   };
 
   function getLabelValueAsText(): string {
