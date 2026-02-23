@@ -1,3 +1,5 @@
+import _ from "lodash";
+
 export function getJsonParseErrorMessage(error: unknown): string {
   if (typeof error === "string") {
     return error.toUpperCase();
@@ -31,4 +33,28 @@ export function parseJsonTextWithError(text: string): {
 
 export function stringifyJson(value: unknown): string {
   return JSON.stringify(value, null, 2);
+}
+
+export function removeArrayItemAtPath(
+  source: unknown,
+  path: (string | number)[]
+): unknown {
+  if (path.length === 0) return source;
+
+  const cloned = _.cloneDeep(source);
+  const parentPath = path.slice(0, -1);
+  const key = path[path.length - 1];
+
+  if (typeof key !== "number") return cloned;
+
+  const parent =
+    parentPath.length === 0
+      ? cloned
+      : parentPath.reduce<any>((acc, part) => (acc == null ? undefined : acc[part]), cloned);
+
+  if (!Array.isArray(parent)) return cloned;
+  if (key < 0 || key >= parent.length) return cloned;
+
+  parent.splice(key, 1);
+  return cloned;
 }
