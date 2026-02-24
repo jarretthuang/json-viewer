@@ -176,6 +176,7 @@
     padding: 0 0.5rem;
     display: none;
     align-items: center;
+    justify-content: end;
   }
 
   .JsonViewerTree > ul .MuiTreeItem-label .JsonViewerTreeItemLabel .label-icon {
