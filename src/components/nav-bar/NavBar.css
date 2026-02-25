@@ -30,7 +30,7 @@
   }
 
   .NavBar .nav-icon-button {
-    @apply mx-2 md:mx-1;
+    @apply mx-2.5 md:mx-1.5;
     opacity: 0.5;
   }
 
@@ -39,7 +39,7 @@
   }
 
   .NavBar .nav-icon {
-    @apply text-[1.6rem] md:text-[0.9rem];
+    @apply text-[1.8rem] md:text-[1.1rem];
   }
 
   .nav-icon-button:focus-visible,

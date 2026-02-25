@@ -108,7 +108,7 @@ export default function NavBar({ createNotification }: WithNotification) {
 
   return (
     <>
-      <nav className="NavBar group h-12 md:h-6" data-expanded={expanded}>
+      <nav className="NavBar group h-14 md:h-8" data-expanded={expanded}>
         <ul className="flex h-full w-full items-center justify-between">
           <li className="jh-logo p-2">
             <a href="https://jhuang.ca" target="_blank" rel="noreferrer" aria-label="Open JH Labs homepage">
@@ -121,7 +121,7 @@ export default function NavBar({ createNotification }: WithNotification) {
               />
             </a>
             <a href="/" className="flex" aria-label="Go to JSON Viewer home">
-              <span className="p-1 text-[25px] font-bold opacity-50 hover:opacity-60">
+              <span className="p-1 text-[28px] font-bold opacity-50 hover:opacity-60 md:text-[24px]">
                 jsonviewer.io
               </span>
             </a>

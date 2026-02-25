@@ -43,15 +43,15 @@
   }
 
   .JsonViewerTree > ul .MuiTreeItem-content {
-    @apply md:rounded-[0.2rem] md:min-h-[1rem] md:py-0;
+    @apply md:rounded-[0.25rem] md:min-h-[1.3rem] md:py-[0.08rem];
 
-    border-radius: 0.4rem;
-    margin: 0.1rem 0;
+    border-radius: 0.5rem;
+    margin: 0.12rem 0;
     align-items: center;
-    min-height: 2rem;
+    min-height: 2.2rem;
     height: fit-content;
-    padding-top: 0.2rem;
-    padding-bottom: 0.2rem;
+    padding-top: 0.24rem;
+    padding-bottom: 0.24rem;
   }
 
   .JsonViewerTree > ul .MuiTreeItem-iconContainer {
@@ -61,15 +61,15 @@
   }
 
   .JsonViewerTree > ul .MuiTreeItem-iconContainer svg {
-    @apply md:text-[0.85rem];
+    @apply md:text-[0.95rem];
 
-    font-size: 1rem;
+    font-size: 1.12rem;
   }
 
   .JsonViewerTree > ul .MuiTreeItem-label {
-    @apply md:text-[0.9rem];
+    @apply md:text-[1rem];
 
-    font-size: 1rem;
+    font-size: 1.1rem;
     padding: 0 0.6rem 0 0.1rem;
     text-align: start;
   }
@@ -207,11 +207,11 @@
   }
 
   .JsonViewerTree > ul .MuiTreeItem-label .JsonViewerTreeItemLabel .label-icon {
-    @apply md:text-[0.85rem];
+    @apply md:text-[0.95rem];
 
     align-self: center;
-    margin-left: 0.2rem;
-    font-size: 1rem;
+    margin-left: 0.24rem;
+    font-size: 1.12rem;
     padding: 0;
   }
 
@@ -220,9 +220,9 @@
     .MuiTreeItem-label
     .JsonViewerTreeItemLabel
     .label-icon--remove {
-    @apply md:text-[0.95rem];
+    @apply md:text-[1.05rem];
 
-    font-size: 1.08rem;
+    font-size: 1.2rem;
   }
 
   .JsonViewerTree

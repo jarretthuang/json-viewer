@@ -6,7 +6,7 @@
   }
 
   .view-switcher-button {
-    @apply shadow-subtle w-[5rem] cursor-pointer select-none rounded-2xl p-[0.2rem] text-center text-lg text-powderBlue-600 hover:bg-powderBlue-300 hover:text-offWhite dark:text-slate-200 dark:shadow-none dark:hover:bg-powderBlue-500 md:w-[3rem] md:p-[0.1rem] md:text-xs;
+    @apply shadow-subtle w-[5.5rem] cursor-pointer select-none rounded-2xl p-[0.28rem] text-center text-[1.25rem] text-powderBlue-600 hover:bg-powderBlue-300 hover:text-offWhite dark:text-slate-200 dark:shadow-none dark:hover:bg-powderBlue-500 md:w-[3.4rem] md:p-[0.16rem] md:text-sm;
     @apply selected:bg-powderBlue-400 selected:text-offWhite dark:selected:bg-powderBlue-600;
 
     border: none;
@@ -19,6 +19,6 @@
   }
 
   .JsonViewer {
-    font-size: 1rem;
+    font-size: 1.08rem;
   }
 }
