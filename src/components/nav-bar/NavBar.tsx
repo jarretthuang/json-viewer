@@ -121,7 +121,7 @@ export default function NavBar({ createNotification }: WithNotification) {
               />
             </a>
             <a href="/" className="flex" aria-label="Go to JSON Viewer home">
-              <span className="p-1 text-[28px] font-bold opacity-50 hover:opacity-60 md:text-[24px]">
+              <span className="p-1 text-3xl font-bold opacity-50 hover:opacity-60 md:text-2xl">
                 jsonviewer.io
               </span>
             </a>

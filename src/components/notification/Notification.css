@@ -2,7 +2,7 @@
 
 @layer components {
   .Notification {
-    @apply text-[1rem] md:text-[0.5rem];
+    @apply text-base md:text-xs;
   }
 
   .Notification .notification {

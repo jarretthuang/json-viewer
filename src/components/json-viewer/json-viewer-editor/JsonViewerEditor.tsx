@@ -166,7 +166,7 @@ function JsonViewerEditor({
   return (
     <div className="JsonViewerEditor flex h-full w-full flex-col dark:bg-zinc-900 dark:text-blue-100">
       {renderToolBar()}
-      <div className="flex h-[calc(100%-3.5rem)] w-full flex-row overflow-y-auto py-2 pl-1 pr-2 font-mono text-[1.1rem] md:h-[calc(100%-2rem)] md:text-[1.05rem]">
+      <div className="flex h-[calc(100%-3.5rem)] w-full flex-row overflow-y-auto py-2 pl-1 pr-2 font-mono text-lg md:h-[calc(100%-2rem)] md:text-base">
         <div className="select-none px-1 text-end font-bold text-powderBlue-400 dark:text-zinc-500 [&>*]:select-text">
           {lines.map((line) => (
             <div key={line}>{line}</div>

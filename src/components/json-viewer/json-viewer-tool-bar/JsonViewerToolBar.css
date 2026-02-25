@@ -14,9 +14,9 @@
 
   .JsonViewerToolBar .tool-bar-button {
     @apply flex flex-row items-center;
-    @apply border-none rounded px-2.5 py-[0.18rem] md:px-2 md:py-[0.12rem];
+    @apply border-none rounded px-2.5 py-0.5 md:px-2 md:py-0;
     @apply text-center cursor-pointer select-none whitespace-nowrap;
-    @apply mx-[0.5rem] md:mx-[6px];
+    @apply mx-2 md:mx-1.5;
   }
 
   .JsonViewerToolBar .tool-bar-button:focus-visible {
@@ -26,11 +26,11 @@
 
   .JsonViewerToolBar svg {
     @apply ml-[-0.2rem] mr-[0.1rem];
-    @apply h-[1.125rem] md:h-3;
-    @apply w-[1.125rem] md:w-3;
+    @apply h-4 md:h-3;
+    @apply w-4 md:w-3;
   }
 
   .JsonViewerToolBar .tool-bar-button-label {
-    @apply font-medium lowercase text-[1.05rem] md:text-[0.75rem];
+    @apply font-medium lowercase text-base md:text-xs;
   }
 }

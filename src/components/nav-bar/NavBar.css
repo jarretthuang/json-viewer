@@ -39,7 +39,7 @@
   }
 
   .NavBar .nav-icon {
-    @apply text-[1.8rem] md:text-[1.1rem];
+    @apply text-3xl md:text-lg;
   }
 
   .nav-icon-button:focus-visible,
@@ -63,7 +63,7 @@
   }
 
   .expanded-content .content {
-    @apply h-[calc(100%-6rem)] text-center text-[1.1rem] md:h-[calc(100%-3rem)] md:text-left md:text-[1rem];
+    @apply h-[calc(100%-6rem)] text-center text-lg md:h-[calc(100%-3rem)] md:text-left md:text-base;
 
     width: 100%;
     display: flex;
@@ -72,7 +72,7 @@
   }
 
   .expanded-content .content .title {
-    @apply text-[2.2rem] md:text-[2rem];
+    @apply text-4xl md:text-3xl;
 
     font-weight: 500;
   }
@@ -93,7 +93,7 @@
   }
 
   .expanded-content .content code {
-    @apply text-left text-[1rem] md:text-[0.95rem];
+    @apply text-left text-base md:text-sm;
 
     white-space: break-spaces;
     user-select: text;
