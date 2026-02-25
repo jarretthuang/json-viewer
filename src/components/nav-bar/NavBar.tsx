@@ -12,6 +12,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import ShareIcon from "@mui/icons-material/Share";
 import { WithNotification } from "../notification/Notification";
 import { copyTextToClipboard } from "@/utils/handleCopy";
+import ModeToggle from "@/components/theme/ModeToggle";
 
 export default function NavBar({ createNotification }: WithNotification) {
   const [expanded, expand] = useState(false);
@@ -92,6 +93,7 @@ export default function NavBar({ createNotification }: WithNotification) {
         >
           <ShareIcon className="nav-icon" style={{ height: "75%" }} />
         </button>
+        <ModeToggle />
         <button
           type="button"
           className="nav-icon-button"

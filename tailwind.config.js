@@ -51,7 +51,7 @@ module.exports = {
       },
     },
   },
-  darkMode: "media",
+  darkMode: "class",
   plugins: [
     plugin(function ({ addVariant }) {
       addVariant("expanded", "&[data-expanded=true]");

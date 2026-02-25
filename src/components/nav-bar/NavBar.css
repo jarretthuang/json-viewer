@@ -29,6 +29,10 @@
     cursor: pointer;
   }
 
+  .nav-icon-button {
+    position: relative;
+  }
+
   .NavBar .nav-icon-button {
     margin: 0 0.5rem;
     opacity: 0.5;
@@ -40,6 +44,16 @@
 
   .NavBar .nav-icon {
     font-size: 1.6rem;
+  }
+
+  .NavBar .theme-auto-indicator {
+    font-size: 0.55rem;
+    line-height: 1;
+    font-weight: 700;
+    position: absolute;
+    right: 0.15rem;
+    bottom: 0.05rem;
+    opacity: 0.75;
   }
 
   .nav-icon-button:focus-visible,
