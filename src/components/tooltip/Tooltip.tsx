@@ -22,7 +22,7 @@ export const Tooltip = styled(
   ({ theme, fontSize, backgroundColor, fontColor, padding }) => ({
     [`& .${tooltipClasses.tooltip}`]: {
       boxShadow: theme.shadows[1],
-      fontSize: fontSize ?? "clamp(0.4rem, 0.95vw, 1rem)",
+      fontSize: fontSize ?? "0.9rem",
       userSelect: "none",
       backgroundColor: backgroundColor,
       color: fontColor,
