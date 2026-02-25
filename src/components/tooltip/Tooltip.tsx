@@ -22,11 +22,7 @@ export const Tooltip = styled(
   ({ theme, fontSize, backgroundColor, fontColor, padding }) => ({
     [`& .${tooltipClasses.tooltip}`]: {
       boxShadow: theme.shadows[1],
-      fontSize: fontSize ?? "0.4rem",
-      // 768px = tailwind "md"
-      "@media (max-width:768px)": {
-        fontSize: "1rem",
-      },
+      fontSize: fontSize ?? "clamp(0.4rem, 0.95vw, 1rem)",
       userSelect: "none",
       backgroundColor: backgroundColor,
       color: fontColor,

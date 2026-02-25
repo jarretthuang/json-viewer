@@ -30,7 +30,7 @@
   }
 
   .NavBar .nav-icon-button {
-    margin: 0 0.5rem;
+    @apply mx-2 md:mx-1;
     opacity: 0.5;
   }
 
@@ -39,7 +39,7 @@
   }
 
   .NavBar .nav-icon {
-    font-size: 1.6rem;
+    @apply text-[1.6rem] md:text-[0.9rem];
   }
 
   .nav-icon-button:focus-visible,
@@ -49,16 +49,6 @@
     outline: 2px solid var(--focus-ring-color);
     outline-offset: 2px;
     border-radius: 0.25rem;
-  }
-
-  @media (min-width: 768px) {
-    .NavBar .nav-icon-button {
-      margin: 0 0.25rem;
-    }
-
-    .NavBar .nav-icon {
-      font-size: 0.9rem;
-    }
   }
 
   .expanded-content {
@@ -73,17 +63,17 @@
   }
 
   .expanded-content .content {
+    @apply h-[calc(100%-6rem)] text-center text-[1.1rem] md:h-[calc(100%-3rem)] md:text-left md:text-[1rem];
+
     width: 100%;
     display: flex;
     flex-direction: column;
-    text-align: left;
-    height: calc(100% - 3rem);
     overflow-y: auto;
-    font-size: 1rem;
   }
 
   .expanded-content .content .title {
-    font-size: 2rem;
+    @apply text-[2.2rem] md:text-[2rem];
+
     font-weight: 500;
   }
 
@@ -103,8 +93,9 @@
   }
 
   .expanded-content .content code {
+    @apply text-left text-[1rem] md:text-[0.95rem];
+
     white-space: break-spaces;
-    font-size: 0.95rem;
     user-select: text;
     cursor: auto;
   }
@@ -115,22 +106,5 @@
     margin-block-end: 1em;
     margin-inline-start: 0;
     margin-inline-end: 0;
-  }
-
-  @media (max-width: 800px) {
-    .expanded-content .content {
-      font-size: 1.1rem;
-      height: calc(100% - 6rem);
-      text-align: center;
-    }
-
-    .expanded-content .content .title {
-      font-size: 2.2rem;
-    }
-
-    .expanded-content .content code {
-      font-size: 1rem;
-      text-align: left;
-    }
   }
 }
