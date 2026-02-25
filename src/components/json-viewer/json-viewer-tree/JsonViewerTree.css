@@ -255,6 +255,14 @@
       padding: 0;
     }
 
+    .JsonViewerTree
+      > ul
+      .MuiTreeItem-label
+      .JsonViewerTreeItemLabel
+      .label-icon--remove {
+      font-size: 1.08rem;
+    }
+
     .JsonViewerTree > ul .MuiTreeItem-label .JsonViewerTreeItemLabel .label-actions {
       width: 3rem;
     }
