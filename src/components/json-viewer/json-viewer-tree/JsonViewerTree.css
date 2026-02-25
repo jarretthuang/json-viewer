@@ -187,6 +187,24 @@
 
   .JsonViewerTree
     > ul
+    .MuiTreeItem-label
+    .JsonViewerTreeItemLabel
+    .label-icon--remove {
+    font-size: 0.74rem;
+  }
+
+  @media (min-width: 768px) {
+    .JsonViewerTree
+      > ul
+      .MuiTreeItem-label
+      .JsonViewerTreeItemLabel
+      .label-icon--remove {
+      font-size: 0.68rem;
+    }
+  }
+
+  .JsonViewerTree
+    > ul
     .MuiTreeItem-label:hover
     .JsonViewerTreeItemLabel[data-is-editing="false"]
     .label-content {
@@ -199,5 +217,58 @@
     .JsonViewerTreeItemLabel[data-is-editing="false"]
     .label-actions {
     display: flex;
+  }
+
+  @media (max-width: 800px) {
+    .JsonViewerTree > ul {
+      overflow-x: scroll;
+      padding-bottom: 0.5rem;
+    }
+
+    .JsonViewerTree > ul > li {
+      width: max-content;
+      max-width: 130dvw;
+      min-width: 100%;
+    }
+
+    .JsonViewerTree > ul .MuiTreeItem-content {
+      border-radius: 0.4rem;
+      min-height: 2rem;
+      padding-top: 0.2rem;
+      padding-bottom: 0.2rem;
+    }
+
+    .JsonViewerTree > ul .MuiTreeItem-iconContainer {
+      padding: 0 0.5rem;
+    }
+
+    .JsonViewerTree > ul .MuiTreeItem-iconContainer svg {
+      font-size: 1rem;
+    }
+
+    .JsonViewerTree > ul .MuiTreeItem-label {
+      font-size: 1rem;
+    }
+
+    .JsonViewerTree > ul .MuiTreeItem-label .JsonViewerTreeItemLabel .label-icon {
+      font-size: 1rem;
+      padding: 0;
+    }
+
+    .JsonViewerTree
+      > ul
+      .MuiTreeItem-label
+      .JsonViewerTreeItemLabel
+      .label-icon--remove {
+      font-size: 1.08rem;
+    }
+
+    .JsonViewerTree > ul .MuiTreeItem-label .JsonViewerTreeItemLabel .label-actions {
+      width: 3rem;
+    }
+
+    .JsonViewerTree > ul .MuiTreeItem-label .JsonViewerTreeItemLabel:hover .label-content {
+      width: calc(100% - 4rem);
+    }
   }
 }

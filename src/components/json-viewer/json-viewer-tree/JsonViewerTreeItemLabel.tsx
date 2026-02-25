@@ -164,7 +164,10 @@ function JsonViewerTreeItemLabel(props: JsonViewerTreeItemLabelProps) {
               }}
               aria-label={`Remove item ${props.name}`}
             >
-              <DeleteOutlineIcon className="label-icon" aria-hidden="true" />
+              <DeleteOutlineIcon
+                className="label-icon label-icon--remove"
+                aria-hidden="true"
+              />
             </button>
           </Tooltip>
         )}
