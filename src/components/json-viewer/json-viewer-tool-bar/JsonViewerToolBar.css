@@ -26,8 +26,8 @@
 
   .JsonViewerToolBar svg {
     @apply ml-[-0.2rem] mr-[0.1rem];
-    @apply h-4.5 md:h-3;
-    @apply w-4.5 md:w-3;
+    @apply h-[1.125rem] md:h-3;
+    @apply w-[1.125rem] md:w-3;
   }
 
   .JsonViewerToolBar .tool-bar-button-label {
