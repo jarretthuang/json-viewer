@@ -22,48 +22,5 @@
     .JsonViewer {
       font-size: 1rem;
     }
-
-    .JsonViewer .JsonViewerTree > ul {
-      overflow-x: scroll;
-      padding-bottom: 0.5rem;
-    }
-
-    .JsonViewer .JsonViewerTree > ul > li {
-      width: max-content;
-      max-width: 130dvw;
-      min-width: 100%;
-    }
-
-    .JsonViewer .JsonViewerTree > ul .MuiTreeItem-content {
-      border-radius: 0.4rem;
-      min-height: 2rem;
-      padding-top: 0.2rem;
-      padding-bottom: 0.2rem;
-    }
-
-    .JsonViewer .JsonViewerTree > ul .MuiTreeItem-iconContainer {
-      padding: 0 0.5rem;
-    }
-
-    .JsonViewer .JsonViewerTree > ul .MuiTreeItem-iconContainer svg {
-      font-size: 1rem;
-    }
-
-    .JsonViewer .JsonViewerTree > ul .MuiTreeItem-label {
-      font-size: 1rem;
-    }
-
-    .JsonViewer .JsonViewerTree > ul .MuiTreeItem-label .JsonViewerTreeItemLabel .label-icon {
-      font-size: 1rem;
-      padding: 0;
-    }
-
-    .JsonViewer .JsonViewerTree > ul .MuiTreeItem-label .JsonViewerTreeItemLabel .label-actions {
-      width: 3rem;
-    }
-
-    .JsonViewer .JsonViewerTree > ul .MuiTreeItem-label .JsonViewerTreeItemLabel:hover .label-content {
-      width: calc(100% - 4rem);
-    }
   }
 }
