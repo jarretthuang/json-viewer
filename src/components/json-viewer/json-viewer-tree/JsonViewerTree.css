@@ -190,7 +190,17 @@
     .MuiTreeItem-label
     .JsonViewerTreeItemLabel
     .label-icon--remove {
-    font-size: 0.68rem;
+    font-size: 0.74rem;
+  }
+
+  @media (min-width: 768px) {
+    .JsonViewerTree
+      > ul
+      .MuiTreeItem-label
+      .JsonViewerTreeItemLabel
+      .label-icon--remove {
+      font-size: 0.68rem;
+    }
   }
 
   .JsonViewerTree
