@@ -14,7 +14,7 @@
 
   .JsonViewerToolBar .tool-bar-button {
     @apply flex flex-row items-center;
-    @apply border-none rounded-xl md:rounded px-2 py-[0.1rem];
+    @apply border-none rounded-lg md:rounded px-2 py-[0.1rem];
     @apply text-center cursor-pointer select-none whitespace-nowrap;
     @apply mx-[0.5rem] md:mx-[5px];
   }
