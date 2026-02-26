@@ -12,7 +12,7 @@ function JsonViewerToolBar(props: { options: JsonViewerToolBarOption[] }) {
               className="tool-bar-button text-powderBlue-500 enabled:hover:bg-powderBlue-200 enabled:hover:text-offWhite disabled:opacity-50 dark:text-slate-200 dark:enabled:hover:bg-powderBlue-600"
               onClick={option.onClick}
               key={option.label}
-              disabled={option.disabled}
+              disabled={option.disabled === true}
             >
               {option.icon}
               <div className="tool-bar-button-label relative inline-flex">

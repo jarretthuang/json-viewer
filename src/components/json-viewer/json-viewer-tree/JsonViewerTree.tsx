@@ -7,7 +7,7 @@ import _ from "lodash";
 import JsonViewerTreeItemLabel, {
   JsonValueType,
 } from "./JsonViewerTreeItemLabel";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import "./JsonViewerTree.css";
 import JsonViewerToolBar from "../json-viewer-tool-bar/JsonViewerToolBar";
 import { JsonViewerToolBarOption } from "../json-viewer-tool-bar/JsonViewerToolBarOption";
@@ -21,8 +21,13 @@ function JsonViewerTree(props: any) {
   const [expanded, setExpanded]: [string[], any] = useState([]);
   const [unescaped, setUnescaped] = useState<boolean>(false);
   const [focusedNodeId, setFocusedNodeId] = useState<string | null>(null);
+  const [isMounted, setIsMounted] = useState(false);
   const allNodeIds = useRef<string[]>([]);
   const expandableNodeIds = useRef<Set<string>>(new Set());
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   function handleValueChange(path: (string | number)[], newValue: any) {
     if (!props.onJsonUpdate) return;
@@ -302,6 +307,10 @@ function JsonViewerTree(props: any) {
   }
 
   function renderToolBar() {
+    const expandDisabled =
+      !isMounted || expanded.length === allNodeIds.current.length;
+    const collapseDisabled = !isMounted || expanded.length === 0;
+
     const options: JsonViewerToolBarOption[] = [
       {
         label: "Expand",
@@ -309,7 +318,7 @@ function JsonViewerTree(props: any) {
           setExpanded(allNodeIds.current);
         },
         icon: <OpenInFullIcon />,
-        disabled: expanded.length === allNodeIds.current.length,
+        disabled: expandDisabled,
       },
       {
         label: "Collapse",
@@ -317,7 +326,7 @@ function JsonViewerTree(props: any) {
           setExpanded([]);
         },
         icon: <CloseFullscreenIcon />,
-        disabled: expanded.length === 0,
+        disabled: collapseDisabled,
       },
       {
         label: "Unescape",
