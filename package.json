@@ -31,8 +31,7 @@
     "react-dom": "18.2.0",
     "react-markdown": "^8.0.7",
     "react-notifications": "^1.7.4",
-    "react-simple-code-editor": "^0.13.1",
-    "typescript": "5.0.4"
+    "react-simple-code-editor": "^0.13.1"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^6.9.1",
@@ -48,6 +47,7 @@
     "prettier": "^3.0.3",
     "prettier-plugin-tailwindcss": "^0.5.6",
     "react-diagnostics": "^1.0.2",
-    "tailwindcss": "^4.2.1"
+    "tailwindcss": "^4.2.1",
+    "typescript": "^5.9.3"
   }
 }
