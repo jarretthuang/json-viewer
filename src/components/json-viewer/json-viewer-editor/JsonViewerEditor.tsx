@@ -164,17 +164,17 @@ function JsonViewerEditor({
   }
 
   return (
-    <div className="JsonViewerEditor flex h-full w-full flex-col dark:bg-zinc-900 dark:text-blue-100">
+    <div className="JsonViewerEditor" style={{ display: "flex", height: "100%", width: "100%", flexDirection: "column" }}>
       {renderToolBar()}
-      <div className="flex h-[calc(100%-3.5rem)] w-full flex-row overflow-y-auto py-2 pl-1 pr-2 font-mono text-lg md:h-[calc(100%-2rem)] md:text-base">
-        <div className="select-none px-1 text-end font-bold text-powderBlue-400 dark:text-zinc-500 [&>*]:select-text">
+      <div style={{ display: "flex", height: "calc(100% - 3.5rem)", width: "100%", flexDirection: "row", overflowY: "auto", paddingTop: "0.5rem", paddingBottom: "0.5rem", paddingLeft: "0.25rem", paddingRight: "0.5rem", fontFamily: "monospace", fontSize: "1.125rem" }}>
+        <div style={{ userSelect: "none", paddingLeft: "0.25rem", paddingRight: "0.25rem", textAlign: "end", fontWeight: 700, color: "#318e99" }}>
           {lines.map((line) => (
             <div key={line}>{line}</div>
           ))}
         </div>
         <Editor
           textareaId={TEXT_AREA_ELEMENT_ID}
-          className="editor h-fit grow resize-none overflow-hidden whitespace-pre-wrap bg-transparent px-1 [&>textarea]:outline-none"
+          className="editor" style={{ height: "fit-content", flexGrow: 1, resize: "none", overflow: "hidden", whiteSpace: "pre-wrap", backgroundColor: "transparent", paddingLeft: "0.25rem", paddingRight: "0.25rem" }}
           value={currentText}
           onValueChange={(code) => updateText(code)}
           highlight={(code) => highlight(code, languages.js)}
@@ -182,7 +182,7 @@ function JsonViewerEditor({
           ignoreTabKey={allowTabFocusExit}
         />
       </div>
-      <div id={TEXT_AREA_HELP_ID} className="sr-only" aria-live="polite">
+      <div id={TEXT_AREA_HELP_ID} style={{ position: "absolute", width: 1, height: 1, padding: 0, margin: -1, overflow: "hidden", clip: "rect(0, 0, 0, 0)", whiteSpace: "nowrap", border: 0 }} aria-live="polite">
         In the editor, Tab inserts indentation. Press Escape, then Tab, to move focus outside the editor.
       </div>
     </div>

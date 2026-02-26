@@ -206,7 +206,7 @@ function JsonViewerTreeItemLabel(props: JsonViewerTreeItemLabelProps) {
         {isEditingKey ? (
           <input
             aria-label={`Edit key ${props.name}`}
-            className="rounded border border-gray-300 bg-white px-1 text-black outline-none dark:border-gray-600 dark:bg-neutral-800 dark:text-white"
+            style={{ borderRadius: "0.25rem", border: "1px solid #d1d5db", backgroundColor: "#ffffff", paddingLeft: "0.25rem", paddingRight: "0.25rem", color: "#000000", outline: "none" }}
             value={editedKey}
             onChange={(e) => setEditedKey(e.target.value)}
             onKeyDown={(e) => {
@@ -220,11 +220,12 @@ function JsonViewerTreeItemLabel(props: JsonViewerTreeItemLabelProps) {
           />
         ) : (
           <div
-            className={`label-name text-slate-800 dark:text-offWhite ${
-              props.isKeyEditable
-                ? "cursor-pointer hover:rounded hover:bg-black/5 hover:dark:bg-white/10"
-                : "cursor-default"
-            }`}
+            className="label-name"
+            style={{
+              color: "#1e293b",
+              cursor: props.isKeyEditable ? "pointer" : "default",
+              borderRadius: props.isKeyEditable ? "0.25rem" : undefined,
+            }}
             role={props.isKeyEditable ? "button" : undefined}
             aria-label={
               props.isKeyEditable
@@ -243,7 +244,7 @@ function JsonViewerTreeItemLabel(props: JsonViewerTreeItemLabelProps) {
           (isEditingValue ? (
             <input
               aria-label={`Edit value for ${props.name}`}
-              className="ml-1 flex-1 rounded border border-gray-300 bg-white px-1 text-black outline-none dark:border-gray-600 dark:bg-neutral-800 dark:text-white"
+              style={{ marginLeft: "0.25rem", flex: 1, borderRadius: "0.25rem", border: "1px solid #d1d5db", backgroundColor: "#ffffff", paddingLeft: "0.25rem", paddingRight: "0.25rem", color: "#000000", outline: "none" }}
               value={editedValue}
               onChange={(e) => setEditedValue(e.target.value)}
               onKeyDown={(e) => {
@@ -257,11 +258,12 @@ function JsonViewerTreeItemLabel(props: JsonViewerTreeItemLabelProps) {
             />
           ) : (
             <div
-              className={`label-value text-gray-700 dark:text-powderBlue-100 ${
-                props.isValueEditable
-                  ? "cursor-pointer hover:rounded hover:bg-black/5 hover:dark:bg-white/10"
-                  : "cursor-default"
-              }`}
+              className="label-value"
+              style={{
+                color: "#374151",
+                cursor: props.isValueEditable ? "pointer" : "default",
+                borderRadius: props.isValueEditable ? "0.25rem" : undefined,
+              }}
               role={props.isValueEditable ? "button" : undefined}
               aria-label={
                 props.isValueEditable

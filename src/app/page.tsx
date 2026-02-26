@@ -11,9 +11,9 @@ export default function App() {
   >(undefined);
 
   return (
-    <main className="flex h-full flex-col justify-center">
+    <main style={{ display: "flex", height: "100%", flexDirection: "column", justifyContent: "center" }}>
       <NavBar createNotification={createNotification} />
-      <Suspense fallback={<div className="flex-1" />}>
+      <Suspense fallback={<div style={{ flex: 1 }} />}>
         <JsonViewer createNotification={createNotification}></JsonViewer>
       </Suspense>
       <Notification notification={notification}></Notification>

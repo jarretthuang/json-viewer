@@ -19,13 +19,9 @@ export default function NavBar({ createNotification }: WithNotification) {
   const overlayRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    if (!onShare) {
-      return;
-    }
+    if (!onShare) return;
     const currentUrl = window.location.href + window.location.search;
-    if (!currentUrl) {
-      return;
-    }
+    if (!currentUrl) return;
     if (Boolean(navigator?.share)) {
       navigator.share({ url: currentUrl });
     } else {
@@ -34,62 +30,36 @@ export default function NavBar({ createNotification }: WithNotification) {
   }, [onShare, createNotification]);
 
   useEffect(() => {
-    if (!expanded) {
-      return;
-    }
-
+    if (!expanded) return;
     overlayRef.current?.focus();
-
     const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        expand(false);
-      }
+      if (e.key === "Escape") expand(false);
     };
-
     window.addEventListener("keydown", handleEscape);
-    return () => {
-      window.removeEventListener("keydown", handleEscape);
-    };
+    return () => window.removeEventListener("keydown", handleEscape);
   }, [expanded]);
 
-  const renderExpandedContent = () => {
-    return (
-      <div className="content items-center overflow-hidden">
-        <span className="title w-min whitespace-nowrap">JSON Viewer</span>
-        <div className="inner-content overflow-auto px-10">
-          <ReactMarkdown>{jsonViewerAppDescription}</ReactMarkdown>
-        </div>
+  const renderExpandedContent = () => (
+    <div className="content" style={{ alignItems: "center", overflow: "hidden" }}>
+      <span className="title" style={{ width: "min-content", whiteSpace: "nowrap" }}>
+        JSON Viewer
+      </span>
+      <div className="inner-content" style={{ overflow: "auto", paddingLeft: "2.5rem", paddingRight: "2.5rem" }}>
+        <ReactMarkdown>{jsonViewerAppDescription}</ReactMarkdown>
       </div>
-    );
-  };
+    </div>
+  );
 
   function renderHeaderIcons() {
     return (
       <>
-        <button
-          type="button"
-          className="nav-icon-button"
-          aria-label="Go back"
-          onClick={() => window.history.back()}
-        >
+        <button type="button" className="nav-icon-button" aria-label="Go back" onClick={() => window.history.back()}>
           <ArrowBackIcon className="nav-icon" style={{ height: "85%" }} />
         </button>
-        <button
-          type="button"
-          className="nav-icon-button"
-          aria-label="Go forward"
-          onClick={() => window.history.forward()}
-        >
+        <button type="button" className="nav-icon-button" aria-label="Go forward" onClick={() => window.history.forward()}>
           <ArrowForwardIcon className="nav-icon" style={{ height: "85%" }} />
         </button>
-        <button
-          type="button"
-          className="nav-icon-button"
-          aria-label="Share URL"
-          onClick={() => {
-            setOnShare(Date.now());
-          }}
-        >
+        <button type="button" className="nav-icon-button" aria-label="Share URL" onClick={() => setOnShare(Date.now())}>
           <ShareIcon className="nav-icon" style={{ height: "75%" }} />
         </button>
         <button
@@ -108,25 +78,25 @@ export default function NavBar({ createNotification }: WithNotification) {
 
   return (
     <>
-      <nav className="NavBar group h-14 md:h-8" data-expanded={expanded}>
-        <ul className="flex h-full w-full items-center justify-between">
-          <li className="jh-logo p-2">
+      <nav className="NavBar" style={{ height: "3.5rem" }} data-expanded={expanded}>
+        <ul style={{ display: "flex", height: "100%", width: "100%", alignItems: "center", justifyContent: "space-between" }}>
+          <li className="jh-logo" style={{ padding: "0.5rem" }}>
             <a href="https://jhuang.ca" target="_blank" rel="noreferrer" aria-label="Open JH Labs homepage">
               <Image
                 src="/logoBW.png"
                 alt="JH"
-                className="rounded-full object-contain opacity-50 invert hover:opacity-60 dark:invert-0"
+                style={{ borderRadius: "9999px", objectFit: "contain", opacity: 0.5, filter: "invert(1)" }}
                 width={40}
                 height={40}
               />
             </a>
-            <a href="/" className="flex" aria-label="Go to JSON Viewer home">
-              <span className="p-1 text-3xl font-bold opacity-50 hover:opacity-60 md:text-2xl">
+            <a href="/" style={{ display: "flex" }} aria-label="Go to JSON Viewer home">
+              <span style={{ padding: "0.25rem", fontSize: "1.875rem", fontWeight: 700, opacity: 0.5 }}>
                 jsonviewer.io
               </span>
             </a>
           </li>
-          <li className="flex h-full justify-end p-1">{renderHeaderIcons()}</li>
+          <li style={{ display: "flex", height: "100%", justifyContent: "flex-end", padding: "0.25rem" }}>{renderHeaderIcons()}</li>
         </ul>
       </nav>
       {expanded && (
@@ -137,16 +107,12 @@ export default function NavBar({ createNotification }: WithNotification) {
           role="dialog"
           aria-modal="true"
           aria-label="JSON viewer information"
-          className="expanded-content absolute left-0 top-0 z-10 flex h-[100svh] w-[100dvw] flex-col overflow-hidden"
+          className="expanded-content"
+          style={{ position: "absolute", left: 0, top: 0, zIndex: 10, display: "flex", height: "100svh", width: "100dvw", flexDirection: "column", overflow: "hidden" }}
         >
-          <div className="flex w-full justify-end pr-5 pt-5">
-            <button
-              type="button"
-              className="nav-close-button"
-              aria-label="Close information panel"
-              onClick={() => expand(!expanded)}
-            >
-              <CloseIcon className="opacity-50 hover:opacity-60 md:p-0.5" />
+          <div style={{ display: "flex", width: "100%", justifyContent: "flex-end", paddingRight: "1.25rem", paddingTop: "1.25rem" }}>
+            <button type="button" className="nav-close-button" aria-label="Close information panel" onClick={() => expand(!expanded)}>
+              <CloseIcon style={{ opacity: 0.5 }} />
             </button>
           </div>
           {renderExpandedContent()}

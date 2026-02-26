@@ -76,8 +76,8 @@ function JsonViewer({ createNotification }: WithNotification) {
     const isInEditView = viewType === "edit";
     return (
       <>
-        <div className="relative flex-1 overflow-hidden rounded-xl shadow-subtle dark:shadow-subtleWhite">
-          <div className="absolute h-full w-full" hidden={!isInEditView}>
+        <div style={{ position: "relative", flex: 1, overflow: "hidden", borderRadius: "0.75rem", boxShadow: "0px 0px 6px rgb(0 0 0 / 30%)" }}>
+          <div style={{ position: "absolute", height: "100%", width: "100%" }} hidden={!isInEditView}>
             <JsonViewerEditor
               currentText={currentText}
               isDefaultText={isDefaultText}
@@ -86,7 +86,7 @@ function JsonViewer({ createNotification }: WithNotification) {
               parseJson={parseJson}
             />
           </div>
-          <div className="absolute h-full w-full" hidden={isInEditView}>
+          <div style={{ position: "absolute", height: "100%", width: "100%" }} hidden={isInEditView}>
             <JsonViewerTree
               json={jsonObject}
               handleCopy={handleCopy}
@@ -130,9 +130,9 @@ function JsonViewer({ createNotification }: WithNotification) {
   }
 
   return (
-    <div className="JsonViewer flex w-full flex-1 flex-col bg-powderBlue-50 px-2 pb-2 dark:bg-neutral-950">
-      <div className="view-switcher flex h-14 w-full md:h-8">
-        <div className="buttons relative w-full justify-center" role="tablist" aria-label="JSON viewer mode">
+    <div className="JsonViewer" style={{ display: "flex", width: "100%", flex: 1, flexDirection: "column", backgroundColor: "#fdfeff", paddingLeft: "0.5rem", paddingRight: "0.5rem", paddingBottom: "0.5rem" }}>
+      <div className="view-switcher" style={{ display: "flex", height: "3.5rem", width: "100%" }}>
+        <div className="buttons" style={{ position: "relative", width: "100%", justifyContent: "center" }} role="tablist" aria-label="JSON viewer mode">
           <button
             type="button"
             role="tab"
@@ -143,7 +143,7 @@ function JsonViewer({ createNotification }: WithNotification) {
           >
             View
           </button>
-          <b className="w-4"></b>
+          <b style={{ width: "1rem" }}></b>
           <button
             type="button"
             role="tab"
@@ -158,14 +158,14 @@ function JsonViewer({ createNotification }: WithNotification) {
             Edit
           </button>
           {!isDefaultText && (
-            <div className="invisible absolute bottom-0 right-0 whitespace-nowrap text-base font-normal text-powderBlue-600 opacity-50 dark:text-slate-200 md:visible md:text-xs">
+            <div style={{ visibility: "hidden", position: "absolute", bottom: 0, right: 0, whiteSpace: "nowrap", fontSize: "1rem", fontWeight: 400, color: "#18464c", opacity: 0.5 }}>
               {textSize.toLocaleString()}
-              <span className="select-none"> characters</span>
+              <span style={{ userSelect: "none" }}> characters</span>
             </div>
           )}
         </div>
       </div>
-      <div className="sr-only" aria-live="polite" aria-atomic="true">
+      <div style={{ position: "absolute", width: 1, height: 1, padding: 0, margin: -1, overflow: "hidden", clip: "rect(0, 0, 0, 0)", whiteSpace: "nowrap", border: 0 }} aria-live="polite" aria-atomic="true">
         {liveMessage}
       </div>
       {renderView(currentView)}
