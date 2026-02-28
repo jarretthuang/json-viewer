@@ -2,6 +2,7 @@ import "./globals.css";
 import type { Metadata, Viewport } from "next";
 import { Ubuntu } from "next/font/google";
 import { Analytics } from "@vercel/analytics/react";
+import ThemeProvider from "@/components/theme/ThemeProvider";
 
 const ubuntu = Ubuntu({
   weight: ["300", "400", "500", "700"],
@@ -39,10 +40,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body className={fontsCssClass}>
-        {children}
-        <Analytics />
+        <ThemeProvider>
+          {children}
+          <Analytics />
+        </ThemeProvider>
       </body>
     </html>
   );
