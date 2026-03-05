@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
 import LightModeIcon from "@mui/icons-material/LightMode";
-import DarkModeIcon from "@mui/icons-material/DarkMode";
+import DarkModeOutlinedIcon from "@mui/icons-material/DarkModeOutlined";
 import { getNextThemeMode } from "./themeModeUtils";
 
 export default function ModeToggle() {
@@ -30,7 +30,7 @@ export default function ModeToggle() {
       onClick={() => setTheme(getNextThemeMode(theme))}
     >
       {resolvedTheme === "dark" ? (
-        <DarkModeIcon className="nav-icon" style={{ height: "75%" }} />
+        <DarkModeOutlinedIcon className="nav-icon" style={{ height: "75%" }} />
       ) : (
         <LightModeIcon className="nav-icon" style={{ height: "75%" }} />
       )}
