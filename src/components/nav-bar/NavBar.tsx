@@ -12,6 +12,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import ShareIcon from "@mui/icons-material/Share";
 import { WithNotification } from "../notification/Notification";
 import { copyTextToClipboard } from "@/utils/handleCopy";
+import ModeToggle from "@/components/theme/ModeToggle";
 
 export default function NavBar({ createNotification }: WithNotification) {
   const [expanded, expand] = useState(false);
@@ -68,7 +69,7 @@ export default function NavBar({ createNotification }: WithNotification) {
       <>
         <button
           type="button"
-          className="nav-icon-button"
+          className="nav-icon-button nav-mobile-hidden"
           aria-label="Go back"
           onClick={() => window.history.back()}
         >
@@ -76,7 +77,7 @@ export default function NavBar({ createNotification }: WithNotification) {
         </button>
         <button
           type="button"
-          className="nav-icon-button"
+          className="nav-icon-button nav-mobile-hidden"
           aria-label="Go forward"
           onClick={() => window.history.forward()}
         >
@@ -92,6 +93,7 @@ export default function NavBar({ createNotification }: WithNotification) {
         >
           <ShareIcon className="nav-icon" style={{ height: "75%" }} />
         </button>
+        <ModeToggle />
         <button
           type="button"
           className="nav-icon-button"

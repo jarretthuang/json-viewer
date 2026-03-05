@@ -29,6 +29,10 @@
     cursor: pointer;
   }
 
+  .nav-icon-button {
+    position: relative;
+  }
+
   .NavBar .nav-icon-button {
     margin: 0 0.5rem;
     opacity: 0.5;
@@ -42,6 +46,16 @@
     font-size: 1.6rem;
   }
 
+  .NavBar .theme-auto-indicator {
+    font-size: 0.45rem;
+    line-height: 1;
+    font-weight: 700;
+    position: absolute;
+    right: -0.12rem;
+    bottom: -0.1rem;
+    opacity: 0.75;
+  }
+
   .nav-icon-button:focus-visible,
   .nav-close-button:focus-visible,
   .NavBar a:focus-visible,
@@ -49,6 +63,12 @@
     outline: 2px solid var(--focus-ring-color);
     outline-offset: 2px;
     border-radius: 0.25rem;
+  }
+
+  @media (max-width: 767px) {
+    .NavBar .nav-mobile-hidden {
+      display: none;
+    }
   }
 
   @media (min-width: 768px) {
