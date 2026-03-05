@@ -47,12 +47,12 @@
   }
 
   .NavBar .theme-auto-indicator {
-    font-size: 0.55rem;
+    font-size: 0.45rem;
     line-height: 1;
     font-weight: 700;
     position: absolute;
-    right: 0.15rem;
-    bottom: 0.05rem;
+    right: -0.08rem;
+    bottom: -0.06rem;
     opacity: 0.75;
   }
 
