@@ -16,10 +16,10 @@ import {
   buildUrlWithQueryParam,
   buildUrlWithoutQueryParam,
   decodeJsonQueryParam,
-  encodeJsonQueryParam,
   JSON_QUERY_PARAM,
   MAX_QUERY_PARAM_LENGTH,
 } from "./utils/jsonUrlUtils";
+import { resolveShareTarget } from "./utils/shareStrategy";
 
 function JsonViewer({ createNotification }: WithNotification) {
   type ViewType = "view" | "edit";
@@ -121,10 +121,11 @@ function JsonViewer({ createNotification }: WithNotification) {
   }
 
   function updateJsonUrlParam(text: string): void {
-    const encodedText = encodeJsonQueryParam(text, MAX_QUERY_PARAM_LENGTH);
-    const newUrl = encodedText
-      ? buildUrlWithQueryParam(window.location.href, JSON_QUERY_PARAM, encodedText)
-      : buildUrlWithoutQueryParam(window.location.href, JSON_QUERY_PARAM);
+    const shareTarget = resolveShareTarget(text, "auto", MAX_QUERY_PARAM_LENGTH);
+    const newUrl =
+      shareTarget.type === "url"
+        ? buildUrlWithQueryParam(window.location.href, JSON_QUERY_PARAM, shareTarget.encoded)
+        : buildUrlWithoutQueryParam(window.location.href, JSON_QUERY_PARAM);
 
     window.history.pushState({ path: newUrl }, "", newUrl);
   }
