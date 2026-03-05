@@ -69,7 +69,7 @@ export default function NavBar({ createNotification }: WithNotification) {
       <>
         <button
           type="button"
-          className="nav-icon-button"
+          className="nav-icon-button nav-mobile-hidden"
           aria-label="Go back"
           onClick={() => window.history.back()}
         >
@@ -77,7 +77,7 @@ export default function NavBar({ createNotification }: WithNotification) {
         </button>
         <button
           type="button"
-          className="nav-icon-button"
+          className="nav-icon-button nav-mobile-hidden"
           aria-label="Go forward"
           onClick={() => window.history.forward()}
         >
