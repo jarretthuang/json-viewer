@@ -10,7 +10,9 @@
     "pretest": "node scripts/check-next-install.js",
     "pretest:ci": "node scripts/check-next-install.js",
     "test": "jest --runInBand",
-    "test:ci": "jest --ci --runInBand"
+    "test:cuj": "jest --ci --runInBand src/app/page.cuj.test.tsx",
+    "test:e2e": "playwright test",
+    "test:ci": "jest --ci --runInBand --testPathIgnorePatterns=e2e/"
   },
   "dependencies": {
     "@emotion/react": "^11.10.6",
@@ -41,6 +43,7 @@
     "typescript": "5.0.4"
   },
   "devDependencies": {
+    "@playwright/test": "^1.58.2",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
     "@testing-library/user-event": "^14.6.1",
