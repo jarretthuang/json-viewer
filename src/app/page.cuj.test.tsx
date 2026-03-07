@@ -72,7 +72,7 @@ describe('CUJ regression coverage', () => {
     });
   });
 
-  test('edit tab supports formatting JSON input', async () => {
+  test('edit tab supports format and minimize actions', async () => {
     const user = userEvent.setup();
     render(<App />);
 
@@ -84,9 +84,13 @@ describe('CUJ regression coverage', () => {
     await user.paste('{"a":1}');
 
     await user.click(screen.getByRole('button', { name: /^format$/i }));
-
     await waitFor(() => {
       expect(screen.getByLabelText(/json editor/i)).toHaveValue('{\n  "a": 1\n}');
+    });
+
+    await user.click(screen.getByRole('button', { name: /^minimize$/i }));
+    await waitFor(() => {
+      expect(screen.getByLabelText(/json editor/i)).toHaveValue('{"a":1}');
     });
   });
 

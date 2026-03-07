@@ -19,7 +19,7 @@ test("core CUJ smoke flow works", async ({ page }) => {
   await expect(page.getByRole("dialog", { name: /json viewer information/i })).toBeHidden();
 });
 
-test("edit tab can format JSON", async ({ page }) => {
+test("edit tab can format and minimize JSON", async ({ page }) => {
   await page.goto("/");
 
   await page.getByRole("tab", { name: /^edit$/i }).click();
@@ -29,4 +29,7 @@ test("edit tab can format JSON", async ({ page }) => {
 
   await page.getByRole("button", { name: /^format$/i }).click();
   await expect(editor).toHaveValue('{\n  "a": 1\n}');
+
+  await page.getByRole("button", { name: /^minimize$/i }).click();
+  await expect(editor).toHaveValue('{"a":1}');
 });
