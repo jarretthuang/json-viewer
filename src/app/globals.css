@@ -25,6 +25,11 @@ html {
   font-weight: 400;
   font-size: 4vmin;
   height: 100svh;
+  background-color: #fdfeff;
+}
+
+html.dark {
+  background-color: #0a0a0a;
 }
 
 body {
@@ -35,6 +40,11 @@ body {
   height: 100svh;
   width: 100dvw;
   overflow-x: hidden;
+  background-color: #fdfeff;
+}
+
+html.dark body {
+  background-color: #0a0a0a;
 }
 
 code {
