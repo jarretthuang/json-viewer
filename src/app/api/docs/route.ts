@@ -1,10 +1,15 @@
 import { NextResponse } from "next/server";
 
+import { buildOpenApiSpec } from "./openapi";
+
 export function GET(request: Request) {
   const origin = new URL(request.url).origin;
 
   return NextResponse.json({
     name: "json-viewer API",
+    docs: {
+      openapi: `${origin}/openapi.json`,
+    },
     endpoints: [
       {
         method: "POST",
@@ -12,10 +17,7 @@ export function GET(request: Request) {
         description:
           "Accepts any JSON payload and returns a shareable json-viewer URL.",
         requestBody: {
-          examples: [
-            { hello: "world" },
-            { json: { hello: "world" } },
-          ],
+          examples: [{ hello: "world" }, { json: { hello: "world" } }],
         },
         response: {
           example: {
@@ -24,5 +26,6 @@ export function GET(request: Request) {
         },
       },
     ],
+    openapi: buildOpenApiSpec(origin),
   });
 }
