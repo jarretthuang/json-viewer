@@ -72,6 +72,24 @@ describe('CUJ regression coverage', () => {
     });
   });
 
+  test('edit tab supports formatting JSON input', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+
+    await user.click(screen.getByRole('tab', { name: /^edit$/i }));
+
+    const editor = screen.getByLabelText(/json editor/i);
+    await user.clear(editor);
+    await user.click(editor);
+    await user.paste('{"a":1}');
+
+    await user.click(screen.getByRole('button', { name: /^format$/i }));
+
+    await waitFor(() => {
+      expect(screen.getByLabelText(/json editor/i)).toHaveValue('{\n  "a": 1\n}');
+    });
+  });
+
   test('nav controls expose accessible button labels', () => {
     render(<App />);
 
