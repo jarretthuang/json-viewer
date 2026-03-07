@@ -26,7 +26,10 @@ jobs:
       - name: Lint
         run: npm run lint
 
-      - name: Test
+      - name: CUJ regression tests
+        run: npm run test:cuj
+
+      - name: Full test suite
         run: npm run test:ci
 
       - name: Build

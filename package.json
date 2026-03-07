@@ -10,6 +10,7 @@
     "pretest": "node scripts/check-next-install.js",
     "pretest:ci": "node scripts/check-next-install.js",
     "test": "jest --runInBand",
+    "test:cuj": "jest --ci --runInBand src/app/page.cuj.test.tsx",
     "test:ci": "jest --ci --runInBand"
   },
   "dependencies": {
