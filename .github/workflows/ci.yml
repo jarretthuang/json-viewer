@@ -29,6 +29,12 @@ jobs:
       - name: CUJ regression tests
         run: npm run test:cuj
 
+      - name: Install Playwright WebKit browser
+        run: npx playwright install --with-deps webkit
+
+      - name: CUJ E2E smoke test (WebKit)
+        run: npm run test:e2e
+
       - name: Full test suite
         run: npm run test:ci
 
