@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-test("core CUJ works on mobile Safari profile", async ({ page }) => {
+test("core CUJ smoke flow works", async ({ page }) => {
   await page.goto("/");
 
   await expect(page.getByText("jsonviewer.io")).toBeVisible();
