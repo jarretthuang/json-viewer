@@ -38,6 +38,22 @@ describe("POST /api/json", () => {
     expect(decodeJsonQueryParam(encoded)).toBe(JSON.stringify({ answer: 42 }));
   });
 
+  it("does not unwrap payloads that contain json plus other keys", async () => {
+    const payload = { json: { answer: 42 }, meta: "keep-me" };
+    const request = new Request("https://example.com/api/json", {
+      method: "POST",
+      body: JSON.stringify(payload),
+      headers: { "Content-Type": "application/json" },
+    });
+
+    const response = await POST(request);
+    const data = await response.json();
+    const encoded = new URL(data.url).searchParams.get(JSON_QUERY_PARAM);
+
+    expect(response.status).toBe(200);
+    expect(decodeJsonQueryParam(encoded)).toBe(JSON.stringify(payload));
+  });
+
   it("returns 400 when payload is invalid json", async () => {
     const request = new Request("https://example.com/api/json", {
       method: "POST",

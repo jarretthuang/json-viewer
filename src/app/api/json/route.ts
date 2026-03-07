@@ -16,6 +16,8 @@ function extractJsonPayload(body: JsonRequestBody): unknown {
   if (
     typeof body === "object" &&
     body !== null &&
+    !Array.isArray(body) &&
+    Object.keys(body).length === 1 &&
     "json" in body &&
     (body as { json?: unknown }).json !== undefined
   ) {
