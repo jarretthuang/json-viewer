@@ -1,7 +1,9 @@
+import { NextResponse } from "next/server";
+
 export function GET(request: Request) {
   const origin = new URL(request.url).origin;
 
-  return Response.json({
+  return NextResponse.json({
     name: "json-viewer API",
     endpoints: [
       {

@@ -1,3 +1,5 @@
+import { NextResponse } from "next/server";
+
 import {
   JSON_QUERY_PARAM,
   buildUrlWithQueryParam,
@@ -29,7 +31,7 @@ export async function POST(request: Request) {
   try {
     body = (await request.json()) as JsonRequestBody;
   } catch {
-    return Response.json(
+    return NextResponse.json(
       {
         error: "Invalid JSON payload.",
       },
@@ -40,7 +42,7 @@ export async function POST(request: Request) {
   const payload = extractJsonPayload(body);
 
   if (payload === undefined) {
-    return Response.json(
+    return NextResponse.json(
       {
         error:
           "Missing JSON payload. Send JSON directly or in a { \"json\": ... } field.",
@@ -53,7 +55,7 @@ export async function POST(request: Request) {
   const encoded = encodeJsonQueryParam(jsonText);
 
   if (!encoded) {
-    return Response.json(
+    return NextResponse.json(
       {
         error:
           "JSON payload is too large to encode in URL. Try a smaller payload.",
@@ -69,5 +71,5 @@ export async function POST(request: Request) {
     encoded,
   );
 
-  return Response.json({ url: viewUrl });
+  return NextResponse.json({ url: viewUrl });
 }
