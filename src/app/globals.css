@@ -29,7 +29,7 @@ html {
 }
 
 html.dark {
-  background-color: #171717;
+  background-color: #0a0a0a;
 }
 
 body {
@@ -44,7 +44,7 @@ body {
 }
 
 html.dark body {
-  background-color: #171717;
+  background-color: #0a0a0a;
 }
 
 code {
