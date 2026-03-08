@@ -33,5 +33,10 @@ npm run dev
 - [Tailwind CSS](https://tailwindcss.com/)
 - [Mui](https://mui.com/)
 
+### API
+- Docs summary: `/api/docs`
+- OpenAPI spec: `/openapi.json`
+- URL creation endpoint: `POST /api/json`
+
 ### License
 Copyright @[Jarrett Huang](https://github.com/jarretthuang), under the [MIT License](https://github.com/jarretthuang/json-viewer/blob/main/LICENSE).
