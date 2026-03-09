@@ -14,7 +14,14 @@ import { WithNotification } from "../notification/Notification";
 import { copyTextToClipboard } from "@/utils/handleCopy";
 import ModeToggle from "@/components/theme/ModeToggle";
 
-export default function NavBar({ createNotification }: WithNotification) {
+type NavBarProps = Partial<WithNotification> & {
+  showActions?: boolean;
+};
+
+export default function NavBar({
+  createNotification,
+  showActions = true,
+}: NavBarProps) {
   const [expanded, expand] = useState(false);
   const [onShare, setOnShare] = useState<number | undefined>(undefined);
   const overlayRef = useRef<HTMLDivElement | null>(null);
@@ -29,13 +36,15 @@ export default function NavBar({ createNotification }: WithNotification) {
     }
     if (Boolean(navigator?.share)) {
       navigator.share({ url: currentUrl });
-    } else {
+    } else if (createNotification) {
       copyTextToClipboard(currentUrl, createNotification, "A shareable URL");
+    } else {
+      navigator.clipboard.writeText(currentUrl);
     }
   }, [onShare, createNotification]);
 
   useEffect(() => {
-    if (!expanded) {
+    if (!showActions || !expanded) {
       return;
     }
 
@@ -51,7 +60,7 @@ export default function NavBar({ createNotification }: WithNotification) {
     return () => {
       window.removeEventListener("keydown", handleEscape);
     };
-  }, [expanded]);
+  }, [expanded, showActions]);
 
   const renderExpandedContent = () => {
     return (
@@ -128,10 +137,12 @@ export default function NavBar({ createNotification }: WithNotification) {
               </span>
             </a>
           </li>
-          <li className="flex h-full justify-end p-1">{renderHeaderIcons()}</li>
+          {showActions && (
+            <li className="flex h-full justify-end p-1">{renderHeaderIcons()}</li>
+          )}
         </ul>
       </nav>
-      {expanded && (
+      {showActions && expanded && (
         <div
           id="navbar-expanded-panel"
           ref={overlayRef}
