@@ -1,7 +1,9 @@
+"use client";
+
 import _ from "lodash";
 import Copyright from "../copyright/Copyright";
 import Image from "next/image";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import "./NavBar.css";
 import { jsonViewerAppDescription } from "@/models/appDescriptions";
@@ -14,10 +16,45 @@ import { WithNotification } from "../notification/Notification";
 import { copyTextToClipboard } from "@/utils/handleCopy";
 import ModeToggle from "@/components/theme/ModeToggle";
 
-export default function NavBar({ createNotification }: WithNotification) {
+type NavBarActionVisibility = {
+  back?: boolean;
+  forward?: boolean;
+  share?: boolean;
+  themeToggle?: boolean;
+  moreOptions?: boolean;
+};
+
+type NavBarProps = Partial<WithNotification> & {
+  showActions?: boolean;
+  actionVisibility?: NavBarActionVisibility;
+};
+
+export default function NavBar({
+  createNotification,
+  showActions = true,
+  actionVisibility,
+}: NavBarProps) {
   const [expanded, expand] = useState(false);
   const [onShare, setOnShare] = useState<number | undefined>(undefined);
   const overlayRef = useRef<HTMLDivElement | null>(null);
+
+  const isActionVisible = useCallback(
+    (key: keyof NavBarActionVisibility) => {
+      if (!showActions) {
+        return false;
+      }
+
+      return actionVisibility?.[key] ?? true;
+    },
+    [showActions, actionVisibility],
+  );
+
+  const showAnyAction =
+    isActionVisible("back") ||
+    isActionVisible("forward") ||
+    isActionVisible("share") ||
+    isActionVisible("themeToggle") ||
+    isActionVisible("moreOptions");
 
   useEffect(() => {
     if (!onShare) {
@@ -29,13 +66,15 @@ export default function NavBar({ createNotification }: WithNotification) {
     }
     if (Boolean(navigator?.share)) {
       navigator.share({ url: currentUrl });
-    } else {
+    } else if (createNotification) {
       copyTextToClipboard(currentUrl, createNotification, "A shareable URL");
+    } else {
+      navigator.clipboard.writeText(currentUrl);
     }
   }, [onShare, createNotification]);
 
   useEffect(() => {
-    if (!expanded) {
+    if (!isActionVisible("moreOptions") || !expanded) {
       return;
     }
 
@@ -51,12 +90,29 @@ export default function NavBar({ createNotification }: WithNotification) {
     return () => {
       window.removeEventListener("keydown", handleEscape);
     };
-  }, [expanded]);
+  }, [expanded, isActionVisible]);
 
   const renderExpandedContent = () => {
     return (
       <div className="content items-center overflow-hidden">
-        <span className="title w-min whitespace-nowrap">JSON Viewer</span>
+        <span className="title w-min whitespace-nowrap">JSON Viewer</span>{" "}
+        <div className="flex items-center gap-1">
+          <span>by</span>
+          <a
+            href="https://jhuang.ca"
+            target="_blank"
+            rel="noreferrer"
+            aria-label="Open JH Labs homepage"
+          >
+            <Image
+              src="/logoBW.png"
+              alt="JH"
+              className="rounded-full object-contain opacity-50 invert hover:opacity-60 dark:invert-0"
+              width={40}
+              height={40}
+            />
+          </a>
+        </div>
         <div className="inner-content overflow-auto px-10">
           <ReactMarkdown>{jsonViewerAppDescription}</ReactMarkdown>
         </div>
@@ -67,43 +123,51 @@ export default function NavBar({ createNotification }: WithNotification) {
   function renderHeaderIcons() {
     return (
       <>
-        <button
-          type="button"
-          className="nav-icon-button nav-mobile-hidden"
-          aria-label="Go back"
-          onClick={() => window.history.back()}
-        >
-          <ArrowBackIcon className="nav-icon" style={{ height: "85%" }} />
-        </button>
-        <button
-          type="button"
-          className="nav-icon-button nav-mobile-hidden"
-          aria-label="Go forward"
-          onClick={() => window.history.forward()}
-        >
-          <ArrowForwardIcon className="nav-icon" style={{ height: "85%" }} />
-        </button>
-        <button
-          type="button"
-          className="nav-icon-button"
-          aria-label="Share URL"
-          onClick={() => {
-            setOnShare(Date.now());
-          }}
-        >
-          <ShareIcon className="nav-icon" style={{ height: "75%" }} />
-        </button>
-        <ModeToggle />
-        <button
-          type="button"
-          className="nav-icon-button"
-          aria-label="More options"
-          aria-expanded={expanded}
-          aria-controls="navbar-expanded-panel"
-          onClick={() => expand(!expanded)}
-        >
-          <MoreHorizIcon className="nav-icon" style={{ height: "100%" }} />
-        </button>
+        {isActionVisible("back") && (
+          <button
+            type="button"
+            className="nav-icon-button nav-mobile-hidden"
+            aria-label="Go back"
+            onClick={() => window.history.back()}
+          >
+            <ArrowBackIcon className="nav-icon" style={{ height: "85%" }} />
+          </button>
+        )}
+        {isActionVisible("forward") && (
+          <button
+            type="button"
+            className="nav-icon-button nav-mobile-hidden"
+            aria-label="Go forward"
+            onClick={() => window.history.forward()}
+          >
+            <ArrowForwardIcon className="nav-icon" style={{ height: "85%" }} />
+          </button>
+        )}
+        {isActionVisible("share") && (
+          <button
+            type="button"
+            className="nav-icon-button"
+            aria-label="Share URL"
+            onClick={() => {
+              setOnShare(Date.now());
+            }}
+          >
+            <ShareIcon className="nav-icon" style={{ height: "75%" }} />
+          </button>
+        )}
+        {isActionVisible("themeToggle") && <ModeToggle />}
+        {isActionVisible("moreOptions") && (
+          <button
+            type="button"
+            className="nav-icon-button"
+            aria-label="More options"
+            aria-expanded={expanded}
+            aria-controls="navbar-expanded-panel"
+            onClick={() => expand(!expanded)}
+          >
+            <MoreHorizIcon className="nav-icon" style={{ height: "100%" }} />
+          </button>
+        )}
       </>
     );
   }
@@ -112,26 +176,32 @@ export default function NavBar({ createNotification }: WithNotification) {
     <>
       <nav className="NavBar group h-12 md:h-6" data-expanded={expanded}>
         <ul className="flex h-full w-full items-center justify-between">
-          <li className="jh-logo p-2">
-            <a href="https://jhuang.ca" target="_blank" rel="noreferrer" aria-label="Open JH Labs homepage">
+          <li className="p-2">
+            <a
+              href="/"
+              className="group flex items-center gap-1"
+              aria-label="Go to JSON Viewer home"
+            >
               <Image
-                src="/logoBW.png"
-                alt="JH"
-                className="rounded-full object-contain opacity-50 invert hover:opacity-60 dark:invert-0"
-                width={40}
-                height={40}
+                src="/android-chrome-256x256.png"
+                alt="JSON Viewer logo"
+                className="object-contain opacity-90 group-hover:opacity-100"
+                width={30}
+                height={30}
               />
-            </a>
-            <a href="/" className="flex" aria-label="Go to JSON Viewer home">
-              <span className="p-1 text-[25px] font-bold opacity-50 hover:opacity-60">
+              <span className="text-[25px] font-bold opacity-50 group-hover:opacity-60">
                 jsonviewer.io
               </span>
             </a>
           </li>
-          <li className="flex h-full justify-end p-1">{renderHeaderIcons()}</li>
+          {showAnyAction && (
+            <li className="flex h-full justify-end p-1">
+              {renderHeaderIcons()}
+            </li>
+          )}
         </ul>
       </nav>
-      {expanded && (
+      {isActionVisible("moreOptions") && expanded && (
         <div
           id="navbar-expanded-panel"
           ref={overlayRef}
