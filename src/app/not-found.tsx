@@ -16,7 +16,7 @@ export default function NotFound() {
       />
 
       <section className="flex w-full flex-1 p-8">
-        <div className="m-auto flex max-w-[500px] flex-col items-center rounded-3xl border border-slate-200/80 bg-powderBlue-100/10 p-12 text-center shadow-sm backdrop-blur dark:border-slate-700/40 dark:bg-powderBlue-600/20 md:rounded-2xl md:p-8">
+        <div className="m-auto flex max-w-[500px] flex-col items-center rounded-3xl p-12 text-center shadow-sm backdrop-blur md:rounded-2xl md:p-8">
           <p className="text-[40px] font-semibold uppercase tracking-[0.22em] text-slate-500 dark:text-slate-400">
             404
           </p>
