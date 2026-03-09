@@ -1,9 +1,29 @@
+import Image from "next/image";
 import Link from "next/link";
 
 export default function NotFound() {
   return (
-    <main className="flex min-h-[100svh] items-center justify-center bg-[#fdfeff] px-6 text-slate-950 dark:bg-[#0a0a0a] dark:text-offWhite">
-      <section className="w-full max-w-xl rounded-2xl border border-slate-200/80 bg-white/80 p-8 text-center shadow-sm backdrop-blur dark:border-slate-700 dark:bg-slate-900/40">
+    <main className="min-h-[100svh] bg-[#fdfeff] text-slate-950 dark:bg-[#0a0a0a] dark:text-offWhite">
+      <nav className="flex h-12 items-center justify-between px-3 md:h-6">
+        <div className="flex items-center">
+          <Link href="/" aria-label="Go to JSON Viewer home" className="p-2">
+            <Image
+              src="/logoBW.png"
+              alt="JH"
+              className="rounded-full object-contain opacity-50 invert hover:opacity-60 dark:invert-0"
+              width={40}
+              height={40}
+            />
+          </Link>
+          <Link href="/" className="flex" aria-label="Go to JSON Viewer home">
+            <span className="p-1 text-[25px] font-bold opacity-50 hover:opacity-60">
+              jsonviewer.io
+            </span>
+          </Link>
+        </div>
+      </nav>
+
+      <section className="mx-auto mt-10 w-full max-w-xl rounded-2xl border border-slate-200/80 bg-white/80 p-8 text-center shadow-sm backdrop-blur dark:border-slate-700 dark:bg-slate-900/40">
         <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500 dark:text-slate-400">
           404
         </p>

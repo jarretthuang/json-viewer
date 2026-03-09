@@ -3,8 +3,11 @@ import { render, screen } from "@testing-library/react";
 import NotFound from "./not-found";
 
 describe("NotFound page", () => {
-  test("renders app-consistent 404 content with home action", () => {
+  test("renders navbar branding plus 404 content with home action", () => {
     render(<NotFound />);
+
+    expect(screen.getByText("jsonviewer.io")).toBeInTheDocument();
+    expect(screen.getByAltText("JH")).toBeInTheDocument();
 
     expect(screen.getByText("404")).toBeInTheDocument();
     expect(
