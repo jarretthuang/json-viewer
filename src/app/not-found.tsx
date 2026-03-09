@@ -10,8 +10,8 @@ export default function NotFound() {
           back: false,
           forward: false,
           share: false,
-          themeToggle: false,
-          moreOptions: false,
+          themeToggle: true,
+          moreOptions: true,
         }}
       />
 
