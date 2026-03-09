@@ -25,6 +25,22 @@ export function GET(request: Request) {
           },
         },
       },
+      {
+        method: "POST",
+        path: "/api/share",
+        description:
+          "Creates a share link with auto URL mode and Google Drive fallback for large payloads.",
+        requestBody: {
+          examples: [{ json: { hello: "world" }, mode: "auto" }],
+        },
+        response: {
+          example: {
+            mode: "drive",
+            slug: "gdrive:<fileId>",
+            url: `${origin}/s/gdrive:<fileId>`,
+          },
+        },
+      },
     ],
     openapi: buildOpenApiSpec(origin),
   });

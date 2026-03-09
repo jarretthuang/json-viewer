@@ -21,7 +21,10 @@ import {
   MAX_QUERY_PARAM_LENGTH,
 } from "./utils/jsonUrlUtils";
 
-function JsonViewer({ createNotification }: WithNotification) {
+function JsonViewer({
+  createNotification,
+  initialTextOverride,
+}: WithNotification & { initialTextOverride?: string }) {
   type ViewType = "view" | "edit";
 
   const DEFAULT_TEXT: string = "Paste your JSON text here!";
@@ -30,7 +33,8 @@ function JsonViewer({ createNotification }: WithNotification) {
 
   const initialQueryParams = useSearchParams();
   const initialJsonQueryParam = initialQueryParams.get(JSON_QUERY_PARAM);
-  const initialText = decodeJsonQueryParam(initialJsonQueryParam) ?? DEFAULT_TEXT;
+  const initialText =
+    initialTextOverride ?? decodeJsonQueryParam(initialJsonQueryParam) ?? DEFAULT_TEXT;
 
   const [currentText, updateText] = useState(initialText);
   const [jsonObject, updateJsonObject] = useState<unknown>(undefined);

@@ -3,9 +3,9 @@ export function buildOpenApiSpec(origin: string) {
     openapi: "3.1.0",
     info: {
       title: "json-viewer API",
-      version: "1.0.0",
+      version: "1.1.0",
       description:
-        "Accepts JSON payloads and returns a shareable json-viewer URL.",
+        "Accepts JSON payloads and returns shareable json-viewer links via URL mode or Google Drive fallback.",
     },
     servers: [{ url: origin }],
     paths: {
@@ -14,62 +14,23 @@ export function buildOpenApiSpec(origin: string) {
           summary: "Create a shareable json-viewer URL",
           description:
             "Accepts JSON directly or wrapped in an envelope object with only a top-level `json` key.",
-          requestBody: {
-            required: true,
-            content: {
-              "application/json": {
-                schema: {
-                  anyOf: [
-                    {
-                      description: "Raw JSON payload",
-                    },
-                    {
-                      type: "object",
-                      additionalProperties: false,
-                      required: ["json"],
-                      properties: {
-                        json: {
-                          description: "JSON payload to encode",
-                        },
-                      },
-                    },
-                  ],
-                },
-                examples: {
-                  raw: {
-                    value: { hello: "world" },
-                  },
-                  envelope: {
-                    value: { json: { hello: "world" } },
-                  },
-                },
-              },
-            },
-          },
           responses: {
-            "200": {
-              description: "Shareable URL generated",
-              content: {
-                "application/json": {
-                  schema: {
-                    type: "object",
-                    required: ["url"],
-                    properties: {
-                      url: {
-                        type: "string",
-                        format: "uri",
-                      },
-                    },
-                  },
-                },
-              },
-            },
-            "400": {
-              description: "Invalid or missing JSON payload",
-            },
-            "413": {
-              description: "Payload too large to encode in URL",
-            },
+            "200": { description: "Shareable URL generated" },
+            "400": { description: "Invalid or missing JSON payload" },
+            "413": { description: "Payload too large to encode in URL" },
+          },
+        },
+      },
+      "/api/share": {
+        post: {
+          summary: "Create a share link with URL/Drive fallback",
+          description:
+            "Supports modes: auto (default), url, and drive. Auto uses URL when small and Drive fallback when payload is large.",
+          responses: {
+            "200": { description: "Share link generated" },
+            "400": { description: "Invalid or missing JSON payload" },
+            "413": { description: "Payload too large for URL mode" },
+            "503": { description: "Drive fallback unavailable" },
           },
         },
       },
