@@ -9,8 +9,11 @@ describe("NotFound page", () => {
     expect(screen.getByText("jsonviewer.io")).toBeInTheDocument();
     expect(screen.getByAltText("JSON Viewer logo")).toBeInTheDocument();
     expect(
-      screen.queryByRole("button", { name: /more options/i }),
-    ).not.toBeInTheDocument();
+      screen.getByRole("button", { name: /more options/i }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /theme:/i }),
+    ).toBeInTheDocument();
 
     expect(screen.getByText("404")).toBeInTheDocument();
     expect(
