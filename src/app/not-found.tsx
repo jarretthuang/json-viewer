@@ -4,7 +4,15 @@ import NavBar from "@/components/nav-bar/NavBar";
 export default function NotFound() {
   return (
     <main className="min-h-[100svh] bg-[#fdfeff] text-slate-950 dark:bg-[#0a0a0a] dark:text-offWhite">
-      <NavBar showActions={false} />
+      <NavBar
+        actionVisibility={{
+          back: false,
+          forward: false,
+          share: false,
+          themeToggle: false,
+          moreOptions: false,
+        }}
+      />
 
       <section className="mx-auto mt-10 w-full max-w-xl rounded-2xl border border-slate-200/80 bg-white/80 p-8 text-center shadow-sm backdrop-blur dark:border-slate-700 dark:bg-slate-900/40">
         <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500 dark:text-slate-400">

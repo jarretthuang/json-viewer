@@ -14,17 +14,42 @@ import { WithNotification } from "../notification/Notification";
 import { copyTextToClipboard } from "@/utils/handleCopy";
 import ModeToggle from "@/components/theme/ModeToggle";
 
+type NavBarActionVisibility = {
+  back?: boolean;
+  forward?: boolean;
+  share?: boolean;
+  themeToggle?: boolean;
+  moreOptions?: boolean;
+};
+
 type NavBarProps = Partial<WithNotification> & {
   showActions?: boolean;
+  actionVisibility?: NavBarActionVisibility;
 };
 
 export default function NavBar({
   createNotification,
   showActions = true,
+  actionVisibility,
 }: NavBarProps) {
   const [expanded, expand] = useState(false);
   const [onShare, setOnShare] = useState<number | undefined>(undefined);
   const overlayRef = useRef<HTMLDivElement | null>(null);
+
+  const isActionVisible = (key: keyof NavBarActionVisibility) => {
+    if (!showActions) {
+      return false;
+    }
+
+    return actionVisibility?.[key] ?? true;
+  };
+
+  const showAnyAction =
+    isActionVisible("back") ||
+    isActionVisible("forward") ||
+    isActionVisible("share") ||
+    isActionVisible("themeToggle") ||
+    isActionVisible("moreOptions");
 
   useEffect(() => {
     if (!onShare) {
@@ -44,7 +69,7 @@ export default function NavBar({
   }, [onShare, createNotification]);
 
   useEffect(() => {
-    if (!showActions || !expanded) {
+    if (!isActionVisible("moreOptions") || !expanded) {
       return;
     }
 
@@ -60,7 +85,7 @@ export default function NavBar({
     return () => {
       window.removeEventListener("keydown", handleEscape);
     };
-  }, [expanded, showActions]);
+  }, [expanded, showActions, actionVisibility]);
 
   const renderExpandedContent = () => {
     return (
@@ -76,43 +101,51 @@ export default function NavBar({
   function renderHeaderIcons() {
     return (
       <>
-        <button
-          type="button"
-          className="nav-icon-button nav-mobile-hidden"
-          aria-label="Go back"
-          onClick={() => window.history.back()}
-        >
-          <ArrowBackIcon className="nav-icon" style={{ height: "85%" }} />
-        </button>
-        <button
-          type="button"
-          className="nav-icon-button nav-mobile-hidden"
-          aria-label="Go forward"
-          onClick={() => window.history.forward()}
-        >
-          <ArrowForwardIcon className="nav-icon" style={{ height: "85%" }} />
-        </button>
-        <button
-          type="button"
-          className="nav-icon-button"
-          aria-label="Share URL"
-          onClick={() => {
-            setOnShare(Date.now());
-          }}
-        >
-          <ShareIcon className="nav-icon" style={{ height: "75%" }} />
-        </button>
-        <ModeToggle />
-        <button
-          type="button"
-          className="nav-icon-button"
-          aria-label="More options"
-          aria-expanded={expanded}
-          aria-controls="navbar-expanded-panel"
-          onClick={() => expand(!expanded)}
-        >
-          <MoreHorizIcon className="nav-icon" style={{ height: "100%" }} />
-        </button>
+        {isActionVisible("back") && (
+          <button
+            type="button"
+            className="nav-icon-button nav-mobile-hidden"
+            aria-label="Go back"
+            onClick={() => window.history.back()}
+          >
+            <ArrowBackIcon className="nav-icon" style={{ height: "85%" }} />
+          </button>
+        )}
+        {isActionVisible("forward") && (
+          <button
+            type="button"
+            className="nav-icon-button nav-mobile-hidden"
+            aria-label="Go forward"
+            onClick={() => window.history.forward()}
+          >
+            <ArrowForwardIcon className="nav-icon" style={{ height: "85%" }} />
+          </button>
+        )}
+        {isActionVisible("share") && (
+          <button
+            type="button"
+            className="nav-icon-button"
+            aria-label="Share URL"
+            onClick={() => {
+              setOnShare(Date.now());
+            }}
+          >
+            <ShareIcon className="nav-icon" style={{ height: "75%" }} />
+          </button>
+        )}
+        {isActionVisible("themeToggle") && <ModeToggle />}
+        {isActionVisible("moreOptions") && (
+          <button
+            type="button"
+            className="nav-icon-button"
+            aria-label="More options"
+            aria-expanded={expanded}
+            aria-controls="navbar-expanded-panel"
+            onClick={() => expand(!expanded)}
+          >
+            <MoreHorizIcon className="nav-icon" style={{ height: "100%" }} />
+          </button>
+        )}
       </>
     );
   }
@@ -122,7 +155,12 @@ export default function NavBar({
       <nav className="NavBar group h-12 md:h-6" data-expanded={expanded}>
         <ul className="flex h-full w-full items-center justify-between">
           <li className="jh-logo p-2">
-            <a href="https://jhuang.ca" target="_blank" rel="noreferrer" aria-label="Open JH Labs homepage">
+            <a
+              href="https://jhuang.ca"
+              target="_blank"
+              rel="noreferrer"
+              aria-label="Open JH Labs homepage"
+            >
               <Image
                 src="/logoBW.png"
                 alt="JH"
@@ -137,12 +175,12 @@ export default function NavBar({
               </span>
             </a>
           </li>
-          {showActions && (
+          {showAnyAction && (
             <li className="flex h-full justify-end p-1">{renderHeaderIcons()}</li>
           )}
         </ul>
       </nav>
-      {showActions && expanded && (
+      {isActionVisible("moreOptions") && expanded && (
         <div
           id="navbar-expanded-panel"
           ref={overlayRef}
