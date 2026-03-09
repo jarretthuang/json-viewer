@@ -1,3 +1,5 @@
+"use client";
+
 import _ from "lodash";
 import Copyright from "../copyright/Copyright";
 import Image from "next/image";
