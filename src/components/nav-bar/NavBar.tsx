@@ -92,7 +92,24 @@ export default function NavBar({
   const renderExpandedContent = () => {
     return (
       <div className="content items-center overflow-hidden">
-        <span className="title w-min whitespace-nowrap">JSON Viewer</span>
+        <span className="title w-min whitespace-nowrap">JSON Viewer</span>{" "}
+        <div className="flex items-center gap-1">
+          <span>by</span>
+          <a
+            href="https://jhuang.ca"
+            target="_blank"
+            rel="noreferrer"
+            aria-label="Open JH Labs homepage"
+          >
+            <Image
+              src="/logoBW.png"
+              alt="JH"
+              className="rounded-full object-contain opacity-50 invert hover:opacity-60 dark:invert-0"
+              width={40}
+              height={40}
+            />
+          </a>
+        </div>
         <div className="inner-content overflow-auto px-10">
           <ReactMarkdown>{jsonViewerAppDescription}</ReactMarkdown>
         </div>
@@ -156,29 +173,28 @@ export default function NavBar({
     <>
       <nav className="NavBar group h-12 md:h-6" data-expanded={expanded}>
         <ul className="flex h-full w-full items-center justify-between">
-          <li className="jh-logo p-2">
+          <li className="p-2">
             <a
-              href="https://jhuang.ca"
-              target="_blank"
-              rel="noreferrer"
-              aria-label="Open JH Labs homepage"
+              href="/"
+              className="group flex items-center gap-1"
+              aria-label="Go to JSON Viewer home"
             >
               <Image
-                src="/logoBW.png"
-                alt="JH"
-                className="rounded-full object-contain opacity-50 invert hover:opacity-60 dark:invert-0"
-                width={40}
-                height={40}
+                src="/android-chrome-256x256.png"
+                alt="JSON Viewer logo"
+                className="object-contain opacity-90 group-hover:opacity-100"
+                width={30}
+                height={30}
               />
-            </a>
-            <a href="/" className="flex" aria-label="Go to JSON Viewer home">
-              <span className="p-1 text-[25px] font-bold opacity-50 hover:opacity-60">
+              <span className="text-[25px] font-bold opacity-50 group-hover:opacity-60">
                 jsonviewer.io
               </span>
             </a>
           </li>
           {showAnyAction && (
-            <li className="flex h-full justify-end p-1">{renderHeaderIcons()}</li>
+            <li className="flex h-full justify-end p-1">
+              {renderHeaderIcons()}
+            </li>
           )}
         </ul>
       </nav>

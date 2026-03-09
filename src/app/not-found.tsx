@@ -9,8 +9,8 @@ export default function NotFound() {
           back: false,
           forward: false,
           share: false,
-          themeToggle: false,
-          moreOptions: false,
+          themeToggle: true,
+          moreOptions: true,
         }}
       />
 
@@ -20,8 +20,8 @@ export default function NotFound() {
         </p>
         <h1 className="mt-3 text-3xl font-bold md:text-4xl">Page not found</h1>
         <p className="mt-3 text-sm leading-relaxed text-slate-600 dark:text-slate-300">
-          The link might be broken or the page may have moved. Let&apos;s get you
-          back to the JSON viewer.
+          The link might be broken or the page may have moved. Let&apos;s get
+          you back to the JSON viewer.
         </p>
         <Link
           href="/"
