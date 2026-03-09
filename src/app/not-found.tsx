@@ -10,8 +10,8 @@ export default function NotFound() {
           back: false,
           forward: false,
           share: false,
-          themeToggle: true,
-          moreOptions: true,
+          themeToggle: false,
+          moreOptions: false,
         }}
       />
 
@@ -20,10 +20,10 @@ export default function NotFound() {
           <p className="text-[40px] font-semibold uppercase tracking-[0.22em] text-slate-500 dark:text-slate-400">
             404
           </p>
-          <span className="text-[24px] font-semibold">Page not found</span>
-          <span className="text-[16px] text-slate-600 dark:text-slate-300">
+          <h1 className="text-[24px] font-semibold">Page not found</h1>
+          <p className="text-[16px] text-slate-600 dark:text-slate-300">
             The link might be broken or the page may have been removed.
-          </span>
+          </p>
           <Link
             href="/"
             className="w-fit px-5 py-2 text-[16px] font-medium underline hover:opacity-80"

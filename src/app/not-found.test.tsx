@@ -7,7 +7,7 @@ describe("NotFound page", () => {
     render(<NotFound />);
 
     expect(screen.getByText("jsonviewer.io")).toBeInTheDocument();
-    expect(screen.getByAltText("JH")).toBeInTheDocument();
+    expect(screen.getByAltText("JSON Viewer logo")).toBeInTheDocument();
     expect(
       screen.queryByRole("button", { name: /more options/i }),
     ).not.toBeInTheDocument();

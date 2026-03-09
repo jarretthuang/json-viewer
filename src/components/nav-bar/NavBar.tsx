@@ -3,7 +3,7 @@
 import _ from "lodash";
 import Copyright from "../copyright/Copyright";
 import Image from "next/image";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import "./NavBar.css";
 import { jsonViewerAppDescription } from "@/models/appDescriptions";
@@ -38,13 +38,16 @@ export default function NavBar({
   const [onShare, setOnShare] = useState<number | undefined>(undefined);
   const overlayRef = useRef<HTMLDivElement | null>(null);
 
-  const isActionVisible = (key: keyof NavBarActionVisibility) => {
-    if (!showActions) {
-      return false;
-    }
+  const isActionVisible = useCallback(
+    (key: keyof NavBarActionVisibility) => {
+      if (!showActions) {
+        return false;
+      }
 
-    return actionVisibility?.[key] ?? true;
-  };
+      return actionVisibility?.[key] ?? true;
+    },
+    [showActions, actionVisibility],
+  );
 
   const showAnyAction =
     isActionVisible("back") ||
@@ -87,7 +90,7 @@ export default function NavBar({
     return () => {
       window.removeEventListener("keydown", handleEscape);
     };
-  }, [expanded, showActions, actionVisibility]);
+  }, [expanded, isActionVisible]);
 
   const renderExpandedContent = () => {
     return (
