@@ -15,8 +15,15 @@ const mockedDriveConfigured = isGoogleDriveConfigured as jest.Mock;
 const mockedUploadJsonToDrive = uploadJsonToDrive as jest.Mock;
 
 describe("POST /api/share", () => {
+  const previousDriveToken = process.env.GOOGLE_DRIVE_ACCESS_TOKEN;
+
   beforeEach(() => {
     jest.clearAllMocks();
+    process.env.GOOGLE_DRIVE_ACCESS_TOKEN = "test-drive-token";
+  });
+
+  afterAll(() => {
+    process.env.GOOGLE_DRIVE_ACCESS_TOKEN = previousDriveToken;
   });
 
   it("returns URL mode for small payloads in auto mode", async () => {
@@ -58,7 +65,9 @@ describe("POST /api/share", () => {
 
     expect(response.status).toBe(200);
     expect(data.mode).toBe("drive");
-    expect(data.url).toBe("https://example.com/s/gdrive%3Afile-123");
+    expect(data.url).toMatch(
+      /^https:\/\/example\.com\/s\/gdrive%3Afile-123%3A[A-Za-z0-9_-]{24}$/,
+    );
     expect(mockedUploadJsonToDrive).toHaveBeenCalledTimes(1);
   });
 

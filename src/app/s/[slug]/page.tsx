@@ -10,8 +10,7 @@ type ShareSlugPageProps = {
 
 export default async function ShareSlugPage({ params }: ShareSlugPageProps) {
   const { slug } = await params;
-  const decodedSlug = decodeURIComponent(slug);
-  const parsed = parseShareSlug(decodedSlug);
+  const parsed = parseShareSlug(slug);
 
   if (!parsed || parsed.provider !== "gdrive") {
     notFound();

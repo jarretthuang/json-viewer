@@ -1,10 +1,20 @@
 import { buildGoogleDriveSlug, parseShareSlug } from "./shareSlug";
 
 describe("shareSlug", () => {
-  it("builds and parses a gdrive slug", () => {
+  const previousDriveToken = process.env.GOOGLE_DRIVE_ACCESS_TOKEN;
+
+  beforeEach(() => {
+    process.env.GOOGLE_DRIVE_ACCESS_TOKEN = "test-drive-token";
+  });
+
+  afterAll(() => {
+    process.env.GOOGLE_DRIVE_ACCESS_TOKEN = previousDriveToken;
+  });
+
+  it("builds and parses a signed gdrive slug", () => {
     const slug = buildGoogleDriveSlug("abc123");
 
-    expect(slug).toBe("gdrive:abc123");
+    expect(slug).toMatch(/^gdrive:abc123:[A-Za-z0-9_-]{24}$/);
     expect(parseShareSlug(slug)).toEqual({ provider: "gdrive", fileId: "abc123" });
   });
 
@@ -14,5 +24,13 @@ describe("shareSlug", () => {
 
   it("returns null for empty gdrive id", () => {
     expect(parseShareSlug("gdrive:")).toBeNull();
+  });
+
+  it("returns null for unsigned gdrive references", () => {
+    expect(parseShareSlug("gdrive:abc123")).toBeNull();
+  });
+
+  it("returns null when signature is invalid", () => {
+    expect(parseShareSlug("gdrive:abc123:invalid-signature")).toBeNull();
   });
 });

@@ -1,4 +1,7 @@
+import { buildShareSignature, isValidShareSignature } from "./shareSignature";
+
 export const GDRIVE_SLUG_PREFIX = "gdrive:";
+const GDRIVE_SLUG_SIGNATURE_SEPARATOR = ":";
 
 export type ShareReference =
   | {
@@ -10,7 +13,8 @@ export type ShareReference =
     };
 
 export function buildGoogleDriveSlug(fileId: string): string {
-  return `${GDRIVE_SLUG_PREFIX}${fileId}`;
+  const signature = buildShareSignature(fileId);
+  return `${GDRIVE_SLUG_PREFIX}${fileId}${GDRIVE_SLUG_SIGNATURE_SEPARATOR}${signature}`;
 }
 
 export function parseShareSlug(slug: string): ShareReference | null {
@@ -18,9 +22,22 @@ export function parseShareSlug(slug: string): ShareReference | null {
     return { provider: "url" };
   }
 
-  const fileId = slug.slice(GDRIVE_SLUG_PREFIX.length).trim();
+  const rawReference = slug.slice(GDRIVE_SLUG_PREFIX.length).trim();
 
-  if (!fileId) {
+  if (!rawReference) {
+    return null;
+  }
+
+  const separatorIndex = rawReference.lastIndexOf(GDRIVE_SLUG_SIGNATURE_SEPARATOR);
+
+  if (separatorIndex <= 0 || separatorIndex === rawReference.length - 1) {
+    return null;
+  }
+
+  const fileId = rawReference.slice(0, separatorIndex).trim();
+  const signature = rawReference.slice(separatorIndex + 1).trim();
+
+  if (!fileId || !signature || !isValidShareSignature(fileId, signature)) {
     return null;
   }
 
