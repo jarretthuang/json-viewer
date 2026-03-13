@@ -21,17 +21,18 @@ type ShareRequestBody =
   | unknown;
 
 function extractPayload(body: ShareRequestBody): { payload: unknown; mode: ShareMode } {
-  if (
-    typeof body === "object" &&
-    body !== null &&
-    !Array.isArray(body) &&
-    "json" in body
-  ) {
+  if (typeof body === "object" && body !== null && !Array.isArray(body)) {
     const parsed = body as { json?: unknown; mode?: ShareMode };
-    return {
-      payload: parsed.json,
-      mode: parsed.mode ?? "auto",
-    };
+    const keys = Object.keys(parsed);
+    const isEnvelope =
+      keys.includes("json") && keys.every((key) => key === "json" || key === "mode");
+
+    if (isEnvelope) {
+      return {
+        payload: parsed.json,
+        mode: parsed.mode ?? "auto",
+      };
+    }
   }
 
   return { payload: body, mode: "auto" };

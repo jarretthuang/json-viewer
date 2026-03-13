@@ -1,14 +1,14 @@
 import { buildGoogleDriveSlug, parseShareSlug } from "./shareSlug";
 
 describe("shareSlug", () => {
-  const previousDriveToken = process.env.GOOGLE_DRIVE_ACCESS_TOKEN;
+  const previousShareSecret = process.env.SHARE_SLUG_SECRET;
 
   beforeEach(() => {
-    process.env.GOOGLE_DRIVE_ACCESS_TOKEN = "test-drive-token";
+    process.env.SHARE_SLUG_SECRET = "test-share-secret";
   });
 
   afterAll(() => {
-    process.env.GOOGLE_DRIVE_ACCESS_TOKEN = previousDriveToken;
+    process.env.SHARE_SLUG_SECRET = previousShareSecret;
   });
 
   it("builds and parses a signed gdrive slug", () => {

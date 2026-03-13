@@ -4,13 +4,7 @@ const SIGNATURE_LENGTH = 24;
 
 function getShareSignatureSecret(): string | null {
   const explicitSecret = process.env.SHARE_SLUG_SECRET?.trim();
-
-  if (explicitSecret) {
-    return explicitSecret;
-  }
-
-  const driveToken = process.env.GOOGLE_DRIVE_ACCESS_TOKEN?.trim();
-  return driveToken || null;
+  return explicitSecret || null;
 }
 
 function createSignature(fileId: string): string | null {
