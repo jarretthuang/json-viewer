@@ -1,3 +1,5 @@
+import { hasShareSignatureSecret } from "./shareSignature";
+
 const DRIVE_UPLOAD_URL = "https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id";
 
 function getAccessToken(): string | null {
@@ -6,7 +8,7 @@ function getAccessToken(): string | null {
 }
 
 export function isGoogleDriveConfigured(): boolean {
-  return Boolean(getAccessToken());
+  return Boolean(getAccessToken()) && hasShareSignatureSecret();
 }
 
 export async function uploadJsonToDrive(content: string): Promise<string> {
@@ -31,7 +33,7 @@ export async function uploadJsonToDrive(content: string): Promise<string> {
     "Content-Type: application/json; charset=UTF-8",
     "",
     content,
-    `--${boundary}--",
+    `--${boundary}--`,
     "",
   ].join("\r\n");
 

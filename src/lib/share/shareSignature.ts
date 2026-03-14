@@ -7,6 +7,10 @@ function getShareSignatureSecret(): string | null {
   return explicitSecret || null;
 }
 
+export function hasShareSignatureSecret(): boolean {
+  return Boolean(getShareSignatureSecret());
+}
+
 function createSignature(fileId: string): string | null {
   const secret = getShareSignatureSecret();
 

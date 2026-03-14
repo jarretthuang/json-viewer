@@ -117,4 +117,26 @@ describe("POST /api/share", () => {
     const decoded = encoded ? decodeJsonQueryParam(encoded) : undefined;
     expect(decoded ? JSON.parse(decoded) : undefined).toEqual(payload);
   });
+
+  it("treats {json, mode} with non-share mode as raw payload", async () => {
+    const payload = { json: { hello: "world" }, mode: "strict" };
+
+    const request = new Request("https://example.com/api/share", {
+      method: "POST",
+      body: JSON.stringify(payload),
+      headers: { "Content-Type": "application/json" },
+    });
+
+    const response = await POST(request);
+    const data = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(data.mode).toBe("url");
+
+    const encoded = new URL(data.url).searchParams.get("json");
+    expect(encoded).toBeTruthy();
+
+    const decoded = encoded ? decodeJsonQueryParam(encoded) : undefined;
+    expect(decoded ? JSON.parse(decoded) : undefined).toEqual(payload);
+  });
 });

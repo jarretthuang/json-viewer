@@ -20,18 +20,26 @@ type ShareRequestBody =
     }
   | unknown;
 
+function isShareMode(value: unknown): value is ShareMode {
+  return value === "auto" || value === "url" || value === "drive";
+}
+
 function extractPayload(body: ShareRequestBody): { payload: unknown; mode: ShareMode } {
   if (typeof body === "object" && body !== null && !Array.isArray(body)) {
-    const parsed = body as { json?: unknown; mode?: ShareMode };
+    const parsed = body as { json?: unknown; mode?: unknown };
     const keys = Object.keys(parsed);
-    const isEnvelope =
+    const hasOnlyEnvelopeKeys =
       keys.includes("json") && keys.every((key) => key === "json" || key === "mode");
 
-    if (isEnvelope) {
-      return {
-        payload: parsed.json,
-        mode: parsed.mode ?? "auto",
-      };
+    if (hasOnlyEnvelopeKeys) {
+      const mode = parsed.mode;
+
+      if (mode === undefined || isShareMode(mode)) {
+        return {
+          payload: parsed.json,
+          mode: mode ?? "auto",
+        };
+      }
     }
   }
 
@@ -69,7 +77,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Missing JSON payload." }, { status: 400 });
   }
 
-  if (!["auto", "url", "drive"].includes(mode)) {
+  if (!isShareMode(mode)) {
     return NextResponse.json(
       { error: 'Invalid mode. Expected one of: "auto", "url", "drive".' },
       { status: 400 },
