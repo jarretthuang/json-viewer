@@ -35,7 +35,7 @@ function JsonViewer({ createNotification, initialTextOverride }: JsonViewerProps
   const initialQueryParams = useSearchParams();
   const initialJsonQueryParam = initialQueryParams.get(JSON_QUERY_PARAM);
   const initialText =
-    initialTextOverride ?? decodeJsonQueryParam(initialJsonQueryParam) ?? DEFAULT_TEXT;
+    decodeJsonQueryParam(initialJsonQueryParam) ?? initialTextOverride ?? DEFAULT_TEXT;
 
   const [currentText, updateText] = useState(initialText);
   const [jsonObject, updateJsonObject] = useState<unknown>(undefined);
