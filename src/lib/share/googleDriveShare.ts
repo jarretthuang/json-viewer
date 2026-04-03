@@ -11,12 +11,18 @@ export function isGoogleDriveConfigured(): boolean {
   return Boolean(getAccessToken()) && hasShareSignatureSecret();
 }
 
-export async function uploadJsonToDrive(content: string): Promise<string> {
+function getConfiguredAccessToken(): string {
   const token = getAccessToken();
 
-  if (!token) {
+  if (!token || !hasShareSignatureSecret()) {
     throw new Error("Google Drive is not configured.");
   }
+
+  return token;
+}
+
+export async function uploadJsonToDrive(content: string): Promise<string> {
+  const token = getConfiguredAccessToken();
 
   const boundary = `json-viewer-${Date.now()}`;
   const metadata = {
@@ -60,11 +66,7 @@ export async function uploadJsonToDrive(content: string): Promise<string> {
 }
 
 export async function readJsonFromDriveById(fileId: string): Promise<string> {
-  const token = getAccessToken();
-
-  if (!token) {
-    throw new Error("Google Drive is not configured.");
-  }
+  const token = getConfiguredAccessToken();
 
   const response = await fetch(
     `https://www.googleapis.com/drive/v3/files/${encodeURIComponent(fileId)}?alt=media`,
