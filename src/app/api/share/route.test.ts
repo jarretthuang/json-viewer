@@ -18,16 +18,19 @@ const mockedUploadJsonToDrive = uploadJsonToDrive as jest.Mock;
 describe("POST /api/share", () => {
   const previousDriveToken = process.env.GOOGLE_DRIVE_ACCESS_TOKEN;
   const previousShareSecret = process.env.SHARE_SLUG_SECRET;
+  const previousDriveWriteToken = process.env.SHARE_DRIVE_WRITE_TOKEN;
 
   beforeEach(() => {
     jest.clearAllMocks();
     process.env.GOOGLE_DRIVE_ACCESS_TOKEN = "test-drive-token";
     process.env.SHARE_SLUG_SECRET = "test-share-secret";
+    process.env.SHARE_DRIVE_WRITE_TOKEN = "test-drive-write-token";
   });
 
   afterAll(() => {
     process.env.GOOGLE_DRIVE_ACCESS_TOKEN = previousDriveToken;
     process.env.SHARE_SLUG_SECRET = previousShareSecret;
+    process.env.SHARE_DRIVE_WRITE_TOKEN = previousDriveWriteToken;
   });
 
   it("returns URL mode for small payloads in auto mode", async () => {
@@ -61,7 +64,10 @@ describe("POST /api/share", () => {
         },
         mode: "auto",
       }),
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        "x-share-drive-write-token": "test-drive-write-token",
+      },
     });
 
     const response = await POST(request);
@@ -94,6 +100,31 @@ describe("POST /api/share", () => {
     const response = await POST(request);
 
     expect(response.status).toBe(413);
+  });
+
+  it("returns 403 when drive sharing is requested without authorization", async () => {
+    mockedDriveConfigured.mockReturnValue(true);
+
+    const request = new Request("https://example.com/api/share", {
+      method: "POST",
+      body: JSON.stringify({
+        json: {
+          items: Array.from(
+            { length: 6000 },
+            (_, index) => `item-${index}-${Math.sin(index).toString(36)}`,
+          ),
+        },
+        mode: "drive",
+      }),
+      headers: { "Content-Type": "application/json" },
+    });
+
+    const response = await POST(request);
+    const data = await response.json();
+
+    expect(response.status).toBe(403);
+    expect(data.error).toBe("Google Drive sharing requires authorization.");
+    expect(mockedUploadJsonToDrive).not.toHaveBeenCalled();
   });
 
   it("preserves raw objects that include a json field", async () => {

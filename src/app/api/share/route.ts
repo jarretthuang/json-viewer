@@ -20,8 +20,31 @@ type ShareRequestBody =
     }
   | unknown;
 
+const DRIVE_SHARE_WRITE_TOKEN_HEADER = "x-share-drive-write-token";
+
 function isShareMode(value: unknown): value is ShareMode {
   return value === "auto" || value === "url" || value === "drive";
+}
+
+function getDriveShareWriteToken(): string | null {
+  const token = process.env.SHARE_DRIVE_WRITE_TOKEN;
+  return token ? token.trim() : null;
+}
+
+function getDriveShareAuthorizationError(request: Request): string | null {
+  const configuredToken = getDriveShareWriteToken();
+
+  if (!configuredToken) {
+    return "Google Drive sharing is not available.";
+  }
+
+  const providedToken = request.headers.get(DRIVE_SHARE_WRITE_TOKEN_HEADER)?.trim();
+
+  if (!providedToken || providedToken !== configuredToken) {
+    return "Google Drive sharing requires authorization.";
+  }
+
+  return null;
 }
 
 function extractPayload(body: ShareRequestBody): { payload: unknown; mode: ShareMode } {
@@ -109,6 +132,15 @@ export async function POST(request: Request) {
           "JSON payload is too large for URL sharing and Google Drive fallback is not configured.",
       },
       { status: 413 },
+    );
+  }
+
+  const authorizationError = getDriveShareAuthorizationError(request);
+
+  if (authorizationError) {
+    return NextResponse.json(
+      { error: authorizationError },
+      { status: 403 },
     );
   }
 
