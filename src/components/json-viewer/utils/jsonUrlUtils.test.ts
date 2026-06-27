@@ -4,6 +4,7 @@ import {
   decodeJsonQueryParam,
   encodeJsonQueryParam,
 } from "./jsonUrlUtils";
+import { MAX_URL_SYNC_SOURCE_LENGTH } from "./jsonPerformanceUtils";
 
 describe("jsonUrlUtils", () => {
   test("encodeJsonQueryParam encodes text and decodeJsonQueryParam restores it", () => {
@@ -20,6 +21,12 @@ describe("jsonUrlUtils", () => {
 
   test("encodeJsonQueryParam returns undefined when encoded text exceeds max length", () => {
     expect(encodeJsonQueryParam("a", 0)).toBeUndefined();
+  });
+
+  test("encodeJsonQueryParam skips raw text above the URL sync threshold", () => {
+    expect(
+      encodeJsonQueryParam("a".repeat(MAX_URL_SYNC_SOURCE_LENGTH + 1))
+    ).toBeUndefined();
   });
 
   test("buildUrlWithQueryParam inserts query param", () => {

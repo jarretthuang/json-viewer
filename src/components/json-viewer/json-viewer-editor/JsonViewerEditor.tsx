@@ -14,6 +14,7 @@ import { highlight, languages } from "prismjs/components/prism-core";
 import "prismjs/components/prism-clike";
 import "prismjs/components/prism-javascript";
 import "./prism-theme.css";
+import { shouldHighlightJsonText } from "../utils/jsonPerformanceUtils";
 
 export type JsonViewerEditorProps = {
   currentText: string;
@@ -22,6 +23,31 @@ export type JsonViewerEditorProps = {
   handleCopy: (s: string) => void;
   parseJson: (text: string) => any;
 };
+
+export function escapeHtml(text: string): string {
+  return text.replace(/[&<>"']/g, (character) => {
+    switch (character) {
+      case "&":
+        return "&amp;";
+      case "<":
+        return "&lt;";
+      case ">":
+        return "&gt;";
+      case '"':
+        return "&quot;";
+      case "'":
+        return "&#39;";
+      default:
+        return character;
+    }
+  });
+}
+
+export function highlightJsonText(code: string): string {
+  return shouldHighlightJsonText(code)
+    ? highlight(code, languages.js)
+    : escapeHtml(code);
+}
 
 function JsonViewerEditor({
   currentText,
@@ -177,7 +203,7 @@ function JsonViewerEditor({
           className="editor h-fit grow resize-none overflow-hidden whitespace-pre-wrap bg-transparent px-1 [&>textarea]:outline-none"
           value={currentText}
           onValueChange={(code) => updateText(code)}
-          highlight={(code) => highlight(code, languages.js)}
+          highlight={highlightJsonText}
           onClick={clearDefaultText}
           ignoreTabKey={allowTabFocusExit}
         />

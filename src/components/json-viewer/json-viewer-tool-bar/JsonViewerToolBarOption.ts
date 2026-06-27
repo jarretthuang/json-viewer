@@ -7,4 +7,5 @@ export type JsonViewerToolBarOption = {
   hidden?: boolean;
   disabled?: boolean;
   ping?: boolean;
+  title?: string;
 };

@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { ReactNotificationOptions } from "react-notifications-component";
 import JsonViewerTree from "./json-viewer-tree/JsonViewerTree";
@@ -20,6 +20,10 @@ import {
   JSON_QUERY_PARAM,
   MAX_QUERY_PARAM_LENGTH,
 } from "./utils/jsonUrlUtils";
+import {
+  getJsonUrlSyncDelay,
+  isXLJsonText,
+} from "./utils/jsonPerformanceUtils";
 
 function JsonViewer({ createNotification }: WithNotification) {
   type ViewType = "view" | "edit";
@@ -35,6 +39,7 @@ function JsonViewer({ createNotification }: WithNotification) {
   const [currentText, updateText] = useState(initialText);
   const [jsonObject, updateJsonObject] = useState<unknown>(undefined);
   const [liveMessage, setLiveMessage] = useState("");
+  const isInitialUrlSync = useRef(true);
 
   const isDefaultText = currentText === DEFAULT_TEXT;
   const textSize = currentText.length;
@@ -72,6 +77,19 @@ function JsonViewer({ createNotification }: WithNotification) {
     announce("Copied to clipboard.");
   };
 
+  useEffect(() => {
+    if (isInitialUrlSync.current) {
+      isInitialUrlSync.current = false;
+      return;
+    }
+
+    const timeoutId = window.setTimeout(() => {
+      updateJsonUrlParam(currentText);
+    }, getJsonUrlSyncDelay(currentText));
+
+    return () => window.clearTimeout(timeoutId);
+  }, [currentText]);
+
   const renderView = (viewType: ViewType) => {
     const isInEditView = viewType === "edit";
     return (
@@ -100,7 +118,16 @@ function JsonViewer({ createNotification }: WithNotification) {
 
   const openTreeView = () => {
     const parsedJson = parseJson(currentText);
-    if (parsedJson) {
+    if (parsedJson !== undefined) {
+      if (isXLJsonText(currentText)) {
+        createNotification({
+          title: "Large JSON",
+          type: "info",
+          container: "top-center",
+          message:
+            "Large JSON loaded. Expand all is disabled for very large trees.",
+        });
+      }
       updateJsonObject(parsedJson);
       switchView("view");
       announce("Switched to view mode.");
@@ -111,13 +138,11 @@ function JsonViewer({ createNotification }: WithNotification) {
     updateJsonObject(newJson);
     const newText = stringifyJson(newJson);
     updateText(newText);
-    updateJsonUrlParam(newText);
     announce("JSON updated.");
   };
 
   function handleUpdateText(s: string): void {
     updateText(s);
-    updateJsonUrlParam(s);
   }
 
   function updateJsonUrlParam(text: string): void {

@@ -16,6 +16,10 @@ import CloseFullscreenIcon from "@mui/icons-material/CloseFullscreen";
 import CodeOffIcon from "@mui/icons-material/CodeOff";
 import UndoIcon from "@mui/icons-material/Undo";
 import { removeJsonItemAtPath } from "../utils/jsonUtils";
+import {
+  MAX_EXPAND_ALL_NODE_COUNT,
+  shouldAllowExpandAll,
+} from "../utils/jsonPerformanceUtils";
 
 function JsonViewerTree(props: any) {
   const [expanded, setExpanded]: [string[], any] = useState([]);
@@ -302,14 +306,25 @@ function JsonViewerTree(props: any) {
   }
 
   function renderToolBar() {
+    const nodeCount = allNodeIds.current.length;
+    const allowExpandAll = shouldAllowExpandAll(nodeCount);
+    const expandAllDisabled = !allowExpandAll || expanded.length === nodeCount;
+    const expandAllTitle =
+      nodeCount > MAX_EXPAND_ALL_NODE_COUNT
+        ? `Expand all is disabled for trees over ${MAX_EXPAND_ALL_NODE_COUNT.toLocaleString()} nodes.`
+        : undefined;
+
     const options: JsonViewerToolBarOption[] = [
       {
         label: "Expand",
         onClick: () => {
-          setExpanded(allNodeIds.current);
+          if (allowExpandAll) {
+            setExpanded(allNodeIds.current);
+          }
         },
         icon: <OpenInFullIcon />,
-        disabled: expanded.length === allNodeIds.current.length,
+        disabled: expandAllDisabled,
+        title: expandAllTitle,
       },
       {
         label: "Collapse",
@@ -339,10 +354,12 @@ function JsonViewerTree(props: any) {
     return <JsonViewerToolBar options={options} />;
   }
 
+  const tree = populateTree(props.json);
+
   return (
     <div className="JsonViewerTree">
       {renderToolBar()}
-      {populateTree(props.json)}
+      {tree}
     </div>
   );
 }

@@ -2,6 +2,7 @@ import {
   compressToEncodedURIComponent,
   decompressFromEncodedURIComponent,
 } from "lz-string";
+import { shouldSyncJsonTextToUrl } from "./jsonPerformanceUtils";
 
 export const JSON_QUERY_PARAM = "json";
 export const MAX_QUERY_PARAM_LENGTH = 20000;
@@ -14,7 +15,7 @@ export function encodeJsonQueryParam(
   text: string,
   maxLength: number = MAX_QUERY_PARAM_LENGTH,
 ): string | undefined {
-  if (!text) {
+  if (!shouldSyncJsonTextToUrl(text)) {
     return undefined;
   }
 

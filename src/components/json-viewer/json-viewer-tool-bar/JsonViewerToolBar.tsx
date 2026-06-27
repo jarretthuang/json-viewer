@@ -13,6 +13,7 @@ function JsonViewerToolBar(props: { options: JsonViewerToolBarOption[] }) {
               onClick={option.onClick}
               key={option.label}
               disabled={option.disabled}
+              title={option.title}
             >
               {option.icon}
               <div className="tool-bar-button-label relative inline-flex">
