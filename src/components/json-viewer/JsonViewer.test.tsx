@@ -36,7 +36,7 @@ describe("JsonViewer", () => {
 
     await user.click(screen.getByRole("tab", { name: /^view$/i }));
 
-    expect(screen.getByRole("status")).toHaveTextContent("Parsing JSON...");
+    expect(screen.getByRole("status", { name: "Parsing JSON" })).toBeInTheDocument();
 
     parseResult.resolve({
       status: "success",

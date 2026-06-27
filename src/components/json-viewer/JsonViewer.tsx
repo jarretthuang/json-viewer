@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { ReactNotificationOptions } from "react-notifications-component";
 import JsonViewerTree from "./json-viewer-tree/JsonViewerTree";
 import JsonViewerEditor from "./json-viewer-editor/JsonViewerEditor";
+import LoadingOverlay from "@/components/loading-overlay/LoadingOverlay";
 import { useSearchParams } from "next/navigation";
 import "./JsonViewer.css";
 import { WithNotification } from "../notification/Notification";
@@ -117,13 +118,7 @@ function JsonViewer({ createNotification }: WithNotification) {
           </div>
           <div className="absolute h-full w-full" hidden={isInEditView}>
             {isParsingJson ? (
-              <div
-                className="flex h-full w-full items-center justify-center bg-white text-sm font-medium text-powderBlue-700 dark:bg-zinc-900 dark:text-powderBlue-100"
-                role="status"
-                aria-live="polite"
-              >
-                Parsing JSON...
-              </div>
+              <LoadingOverlay label="Parsing JSON" />
             ) : (
               <JsonViewerTree
                 json={jsonObject}

@@ -7,6 +7,7 @@ import MinimizeIcon from "@mui/icons-material/Minimize";
 import CleaningServicesIcon from "@mui/icons-material/CleaningServices";
 import FormatAlignRightIcon from "@mui/icons-material/FormatAlignRight";
 import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
+import LoadingOverlay from "@/components/loading-overlay/LoadingOverlay";
 import dynamic from "next/dynamic";
 import { useTheme } from "next-themes";
 import type { OnChange, OnMount } from "@monaco-editor/react";
@@ -15,7 +16,7 @@ import { useEffect, useRef, useState } from "react";
 
 const MonacoEditor = dynamic(() => import("@monaco-editor/react"), {
   ssr: false,
-  loading: () => <div className="p-3 text-sm">Loading editor...</div>,
+  loading: () => null,
 });
 
 export type JsonViewerEditorProps = {
@@ -25,6 +26,10 @@ export type JsonViewerEditorProps = {
   handleCopy: (s: string) => void;
   parseJson: (text: string) => any;
 };
+
+function LoadingEditorOverlay() {
+  return <LoadingOverlay label="Loading editor" />;
+}
 
 export const JSON_EDITOR_OPTIONS: Monaco.editor.IStandaloneEditorConstructionOptions =
   {
@@ -125,6 +130,9 @@ function JsonViewerEditor({
   const [isMonacoReady, setIsMonacoReady] = useState(
     process.env.NODE_ENV === "test"
   );
+  const [isEditorMounted, setIsEditorMounted] = useState(
+    process.env.NODE_ENV === "test"
+  );
 
   useEffect(() => {
     latestTextRef.current = currentText;
@@ -200,6 +208,7 @@ function JsonViewerEditor({
   const handleEditorMount: OnMount = (editor, monacoInstance) => {
     editorRef.current = editor;
     monacoRef.current = monacoInstance;
+    setIsEditorMounted(true);
     defineJsonViewerMonacoThemes(monacoInstance);
     monacoInstance.editor.setTheme(getMonacoTheme(resolvedTheme));
 
@@ -261,27 +270,26 @@ function JsonViewerEditor({
   }
 
   return (
-    <div className="JsonViewerEditor flex h-full w-full flex-col dark:bg-zinc-900 dark:text-blue-100">
+    <div className="JsonViewerEditor relative flex h-full w-full flex-col dark:bg-zinc-900 dark:text-blue-100">
       {renderToolBar()}
       <div className="h-[calc(100%-3rem)] w-full overflow-hidden overscroll-x-contain md:h-[calc(100%-1.5rem)]">
         {isMonacoReady ? (
           <MonacoEditor
             height="100%"
             language="json"
-            loading="Loading editor..."
+            loading={null}
             onChange={handleEditorChange}
             onMount={handleEditorMount}
             options={JSON_EDITOR_OPTIONS}
             theme={getMonacoTheme(resolvedTheme)}
             value={currentText}
           />
-        ) : (
-          <div className="p-3 text-sm">Loading editor...</div>
-        )}
+        ) : null}
       </div>
       <div id="json-viewer-editor-help" className="sr-only" aria-live="polite">
         In the editor, Tab inserts indentation. Press Escape, then Tab, to move focus outside the editor.
       </div>
+      {(!isMonacoReady || !isEditorMounted) && <LoadingEditorOverlay />}
     </div>
   );
 }
