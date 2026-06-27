@@ -24,6 +24,8 @@ import {
   getJsonUrlSyncDelay,
   isXLJsonText,
 } from "./utils/jsonPerformanceUtils";
+import { JsonParseTaskResult } from "./utils/jsonParseWorkerMessages";
+import { createJsonParseTask } from "./utils/jsonParseWorkerClient";
 
 function JsonViewer({ createNotification }: WithNotification) {
   type ViewType = "view" | "edit";
@@ -38,8 +40,11 @@ function JsonViewer({ createNotification }: WithNotification) {
 
   const [currentText, updateText] = useState(initialText);
   const [jsonObject, updateJsonObject] = useState<unknown>(undefined);
+  const [isParsingJson, setIsParsingJson] = useState(false);
   const [liveMessage, setLiveMessage] = useState("");
   const isInitialUrlSync = useRef(true);
+  const activeParseRequestId = useRef(0);
+  const cancelActiveParse = useRef<() => void>(() => {});
 
   const isDefaultText = currentText === DEFAULT_TEXT;
   const textSize = currentText.length;
@@ -90,6 +95,12 @@ function JsonViewer({ createNotification }: WithNotification) {
     return () => window.clearTimeout(timeoutId);
   }, [currentText]);
 
+  useEffect(() => {
+    return () => {
+      cancelActiveParse.current();
+    };
+  }, []);
+
   const renderView = (viewType: ViewType) => {
     const isInEditView = viewType === "edit";
     return (
@@ -105,34 +116,80 @@ function JsonViewer({ createNotification }: WithNotification) {
             />
           </div>
           <div className="absolute h-full w-full" hidden={isInEditView}>
-            <JsonViewerTree
-              json={jsonObject}
-              handleCopy={handleCopy}
-              onJsonUpdate={handleJsonUpdate}
-            ></JsonViewerTree>
+            {isParsingJson ? (
+              <div
+                className="flex h-full w-full items-center justify-center bg-white text-sm font-medium text-powderBlue-700 dark:bg-zinc-900 dark:text-powderBlue-100"
+                role="status"
+                aria-live="polite"
+              >
+                Parsing JSON...
+              </div>
+            ) : (
+              <JsonViewerTree
+                json={jsonObject}
+                handleCopy={handleCopy}
+                onJsonUpdate={handleJsonUpdate}
+              ></JsonViewerTree>
+            )}
           </div>
         </div>
       </>
     );
   };
 
-  const openTreeView = () => {
-    const parsedJson = parseJson(currentText);
-    if (parsedJson !== undefined) {
-      if (isXLJsonText(currentText)) {
-        createNotification({
-          title: "Large JSON",
-          type: "info",
-          container: "top-center",
-          message:
-            "Large JSON loaded. Expand all is disabled for very large trees.",
-        });
-      }
-      updateJsonObject(parsedJson);
-      switchView("view");
-      announce("Switched to view mode.");
+  const openTreeView = async () => {
+    cancelActiveParse.current();
+
+    const parseTask = createJsonParseTask(currentText);
+    activeParseRequestId.current = parseTask.requestId;
+    cancelActiveParse.current = parseTask.cancel;
+    updateJsonObject(undefined);
+    setIsParsingJson(true);
+    switchView("view");
+    announce("Parsing JSON.");
+
+    const result = await parseTask.promise;
+
+    if (activeParseRequestId.current !== parseTask.requestId) {
+      return;
     }
+
+    cancelActiveParse.current = () => {};
+    setIsParsingJson(false);
+    handleParseResult(result);
   };
+
+  function handleParseResult(result: JsonParseTaskResult): void {
+    if (result.status === "cancelled") {
+      return;
+    }
+
+    if (result.status === "error") {
+      createNotification({
+        title: "Invalid JSON",
+        type: "info",
+        container: "top-center",
+        message: result.errorMessage,
+      });
+      switchView("edit");
+      announce("Invalid JSON. Please fix syntax errors.");
+      return;
+    }
+
+    if (isXLJsonText(currentText)) {
+      createNotification({
+        title: "Large JSON",
+        type: "info",
+        container: "top-center",
+        message:
+          "Large JSON loaded. Expand all is disabled for very large trees.",
+      });
+    }
+
+    updateJsonObject(result.parsed);
+    switchView("view");
+    announce("Switched to view mode.");
+  }
 
   const handleJsonUpdate = (newJson: any) => {
     updateJsonObject(newJson);
@@ -176,6 +233,9 @@ function JsonViewer({ createNotification }: WithNotification) {
             className="button view-switcher-button"
             data-selected={currentView === "edit"}
             onClick={() => {
+              cancelActiveParse.current();
+              activeParseRequestId.current += 1;
+              setIsParsingJson(false);
               switchView("edit");
               announce("Switched to edit mode.");
             }}
