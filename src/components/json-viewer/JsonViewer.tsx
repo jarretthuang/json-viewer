@@ -30,7 +30,7 @@ import { createJsonParseTask } from "./utils/jsonParseWorkerClient";
 function JsonViewer({ createNotification }: WithNotification) {
   type ViewType = "view" | "edit";
 
-  const DEFAULT_TEXT: string = "Paste your JSON text here!";
+  const DEFAULT_TEXT: string = "// Paste your JSON text here!";
 
   const [currentView, switchView] = useState<ViewType>("edit");
 

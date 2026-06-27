@@ -4,11 +4,18 @@ import {
   parseJsonTextWithError,
   stringifyJson,
   removeJsonItemAtPath,
+  stripJsonLineComments,
 } from "./jsonUtils";
 
 describe("jsonUtils", () => {
   test("parseJsonText returns parsed object for valid JSON", () => {
     expect(parseJsonText('{"a":1}')).toEqual({ a: 1 });
+  });
+
+  test("parseJsonText ignores leading line comments", () => {
+    expect(parseJsonText('// Paste your JSON text here!\n{"a":1}')).toEqual({
+      a: 1,
+    });
   });
 
   test("parseJsonText returns undefined for invalid JSON", () => {
@@ -17,6 +24,12 @@ describe("jsonUtils", () => {
 
   test("parseJsonTextWithError returns parsed value with empty error", () => {
     expect(parseJsonTextWithError("123")).toEqual({ parsed: 123, errorMessage: "" });
+  });
+
+  test("stripJsonLineComments removes comment-only lines", () => {
+    expect(stripJsonLineComments('// help\n{"a":"// value"}\n  // note')).toBe(
+      '{"a":"// value"}'
+    );
   });
 
   test("parseJsonTextWithError returns error message for invalid JSON", () => {
