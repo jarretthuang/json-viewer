@@ -15,6 +15,9 @@ describe("JsonViewerEditor options", () => {
     expect(JSON_EDITOR_OPTIONS.fontSize).toBe(16);
     expect(JSON_EDITOR_OPTIONS.formatOnPaste).toBe(false);
     expect(JSON_EDITOR_OPTIONS.ariaLabel).toBe("JSON editor");
+    expect(JSON_EDITOR_OPTIONS.scrollbar).toEqual(
+      expect.objectContaining({ alwaysConsumeMouseWheel: true })
+    );
   });
 
   test("maps the app theme to a Monaco theme", () => {
