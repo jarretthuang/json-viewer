@@ -7,7 +7,7 @@ import _ from "lodash";
 import JsonViewerTreeItemLabel, {
   JsonValueType,
 } from "./JsonViewerTreeItemLabel";
-import { useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import "./JsonViewerTree.css";
 import JsonViewerToolBar from "../json-viewer-tool-bar/JsonViewerToolBar";
 import { JsonViewerToolBarOption } from "../json-viewer-tool-bar/JsonViewerToolBarOption";
@@ -21,11 +21,104 @@ import {
   shouldAllowExpandAll,
 } from "../utils/jsonPerformanceUtils";
 
+type TreeMetadata = {
+  nodeIds: string[];
+  expandableNodeIds: string[];
+  nodeCount: number;
+  isCapped: boolean;
+};
+
+function hasObjectChildren(value: Record<string, unknown>): boolean {
+  for (const key in value) {
+    if (Object.prototype.hasOwnProperty.call(value, key)) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+function collectTreeMetadata(
+  json: any,
+  key: string,
+  nodeIdPrefix: string,
+  shouldUnescape: boolean,
+  nodeCountLimit: number = MAX_EXPAND_ALL_NODE_COUNT
+): TreeMetadata {
+  const nodeIds: string[] = [];
+  const expandableIds: string[] = [];
+  let nodeCount = 0;
+  let isCapped = false;
+
+  function visit(value: any, currentKey: string, currentNodeIdPrefix: string) {
+    if (isCapped) return;
+
+    nodeCount += 1;
+    if (nodeCount > nodeCountLimit) {
+      isCapped = true;
+      return;
+    }
+
+    const nodeId = currentNodeIdPrefix + "." + currentKey;
+    nodeIds.push(nodeId);
+    let childValue = value;
+
+    if (shouldUnescape && typeof value === "string") {
+      try {
+        const possibleJson = JSON.parse(value);
+        if (typeof possibleJson === "object" && possibleJson !== null) {
+          childValue = possibleJson;
+        }
+      } catch {}
+    }
+
+    if (_.isNull(childValue) || _.isUndefined(childValue)) {
+      return;
+    }
+
+    if (typeof childValue !== "object") {
+      return;
+    }
+
+    const hasChildren = Array.isArray(childValue)
+      ? childValue.length > 0
+      : hasObjectChildren(childValue);
+
+    if (!hasChildren) {
+      return;
+    }
+
+    expandableIds.push(nodeId);
+
+    if (Array.isArray(childValue)) {
+      for (let index = 0; index < childValue.length; index += 1) {
+        visit(childValue[index], index.toString(), nodeId);
+        if (isCapped) return;
+      }
+    } else {
+      for (const childKey in childValue) {
+        if (Object.prototype.hasOwnProperty.call(childValue, childKey)) {
+          visit(childValue[childKey], childKey, nodeId);
+          if (isCapped) return;
+        }
+      }
+    }
+  }
+
+  visit(json, key, nodeIdPrefix);
+
+  return {
+    nodeIds: isCapped ? [] : nodeIds,
+    expandableNodeIds: isCapped ? [] : expandableIds,
+    nodeCount,
+    isCapped,
+  };
+}
+
 function JsonViewerTree(props: any) {
   const [expanded, setExpanded]: [string[], any] = useState([]);
   const [unescaped, setUnescaped] = useState<boolean>(false);
   const [focusedNodeId, setFocusedNodeId] = useState<string | null>(null);
-  const allNodeIds = useRef<string[]>([]);
   const expandableNodeIds = useRef<Set<string>>(new Set());
 
   function handleValueChange(path: (string | number)[], newValue: any) {
@@ -105,27 +198,22 @@ function JsonViewerTree(props: any) {
   }
 
   function renderTreeItems(json: any, shouldUnescape: boolean) {
-    const nodeIdSet = new Set<string>();
     expandableNodeIds.current.clear();
-    const result = populateTreeItems(
+    return populateTreeItems(
       json,
       "JSON", // Root Key Name
       "",
-      nodeIdSet,
       shouldUnescape,
       false,
       [],
       false // Root key not editable
     );
-    allNodeIds.current = Array.from(nodeIdSet);
-    return result;
   }
 
   function populateTreeItems(
     json: any,
     key: string,
     nodeIdPrefix: string,
-    nodeIdSet: Set<string>,
     shouldUnescape: boolean,
     isUnescapedContent: boolean = false,
     path: (string | number)[] = [],
@@ -133,7 +221,6 @@ function JsonViewerTree(props: any) {
   ) {
     const isItemRemovable = path.length > 0 && !isUnescapedContent;
     const nodeId: string = nodeIdPrefix + "." + key;
-    nodeIdSet.add(nodeId);
 
     if (_.isNull(json) || _.isUndefined(json)) {
       return (
@@ -164,7 +251,6 @@ function JsonViewerTree(props: any) {
         json,
         key,
         nodeId,
-        nodeIdSet,
         shouldUnescape,
         isUnescapedContent,
         path,
@@ -190,7 +276,6 @@ function JsonViewerTree(props: any) {
               possibleJson,
               key,
               nodeId,
-              nodeIdSet,
               shouldUnescape,
               true,
               [], // Path lost for unescaped content
@@ -230,13 +315,37 @@ function JsonViewerTree(props: any) {
     json: any,
     key: string,
     nodeId: string,
-    nodeIdSet: Set<string>,
     shouldUnescape: boolean,
     isUnescapedContent: boolean = false,
     path: (string | number)[] = [],
     isKeyEditable: boolean = false
   ) {
-    expandableNodeIds.current.add(nodeId);
+    const isExpanded = expanded.includes(nodeId);
+    const hasChildren = Array.isArray(json)
+      ? json.length > 0
+      : hasObjectChildren(json);
+
+    if (hasChildren) {
+      expandableNodeIds.current.add(nodeId);
+    }
+
+    const childItems = isExpanded
+      ? renderChildTreeItems(
+          json,
+          nodeId,
+          shouldUnescape,
+          isUnescapedContent,
+          path
+        )
+      : hasChildren
+        ? [
+            <JsonViewerTreeItem
+              key={`${nodeId}.__lazy-placeholder`}
+              nodeId={`${nodeId}.__lazy-placeholder`}
+              className="hidden"
+            />,
+          ]
+        : null;
 
     if (Array.isArray(json)) {
       return (
@@ -256,18 +365,7 @@ function JsonViewerTree(props: any) {
             />
           }
         >
-          {json.map((itemInArray, index) =>
-            populateTreeItems(
-              itemInArray,
-              index.toString(),
-              nodeId,
-              nodeIdSet,
-              shouldUnescape,
-              isUnescapedContent,
-              [...path, index],
-              false // Array keys (indices) are not editable
-            )
-          )}
+          {childItems}
         </JsonViewerTreeItem>
       );
     } else {
@@ -288,29 +386,54 @@ function JsonViewerTree(props: any) {
             />
           }
         >
-          {Object.keys(json).map((key: string) =>
-            populateTreeItems(
-              json[key],
-              key,
-              nodeId,
-              nodeIdSet,
-              shouldUnescape,
-              isUnescapedContent,
-              [...path, key],
-              true // Object keys are editable
-            )
-          )}
+          {childItems}
         </JsonViewerTreeItem>
       );
     }
   }
 
+  function renderChildTreeItems(
+    json: any,
+    nodeId: string,
+    shouldUnescape: boolean,
+    isUnescapedContent: boolean,
+    path: (string | number)[]
+  ) {
+    if (Array.isArray(json)) {
+      return json.map((itemInArray, index) =>
+        populateTreeItems(
+          itemInArray,
+          index.toString(),
+          nodeId,
+          shouldUnescape,
+          isUnescapedContent,
+          [...path, index],
+          false // Array keys (indices) are not editable
+        )
+      );
+    }
+
+    return Object.keys(json).map((key) =>
+      populateTreeItems(
+        json[key],
+        key,
+        nodeId,
+        shouldUnescape,
+        isUnescapedContent,
+        [...path, key],
+        true // Object keys are editable
+      )
+    );
+  }
+
   function renderToolBar() {
-    const nodeCount = allNodeIds.current.length;
-    const allowExpandAll = shouldAllowExpandAll(nodeCount);
-    const expandAllDisabled = !allowExpandAll || expanded.length === nodeCount;
+    const nodeCount = metadata.nodeCount;
+    const allowExpandAll = !metadata.isCapped && shouldAllowExpandAll(nodeCount);
+    const expandAllDisabled =
+      !allowExpandAll ||
+      metadata.expandableNodeIds.every((nodeId) => expanded.includes(nodeId));
     const expandAllTitle =
-      nodeCount > MAX_EXPAND_ALL_NODE_COUNT
+      metadata.isCapped || nodeCount > MAX_EXPAND_ALL_NODE_COUNT
         ? `Expand all is disabled for trees over ${MAX_EXPAND_ALL_NODE_COUNT.toLocaleString()} nodes.`
         : undefined;
 
@@ -319,7 +442,7 @@ function JsonViewerTree(props: any) {
         label: "Expand",
         onClick: () => {
           if (allowExpandAll) {
-            setExpanded(allNodeIds.current);
+            setExpanded(metadata.nodeIds);
           }
         },
         icon: <OpenInFullIcon />,
@@ -354,6 +477,10 @@ function JsonViewerTree(props: any) {
     return <JsonViewerToolBar options={options} />;
   }
 
+  const metadata = useMemo(
+    () => collectTreeMetadata(props.json, "JSON", "", unescaped),
+    [props.json, unescaped]
+  );
   const tree = populateTree(props.json);
 
   return (
