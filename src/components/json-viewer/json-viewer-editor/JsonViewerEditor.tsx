@@ -1,5 +1,6 @@
 "use client";
 import { sampleJson } from "../assets/sample";
+import { createXLExampleJson } from "../assets/xlFixtures";
 import JsonViewerToolBar from "../json-viewer-tool-bar/JsonViewerToolBar";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import ContentPasteIcon from "@mui/icons-material/ContentPaste";
@@ -7,6 +8,7 @@ import MinimizeIcon from "@mui/icons-material/Minimize";
 import CleaningServicesIcon from "@mui/icons-material/CleaningServices";
 import FormatAlignRightIcon from "@mui/icons-material/FormatAlignRight";
 import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
+import DataObjectOutlinedIcon from "@mui/icons-material/DataObjectOutlined";
 import LoadingOverlay from "@/components/loading-overlay/LoadingOverlay";
 import dynamic from "next/dynamic";
 import { useTheme } from "next-themes";
@@ -277,10 +279,16 @@ function JsonViewerEditor({
   function renderToolBar() {
     const options = [
       {
-        label: "Example",
-        onClick: () => updateText(JSON.stringify(sampleJson)),
+        label: "XL example",
+        onClick: () => updateText(createXLExampleJson()),
         icon: <DescriptionOutlinedIcon />,
         ping: isDefaultText,
+        title: "Load a 2 MB JSON example",
+      },
+      {
+        label: "Example",
+        onClick: () => updateText(JSON.stringify(sampleJson)),
+        icon: <DataObjectOutlinedIcon />,
       },
       {
         label: "Copy",

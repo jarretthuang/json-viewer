@@ -1,3 +1,5 @@
+export const XL_EXAMPLE_JSON_TEXT_LENGTH = 2_000_000;
+
 export function createWideObjectJson(fieldCount: number): string {
   const entries = Array.from({ length: fieldCount }, (_, index) => [
     `key_${index}`,
@@ -18,15 +20,36 @@ export function createLargeArrayJson(itemCount: number): string {
 }
 
 export function createLargeArrayJsonAtLeast(minLength: number): string {
-  let itemCount = Math.max(1, Math.ceil(minLength / 50));
-  let text = createLargeArrayJson(itemCount);
+  let lowItemCount = 1;
+  let highItemCount = Math.max(1, Math.ceil(minLength / 50));
+  let text = createLargeArrayJson(highItemCount);
 
   while (text.length < minLength) {
-    itemCount = Math.ceil(itemCount * 1.25);
-    text = createLargeArrayJson(itemCount);
+    lowItemCount = highItemCount + 1;
+    highItemCount = Math.ceil(highItemCount * 1.25);
+    text = createLargeArrayJson(highItemCount);
+  }
+
+  while (lowItemCount < highItemCount) {
+    const midpoint = Math.floor((lowItemCount + highItemCount) / 2);
+    const midpointText = createLargeArrayJson(midpoint);
+
+    if (midpointText.length >= minLength) {
+      highItemCount = midpoint;
+      text = midpointText;
+    } else {
+      lowItemCount = midpoint + 1;
+    }
   }
 
   return text;
+}
+
+let xlExampleJson: string | undefined;
+
+export function createXLExampleJson(): string {
+  xlExampleJson ??= createLargeArrayJsonAtLeast(XL_EXAMPLE_JSON_TEXT_LENGTH);
+  return xlExampleJson;
 }
 
 export function createDeepObjectJson(depth: number): string {

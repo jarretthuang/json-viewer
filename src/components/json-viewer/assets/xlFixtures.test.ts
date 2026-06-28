@@ -1,8 +1,10 @@
 import {
+  XL_EXAMPLE_JSON_TEXT_LENGTH,
   createDeepObjectJson,
   createLargeArrayJson,
   createLargeArrayJsonAtLeast,
   createMixedLargeJson,
+  createXLExampleJson,
   createWideObjectJson,
 } from "./xlFixtures";
 
@@ -27,7 +29,17 @@ describe("xlFixtures", () => {
     const parsed = JSON.parse(text);
 
     expect(text.length).toBeGreaterThanOrEqual(10_000);
+    expect(text.length).toBeLessThan(10_100);
     expect(parsed.length).toBeGreaterThan(0);
+  });
+
+  test("generates a valid XL example around 2 MB", () => {
+    const text = createXLExampleJson();
+    const parsed = JSON.parse(text);
+
+    expect(text.length).toBeGreaterThanOrEqual(XL_EXAMPLE_JSON_TEXT_LENGTH);
+    expect(text.length).toBeLessThan(XL_EXAMPLE_JSON_TEXT_LENGTH + 1_000);
+    expect(parsed.length).toBeGreaterThan(40_000);
   });
 
   test("generates valid deep object JSON", () => {

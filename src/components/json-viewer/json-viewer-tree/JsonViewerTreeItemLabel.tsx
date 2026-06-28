@@ -5,7 +5,6 @@ import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import { Tooltip } from "../../tooltip/Tooltip";
 import { Fragment, useState, useEffect } from "react";
 import _ from "lodash";
-import { withDiagnostics } from "react-diagnostics";
 import CodeOffIcon from "@mui/icons-material/CodeOff";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 
@@ -310,4 +309,4 @@ function JsonViewerTreeItemLabel(props: JsonViewerTreeItemLabelProps) {
   );
 }
 
-export default withDiagnostics.detailed(JsonViewerTreeItemLabel);
+export default JsonViewerTreeItemLabel;

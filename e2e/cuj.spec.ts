@@ -6,7 +6,7 @@ test("core CUJ smoke flow works", async ({ page }) => {
 
   await expect(page.getByText("jsonviewer.io")).toBeVisible();
 
-  await page.getByRole("button", { name: /example/i }).click();
+  await page.getByRole("button", { name: /^example$/i }).click();
   await page.getByRole("tab", { name: /^view$/i }).click();
 
   const tree = page.getByLabel(/json viewer tree/i);
@@ -18,6 +18,21 @@ test("core CUJ smoke flow works", async ({ page }) => {
 
   await page.keyboard.press("Escape");
   await expect(page.getByRole("dialog", { name: /json viewer information/i })).toBeHidden();
+});
+
+test("XL example toolbar action is visible on mobile and desktop", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 500, height: 800 });
+  await page.goto("/");
+
+  const xlExampleButton = page.getByRole("button", {
+    name: /^xl example$/i,
+  });
+  await expect(xlExampleButton).toBeVisible();
+
+  await page.setViewportSize({ width: 900, height: 800 });
+  await expect(xlExampleButton).toBeVisible();
 });
 
 test("edit tab can format and minimize JSON", async ({ page }) => {

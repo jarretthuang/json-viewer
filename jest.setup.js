@@ -17,16 +17,6 @@ jest.mock('next/navigation', () => ({
   useSearchParams: () => new URLSearchParams(),
 }));
 
-jest.mock(
-  'react-diagnostics',
-  () => ({
-    withDiagnostics: {
-      detailed: (Component) => Component,
-    },
-  }),
-  { virtual: true }
-);
-
 jest.mock('react-markdown', () => ({
   __esModule: true,
   default: ({ children }) => children,

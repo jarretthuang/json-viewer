@@ -1,6 +1,7 @@
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import App from './page';
+import { XL_EXAMPLE_JSON_TEXT_LENGTH } from '@/components/json-viewer/assets/xlFixtures';
 
 describe('CUJ regression coverage', () => {
   test('app loads and JSON tree renders from editor sample', async () => {
@@ -9,7 +10,7 @@ describe('CUJ regression coverage', () => {
 
     expect(screen.getByText('jsonviewer.io')).toBeInTheDocument();
 
-    await user.click(screen.getByRole('button', { name: /example/i }));
+    await user.click(screen.getByRole('button', { name: /^example$/i }));
     await user.click(screen.getByRole('tab', { name: /^view$/i }));
 
     expect(await screen.findByLabelText(/json viewer tree/i)).toBeInTheDocument();
@@ -20,7 +21,7 @@ describe('CUJ regression coverage', () => {
     const user = userEvent.setup();
     render(<App />);
 
-    await user.click(screen.getByRole('button', { name: /example/i }));
+    await user.click(screen.getByRole('button', { name: /^example$/i }));
     await user.click(screen.getByRole('tab', { name: /^view$/i }));
 
     const tree = await screen.findByLabelText(/json viewer tree/i);
@@ -38,7 +39,7 @@ describe('CUJ regression coverage', () => {
     const user = userEvent.setup();
     render(<App />);
 
-    await user.click(screen.getByRole('button', { name: /example/i }));
+    await user.click(screen.getByRole('button', { name: /^example$/i }));
     await user.click(screen.getByRole('tab', { name: /^view$/i }));
     await user.click(screen.getByRole('button', { name: /expand/i }));
 
@@ -57,7 +58,7 @@ describe('CUJ regression coverage', () => {
     const user = userEvent.setup();
     render(<App />);
 
-    await user.click(screen.getByRole('button', { name: /example/i }));
+    await user.click(screen.getByRole('button', { name: /^example$/i }));
     await user.click(screen.getByRole('tab', { name: /^view$/i }));
 
     await user.click(screen.getByText('JSON'));
@@ -91,6 +92,29 @@ describe('CUJ regression coverage', () => {
     await user.click(screen.getByRole('button', { name: /^minimize$/i }));
     await waitFor(() => {
       expect(screen.getByLabelText(/json editor/i)).toHaveValue('{"a":1}');
+    });
+  });
+
+  test('toolbar can load the XL JSON example', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+
+    expect(
+      screen
+        .getByRole('button', { name: /^example$/i })
+        .querySelector('.animate-ping')
+    ).not.toBeInTheDocument();
+
+    const xlExampleButton = screen.getByRole('button', { name: /xl example/i });
+    expect(xlExampleButton.querySelector('.animate-ping')).toBeInTheDocument();
+
+    await user.click(xlExampleButton);
+
+    await waitFor(() => {
+      expect(
+        (screen.getByLabelText(/json editor/i) as HTMLTextAreaElement).value
+          .length
+      ).toBeGreaterThanOrEqual(XL_EXAMPLE_JSON_TEXT_LENGTH);
     });
   });
 
