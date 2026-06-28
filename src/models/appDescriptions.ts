@@ -1,8 +1,8 @@
 export const jsonViewerAppDescription = `
-Introducing the __JSON Viewer__ app, your indispensable tool for effortlessly managing JSON data.
+__JSON Viewer__ helps you edit, format, minify, and inspect JSON with ultra-fast performance for payloads up to 10 MB.
 
-The __Edit__ tab allows easy editing of JSON text with convenient options like auto-indenting and structure minimization.
+Use __Edit__ to work with raw JSON text.
 
-Switch to the __View__ tab for a clear tree structure, offering an intuitive visual representation of your JSON object.
+Switch to __View__ to explore the same data as a readable tree.
 
 `;

@@ -209,7 +209,7 @@ export default function NavBar({
           role="dialog"
           aria-modal="true"
           aria-label="JSON viewer information"
-          className="expanded-content absolute left-0 top-0 z-10 flex h-[100svh] w-[100dvw] flex-col overflow-hidden"
+          className="expanded-content fixed inset-0 flex h-[100svh] w-[100dvw] flex-col overflow-hidden"
         >
           <div className="flex w-full justify-end pr-5 pt-5">
             <button

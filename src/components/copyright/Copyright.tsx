@@ -1,7 +1,7 @@
 
 function Copyright() {
   return (
-    <footer className="flex h-36 w-full max-w-6xl items-center justify-center self-center px-10 text-[15px] text-mono-800 dark:text-mono-500 md:fixed md:bottom-0 md:h-12 md:justify-end">
+    <footer className="flex h-36 w-full max-w-6xl shrink-0 items-center justify-center self-center px-10 text-[15px] text-mono-800 dark:text-mono-500 md:h-12 md:justify-end">
       <div className="hidden flex-row gap-1 md:flex">
         <span>Copyright © {new Date().getFullYear()}</span>
         <a

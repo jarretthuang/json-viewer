@@ -74,3 +74,45 @@ test("edit tab lets keyboard users leave Monaco after Escape then Tab", async ({
     )
     .toBe(false);
 });
+
+test("navbar overlay covers Monaco find widget", async ({ page }) => {
+  await page.goto("/");
+
+  const editor = page.locator(".monaco-editor").first();
+  await expect(editor).toBeVisible();
+  await editor.evaluate((editorElement) => {
+    const findWidget = document.createElement("div");
+    findWidget.className = "editor-widget find-widget visible";
+    findWidget.textContent = "Find";
+    findWidget.style.background = "rgb(255, 0, 0)";
+    findWidget.style.height = "96px";
+    findWidget.style.position = "absolute";
+    findWidget.style.right = "0";
+    findWidget.style.top = "0";
+    findWidget.style.width = "320px";
+    findWidget.style.zIndex = "35";
+    editorElement.appendChild(findWidget);
+  });
+
+  const findWidget = page.locator(".monaco-editor .find-widget.visible").first();
+  await expect(findWidget).toBeVisible();
+
+  await page.getByRole("button", { name: /more options/i }).click();
+
+  const dialog = page.getByRole("dialog", { name: /json viewer information/i });
+  await expect(dialog).toBeVisible();
+
+  await expect
+    .poll(async () =>
+      findWidget.evaluate((widget) => {
+        const { left, top, width, height } = widget.getBoundingClientRect();
+        const elementAtWidgetCenter = document.elementFromPoint(
+          left + width / 2,
+          top + height / 2
+        );
+
+        return elementAtWidgetCenter?.closest("#navbar-expanded-panel")?.id;
+      })
+    )
+    .toBe("navbar-expanded-panel");
+});
