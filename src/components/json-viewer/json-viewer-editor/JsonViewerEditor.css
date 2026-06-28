@@ -5,3 +5,35 @@
 .JsonViewerEditor .monaco-editor .sticky-widget .sticky-line-number-inner {
   transform: translateX(4px);
 }
+
+.JsonViewerEditor .monaco-scrollable-element > .scrollbar {
+  background: transparent;
+}
+
+.JsonViewerEditor .monaco-scrollable-element > .scrollbar > .slider {
+  border-radius: 999px;
+  background: rgba(100, 116, 139, 0.3);
+}
+
+.JsonViewerEditor .monaco-scrollable-element > .scrollbar > .slider:hover {
+  background: rgba(100, 116, 139, 0.45);
+}
+
+.dark .JsonViewerEditor .monaco-scrollable-element > .scrollbar > .slider {
+  background: rgba(212, 212, 216, 0.28);
+}
+
+.dark .JsonViewerEditor
+  .monaco-scrollable-element
+  > .scrollbar
+  > .slider:hover {
+  background: rgba(212, 212, 216, 0.42);
+}
+
+.JsonViewerEditor .monaco-editor .find-widget {
+  overflow: visible;
+}
+
+.JsonViewerEditor .monaco-editor .find-widget > .button.codicon-widget-close {
+  top: 8px;
+}

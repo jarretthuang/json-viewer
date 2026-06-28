@@ -18,7 +18,14 @@ describe("JsonViewerEditor options", () => {
     expect(JSON_EDITOR_OPTIONS.lineNumbersMinChars).toBe(4);
     expect(JSON_EDITOR_OPTIONS.ariaLabel).toBe("JSON editor");
     expect(JSON_EDITOR_OPTIONS.scrollbar).toEqual(
-      expect.objectContaining({ alwaysConsumeMouseWheel: true })
+      expect.objectContaining({
+        alwaysConsumeMouseWheel: true,
+        horizontalHasArrows: false,
+        horizontalScrollbarSize: 8,
+        useShadows: false,
+        verticalHasArrows: false,
+        verticalScrollbarSize: 8,
+      })
     );
   });
 

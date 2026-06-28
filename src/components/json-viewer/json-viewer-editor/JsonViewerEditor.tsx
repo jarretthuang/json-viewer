@@ -53,8 +53,11 @@ export const JSON_EDITOR_OPTIONS: Monaco.editor.IStandaloneEditorConstructionOpt
     scrollBeyondLastLine: false,
     scrollbar: {
       alwaysConsumeMouseWheel: true,
-      horizontalScrollbarSize: 10,
-      verticalScrollbarSize: 10,
+      horizontalHasArrows: false,
+      horizontalScrollbarSize: 8,
+      useShadows: false,
+      verticalHasArrows: false,
+      verticalScrollbarSize: 8,
     },
     tabSize: 2,
     wordWrap: "off",
@@ -273,7 +276,7 @@ function JsonViewerEditor({
   return (
     <div className="JsonViewerEditor relative flex h-full w-full flex-col dark:bg-zinc-900 dark:text-blue-100">
       {renderToolBar()}
-      <div className="h-[calc(100%-3rem)] w-full overflow-hidden overscroll-x-contain md:h-[calc(100%-1.5rem)]">
+      <div className="h-[calc(100%-3rem)] w-full overflow-visible overscroll-x-contain md:h-[calc(100%-1.5rem)]">
         {isMonacoReady ? (
           <MonacoEditor
             height="100%"
