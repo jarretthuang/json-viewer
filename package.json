@@ -4,6 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "benchmark": "node scripts/benchmark-json-viewer.js",
+    "benchmark:ci": "node scripts/benchmark-json-viewer.js --runs=3 --payloads=1",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",

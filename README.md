@@ -53,9 +53,37 @@ Performance depends on browser, hardware, and JSON shape. Large arrays are rende
 
 ## Development
 
+Install dependencies:
+
 ```bash
 npm install
+```
+
+Run the local development server:
+
+```bash
 npm run dev
+```
+
+Run tests and lint checks:
+
+```bash
+npm run test
+npm run test:e2e
+npm run lint
+```
+
+Build and run the production app locally:
+
+```bash
+npm run build
+npm run start
+```
+
+Run the performance benchmark locally against a running app:
+
+```bash
+npm run benchmark -- --base-url=http://127.0.0.1:3000 --runs=10 --payloads=1,5,10
 ```
 
 ## Stack

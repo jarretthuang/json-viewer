@@ -28,6 +28,14 @@ npm run test:e2e
 
 Playwright may require installed browser binaries. If Firefox/WebKit are missing locally, Chromium-only checks can still be useful, but mention the limitation.
 
+For manual performance benchmarking against a running app:
+
+```bash
+npm run benchmark -- --base-url=http://127.0.0.1:3000 --runs=10 --payloads=1,5,10
+```
+
+CI runs `npm run benchmark:ci` as a production smoke benchmark after `npm run build`. Keep that CI benchmark small and avoid strict timing budgets unless the user explicitly asks for performance gates; browser timings are hardware- and load-dependent.
+
 ## Repo Structure
 
 ```text
