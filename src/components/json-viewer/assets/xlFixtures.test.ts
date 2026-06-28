@@ -1,6 +1,7 @@
 import {
   createDeepObjectJson,
   createLargeArrayJson,
+  createLargeArrayJsonAtLeast,
   createMixedLargeJson,
   createWideObjectJson,
 } from "./xlFixtures";
@@ -19,6 +20,14 @@ describe("xlFixtures", () => {
 
     expect(parsed).toHaveLength(25);
     expect(parsed[1]).toEqual({ id: 1, active: false, label: "Item 1" });
+  });
+
+  test("generates large array JSON above a requested source length", () => {
+    const text = createLargeArrayJsonAtLeast(10_000);
+    const parsed = JSON.parse(text);
+
+    expect(text.length).toBeGreaterThanOrEqual(10_000);
+    expect(parsed.length).toBeGreaterThan(0);
   });
 
   test("generates valid deep object JSON", () => {

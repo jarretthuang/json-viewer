@@ -7,14 +7,18 @@ import MinimizeIcon from "@mui/icons-material/Minimize";
 import CleaningServicesIcon from "@mui/icons-material/CleaningServices";
 import FormatAlignRightIcon from "@mui/icons-material/FormatAlignRight";
 import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
-import { useState, useEffect, useRef } from "react";
-import _ from "lodash";
-import Editor from "react-simple-code-editor";
-import { highlight, languages } from "prismjs/components/prism-core";
-import "prismjs/components/prism-clike";
-import "prismjs/components/prism-javascript";
-import "./prism-theme.css";
-import { shouldHighlightJsonText } from "../utils/jsonPerformanceUtils";
+import LoadingOverlay from "@/components/loading-overlay/LoadingOverlay";
+import dynamic from "next/dynamic";
+import { useTheme } from "next-themes";
+import type { OnChange, OnMount } from "@monaco-editor/react";
+import type * as Monaco from "monaco-editor";
+import { useEffect, useRef, useState } from "react";
+import "./JsonViewerEditor.css";
+
+const MonacoEditor = dynamic(() => import("@monaco-editor/react"), {
+  ssr: false,
+  loading: () => null,
+});
 
 export type JsonViewerEditorProps = {
   currentText: string;
@@ -24,29 +28,95 @@ export type JsonViewerEditorProps = {
   parseJson: (text: string) => any;
 };
 
-export function escapeHtml(text: string): string {
-  return text.replace(/[&<>"']/g, (character) => {
-    switch (character) {
-      case "&":
-        return "&amp;";
-      case "<":
-        return "&lt;";
-      case ">":
-        return "&gt;";
-      case '"':
-        return "&quot;";
-      case "'":
-        return "&#39;";
-      default:
-        return character;
-    }
-  });
+function LoadingEditorOverlay() {
+  return <LoadingOverlay label="Loading editor" />;
 }
 
-export function highlightJsonText(code: string): string {
-  return shouldHighlightJsonText(code)
-    ? highlight(code, languages.js)
-    : escapeHtml(code);
+export const JSON_EDITOR_OPTIONS: Monaco.editor.IStandaloneEditorConstructionOptions =
+  {
+    automaticLayout: true,
+    ariaLabel: "JSON editor",
+    codeLens: false,
+    contextmenu: true,
+    folding: false,
+    fontSize: 16,
+    formatOnPaste: false,
+    formatOnType: false,
+    glyphMargin: false,
+    hideCursorInOverviewRuler: true,
+    lineDecorationsWidth: 14,
+    lineNumbersMinChars: 4,
+    minimap: { enabled: false },
+    overviewRulerBorder: false,
+    renderLineHighlight: "line",
+    renderValidationDecorations: "editable",
+    scrollBeyondLastLine: false,
+    scrollbar: {
+      alwaysConsumeMouseWheel: true,
+      horizontalHasArrows: false,
+      horizontalScrollbarSize: 8,
+      useShadows: false,
+      verticalHasArrows: false,
+      verticalScrollbarSize: 8,
+    },
+    tabSize: 2,
+    wordWrap: "off",
+    wrappingIndent: "none",
+  };
+
+export const JSON_VIEWER_LIGHT_MONACO_THEME = "json-viewer-light";
+export const JSON_VIEWER_DARK_MONACO_THEME = "json-viewer-dark";
+
+type MonacoThemeApi = {
+  editor: {
+    defineTheme: (
+      themeName: string,
+      themeData: Monaco.editor.IStandaloneThemeData
+    ) => void;
+    setTheme: (themeName: string) => void;
+  };
+};
+
+export function getMonacoTheme(resolvedTheme?: string):
+  | typeof JSON_VIEWER_LIGHT_MONACO_THEME
+  | typeof JSON_VIEWER_DARK_MONACO_THEME {
+  return resolvedTheme === "dark"
+    ? JSON_VIEWER_DARK_MONACO_THEME
+    : JSON_VIEWER_LIGHT_MONACO_THEME;
+}
+
+export function defineJsonViewerMonacoThemes(
+  monacoInstance: MonacoThemeApi
+): void {
+  monacoInstance.editor.defineTheme(JSON_VIEWER_LIGHT_MONACO_THEME, {
+    base: "vs",
+    inherit: true,
+    rules: [],
+    colors: {
+      "editor.background": "#fdfeff",
+      "editorGutter.background": "#fdfeff",
+      "editorLineNumber.foreground": "#318e99",
+      "editorLineNumber.activeForeground": "#18464c",
+      "editor.lineHighlightBackground": "#b0e0e61f",
+      "editor.selectionBackground": "#63c2cd4d",
+      "editor.inactiveSelectionBackground": "#63c2cd26",
+    },
+  });
+
+  monacoInstance.editor.defineTheme(JSON_VIEWER_DARK_MONACO_THEME, {
+    base: "vs-dark",
+    inherit: true,
+    rules: [],
+    colors: {
+      "editor.background": "#18181b",
+      "editorGutter.background": "#18181b",
+      "editorLineNumber.foreground": "#71717a",
+      "editorLineNumber.activeForeground": "#fafafa",
+      "editor.lineHighlightBackground": "#ffffff0a",
+      "editor.selectionBackground": "#63c2cd4d",
+      "editor.inactiveSelectionBackground": "#63c2cd26",
+    },
+  });
 }
 
 function JsonViewerEditor({
@@ -56,81 +126,61 @@ function JsonViewerEditor({
   handleCopy,
   parseJson,
 }: JsonViewerEditorProps) {
-  const [lines, setLines] = useState<number[]>([]);
-  const [allowTabFocusExit, setAllowTabFocusExit] = useState(false);
-  const TEXT_AREA_ELEMENT_ID = "json-viewer-editor-textarea";
-  const TEXT_AREA_HELP_ID = "json-viewer-editor-help";
-  const textareaElementRef = useRef<HTMLElement | null>(null);
+  const editorRef = useRef<Monaco.editor.IStandaloneCodeEditor | null>(null);
+  const monacoRef = useRef<MonacoThemeApi | null>(null);
+  const latestTextRef = useRef(currentText);
+  const isDefaultTextRef = useRef(isDefaultText);
+  const { resolvedTheme } = useTheme();
+  const [isMonacoReady, setIsMonacoReady] = useState(
+    process.env.NODE_ENV === "test"
+  );
+  const [isEditorMounted, setIsEditorMounted] = useState(
+    process.env.NODE_ENV === "test"
+  );
 
   useEffect(() => {
-    if (!textareaElementRef.current) {
-      textareaElementRef.current = document?.getElementById(TEXT_AREA_ELEMENT_ID);
-    }
+    latestTextRef.current = currentText;
+    isDefaultTextRef.current = isDefaultText;
 
-    const textareaElement = textareaElementRef.current;
-    if (textareaElement) {
-      textareaElement.setAttribute("aria-label", "JSON editor");
-      textareaElement.setAttribute("aria-describedby", TEXT_AREA_HELP_ID);
-      textareaElement.setAttribute("spellcheck", "false");
+    const editor = editorRef.current;
+    const model = editor?.getModel();
+    if (model && model.getValue() !== currentText) {
+      model.setValue(currentText);
     }
-  });
+  }, [currentText, isDefaultText]);
 
   useEffect(() => {
-    const textareaElement = textareaElementRef.current;
-    if (!textareaElement) {
+    if (process.env.NODE_ENV === "test") {
       return;
     }
 
-    const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        setAllowTabFocusExit(true);
-      } else if (allowTabFocusExit && e.key !== "Tab") {
-        setAllowTabFocusExit(false);
+    let isMounted = true;
+
+    Promise.all([import("@monaco-editor/react"), import("monaco-editor")]).then(
+      ([monacoReact, monacoInstance]) => {
+        monacoReact.loader.config({ monaco: monacoInstance });
+        defineJsonViewerMonacoThemes(monacoInstance);
+        if (isMounted) {
+          setIsMonacoReady(true);
+        }
       }
-    };
-
-    const onBlur = () => {
-      setAllowTabFocusExit(false);
-    };
-
-    textareaElement.addEventListener("keydown", onKeyDown);
-    textareaElement.addEventListener("blur", onBlur);
+    );
 
     return () => {
-      textareaElement.removeEventListener("keydown", onKeyDown);
-      textareaElement.removeEventListener("blur", onBlur);
+      isMounted = false;
     };
-  }, [allowTabFocusExit]);
-
-  const updateLineNumbers = () => {
-    const textareaElement = textareaElementRef.current;
-    if (textareaElement) {
-      const height: number = textareaElement.offsetHeight ?? 0;
-      const lineHeight: number =
-        _.toNumber(
-          getComputedStyle(textareaElement)?.lineHeight?.slice(0, -2)
-        ) ?? 1;
-      const numberOfLines: number = Math.ceil(height / lineHeight);
-      const lines = Array.from(
-        { length: numberOfLines },
-        (_, index) => index + 1
-      );
-      setLines(lines);
-    }
-  };
+  }, []);
 
   useEffect(() => {
-    if (textareaElementRef.current) {
-      updateLineNumbers();
-    }
-    window.addEventListener("resize", updateLineNumbers);
-    return () => {
-      window.removeEventListener("resize", updateLineNumbers);
-    };
-  }, [currentText]);
+    monacoRef.current?.editor.setTheme(getMonacoTheme(resolvedTheme));
+  }, [resolvedTheme]);
+
+  const getEditorText = () =>
+    editorRef.current?.getValue() ?? latestTextRef.current;
 
   const clearDefaultText = () => {
-    if (isDefaultText) {
+    if (isDefaultTextRef.current) {
+      latestTextRef.current = "";
       updateText("");
     }
   };
@@ -139,6 +189,7 @@ function JsonViewerEditor({
     const parsedJson = parseJson(text);
     if (parsedJson) {
       const formattedJsonString = JSON.stringify(parsedJson, null, 2);
+      latestTextRef.current = formattedJsonString;
       updateText(formattedJsonString);
     }
   };
@@ -147,8 +198,41 @@ function JsonViewerEditor({
     const parsedJson = parseJson(text);
     if (parsedJson) {
       const formattedJsonString = JSON.stringify(parsedJson, null);
+      latestTextRef.current = formattedJsonString;
       updateText(formattedJsonString);
     }
+  };
+
+  const handleEditorChange: OnChange = (value) => {
+    const nextText = value ?? "";
+    latestTextRef.current = nextText;
+    updateText(nextText);
+  };
+
+  const handleEditorMount: OnMount = (editor, monacoInstance) => {
+    editorRef.current = editor;
+    monacoRef.current = monacoInstance;
+    setIsEditorMounted(true);
+    defineJsonViewerMonacoThemes(monacoInstance);
+    monacoInstance.editor.setTheme(getMonacoTheme(resolvedTheme));
+
+    const jsonLanguage = monacoInstance.languages.json as unknown as {
+      jsonDefaults?: {
+        setDiagnosticsOptions: (options: {
+          allowComments: boolean;
+          enableSchemaRequest: boolean;
+          validate: boolean;
+        }) => void;
+      };
+    };
+
+    jsonLanguage.jsonDefaults?.setDiagnosticsOptions({
+      allowComments: true,
+      enableSchemaRequest: false,
+      validate: true,
+    });
+
+    editor.onDidFocusEditorText(clearDefaultText);
   };
 
   function renderToolBar() {
@@ -161,7 +245,7 @@ function JsonViewerEditor({
       },
       {
         label: "Copy",
-        onClick: () => handleCopy(currentText),
+        onClick: () => handleCopy(getEditorText()),
         icon: <ContentCopyIcon />,
       },
       {
@@ -172,12 +256,12 @@ function JsonViewerEditor({
       },
       {
         label: "Format",
-        onClick: () => formatJson(currentText),
+        onClick: () => formatJson(getEditorText()),
         icon: <FormatAlignRightIcon />,
       },
       {
         label: "Minimize",
-        onClick: () => minimizeJson(currentText),
+        onClick: () => minimizeJson(getEditorText()),
         icon: <MinimizeIcon />,
       },
       {
@@ -190,27 +274,26 @@ function JsonViewerEditor({
   }
 
   return (
-    <div className="JsonViewerEditor flex h-full w-full flex-col dark:bg-zinc-900 dark:text-blue-100">
+    <div className="JsonViewerEditor relative flex h-full w-full flex-col dark:bg-zinc-900 dark:text-blue-100">
       {renderToolBar()}
-      <div className="flex h-[calc(100%-3rem)] w-full flex-row overflow-y-auto py-2 pl-1 pr-2 font-mono text-[1rem] md:h-[calc(100%-1.5rem)] md:text-[2vmin]">
-        <div className="select-none px-1 text-end font-bold text-powderBlue-400 dark:text-zinc-500 [&>*]:select-text">
-          {lines.map((line) => (
-            <div key={line}>{line}</div>
-          ))}
-        </div>
-        <Editor
-          textareaId={TEXT_AREA_ELEMENT_ID}
-          className="editor h-fit grow resize-none overflow-hidden whitespace-pre-wrap bg-transparent px-1 [&>textarea]:outline-none"
-          value={currentText}
-          onValueChange={(code) => updateText(code)}
-          highlight={highlightJsonText}
-          onClick={clearDefaultText}
-          ignoreTabKey={allowTabFocusExit}
-        />
+      <div className="h-[calc(100%-3rem)] w-full overflow-visible overscroll-x-contain md:h-[calc(100%-1.5rem)]">
+        {isMonacoReady ? (
+          <MonacoEditor
+            height="100%"
+            language="json"
+            loading={null}
+            onChange={handleEditorChange}
+            onMount={handleEditorMount}
+            options={JSON_EDITOR_OPTIONS}
+            theme={getMonacoTheme(resolvedTheme)}
+            value={currentText}
+          />
+        ) : null}
       </div>
-      <div id={TEXT_AREA_HELP_ID} className="sr-only" aria-live="polite">
+      <div id="json-viewer-editor-help" className="sr-only" aria-live="polite">
         In the editor, Tab inserts indentation. Press Escape, then Tab, to move focus outside the editor.
       </div>
+      {(!isMonacoReady || !isEditorMounted) && <LoadingEditorOverlay />}
     </div>
   );
 }

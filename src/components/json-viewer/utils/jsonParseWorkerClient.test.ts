@@ -40,6 +40,15 @@ describe("jsonParseWorkerClient", () => {
     });
   });
 
+  test("fallback parser ignores JSON placeholder comments", async () => {
+    const task = createJsonParseTask("// Paste your JSON text here!\n{\"a\":1}", () => undefined);
+
+    await expect(task.promise).resolves.toEqual({
+      status: "success",
+      parsed: { a: 1 },
+    });
+  });
+
   test("returns parser errors from the fallback path", async () => {
     const task = createJsonParseTask('{"a":', () => undefined);
     const result = await task.promise;

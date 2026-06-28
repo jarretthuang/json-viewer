@@ -32,6 +32,69 @@ jest.mock('react-markdown', () => ({
   default: ({ children }) => children,
 }));
 
+jest.mock('monaco-editor', () => ({
+  editor: {
+    defineTheme: jest.fn(),
+    setTheme: jest.fn(),
+  },
+  languages: {
+    json: {
+      jsonDefaults: {
+        setDiagnosticsOptions: jest.fn(),
+      },
+    },
+  },
+}));
+
+jest.mock('@monaco-editor/react', () => {
+  const React = require('react');
+  const monaco = require('monaco-editor');
+
+  const createEditor = (textarea) => ({
+    addAction: jest.fn(),
+    getModel: () => ({
+      getValue: () => textarea?.value ?? '',
+      setValue: (value) => {
+        if (textarea) {
+          textarea.value = value;
+        }
+      },
+    }),
+    getValue: () => textarea?.value ?? '',
+    onDidFocusEditorText: jest.fn(),
+  });
+
+  const MonacoEditorMock = ({
+    onChange,
+    onMount,
+    options,
+    value,
+  }) => {
+    const ref = React.useRef(null);
+
+    React.useEffect(() => {
+      if (ref.current && onMount) {
+        onMount(createEditor(ref.current), monaco);
+      }
+    }, [onMount]);
+
+    return React.createElement('textarea', {
+      'aria-label': options?.ariaLabel ?? 'JSON editor',
+      onChange: (event) => onChange?.(event.target.value),
+      ref,
+      value,
+    });
+  };
+
+  return {
+    __esModule: true,
+    default: MonacoEditorMock,
+    loader: {
+      config: jest.fn(),
+    },
+  };
+});
+
 if (typeof window !== 'undefined') {
   Object.defineProperty(window, 'matchMedia', {
     writable: true,

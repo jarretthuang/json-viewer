@@ -14,7 +14,7 @@ export function getJsonParseErrorMessage(error: unknown): string {
 
 export function parseJsonText(text: string): unknown | undefined {
   try {
-    return JSON.parse(text);
+    return JSON.parse(stripJsonLineComments(text));
   } catch {
     return undefined;
   }
@@ -25,10 +25,18 @@ export function parseJsonTextWithError(text: string): {
   errorMessage: string;
 } {
   try {
-    return { parsed: JSON.parse(text), errorMessage: "" };
+    return { parsed: JSON.parse(stripJsonLineComments(text)), errorMessage: "" };
   } catch (error) {
     return { parsed: undefined, errorMessage: getJsonParseErrorMessage(error) };
   }
+}
+
+export function stripJsonLineComments(text: string): string {
+  return text
+    .split("\n")
+    .filter((line) => !line.trimStart().startsWith("//"))
+    .join("\n")
+    .trim();
 }
 
 export function stringifyJson(value: unknown): string {
