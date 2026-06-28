@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { compressToEncodedURIComponent } from "lz-string";
 
 test("core CUJ smoke flow works", async ({ page }) => {
   await page.goto("/");
@@ -24,12 +25,21 @@ test("edit tab can format and minimize JSON", async ({ page }) => {
 
   await page.getByRole("tab", { name: /^edit$/i }).click();
 
-  const editor = page.getByLabel(/json editor/i);
-  await editor.fill('{"a":1}');
+  const editor = page.locator(".monaco-editor").first();
+  await expect(editor).toBeVisible();
+  await editor.click();
+
+  const modifier = process.platform === "darwin" ? "Meta" : "Control";
+  await page.keyboard.press(`${modifier}+A`);
+  await page.keyboard.type('{"a":1}');
 
   await page.getByRole("button", { name: /^format$/i }).click();
-  await expect(editor).toHaveValue('{\n  "a": 1\n}');
+  await expect
+    .poll(() => new URL(page.url()).searchParams.get("json"))
+    .toBe(compressToEncodedURIComponent('{\n  "a": 1\n}'));
 
   await page.getByRole("button", { name: /^minimize$/i }).click();
-  await expect(editor).toHaveValue('{"a":1}');
+  await expect
+    .poll(() => new URL(page.url()).searchParams.get("json"))
+    .toBe(compressToEncodedURIComponent('{"a":1}'));
 });
