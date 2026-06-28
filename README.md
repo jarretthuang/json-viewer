@@ -1,7 +1,8 @@
-<h1 align="center">JSON Viewer
+<h1 align="center">
     <a href="https://jsonviewer.io" target="_blank">
-        <img src="https://raw.githubusercontent.com/jarretthuang/json-viewer/main/public/logo.png" alt="JH Labs" style="width: 60px; height: 60px; padding-left: 10px;" />
+        <img src="https://raw.githubusercontent.com/jarretthuang/json-viewer/main/public/android-chrome-256x256.png" alt="JSON Viewer" style="width: 36px; height: 36px; padding-right: 8px; vertical-align: middle; position: relative; top: -2px;" />
     </a>
+    JSON Viewer
 </h1>
 
 <div align="center">
@@ -13,7 +14,7 @@
     <a href="https://github.com/jarretthuang/json-viewer/blob/main/LICENSE"><img src="https://img.shields.io/github/license/jarretthuang/json-viewer?color=2b9348" alt="License Badge"/></a>
 </div>
 
-**Live app:** https://jsonviewer.io
+## Live app: [https://jsonviewer.io](https://jsonviewer.io)
 
 ## Summary
 
