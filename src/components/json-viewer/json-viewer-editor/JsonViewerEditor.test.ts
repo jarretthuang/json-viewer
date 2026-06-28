@@ -2,6 +2,7 @@ import {
   JSON_EDITOR_OPTIONS,
   JSON_VIEWER_DARK_MONACO_THEME,
   JSON_VIEWER_LIGHT_MONACO_THEME,
+  configureMonacoTabFocusEscape,
   defineJsonViewerMonacoThemes,
   getMonacoTheme,
 } from "./JsonViewerEditor";
@@ -16,6 +17,7 @@ describe("JsonViewerEditor options", () => {
     expect(JSON_EDITOR_OPTIONS.formatOnPaste).toBe(false);
     expect(JSON_EDITOR_OPTIONS.lineDecorationsWidth).toBe(14);
     expect(JSON_EDITOR_OPTIONS.lineNumbersMinChars).toBe(4);
+    expect(JSON_EDITOR_OPTIONS.tabFocusMode).toBe(false);
     expect(JSON_EDITOR_OPTIONS.ariaLabel).toBe("JSON editor");
     expect(JSON_EDITOR_OPTIONS.scrollbar).toEqual(
       expect.objectContaining({
@@ -62,5 +64,55 @@ describe("JsonViewerEditor options", () => {
         }),
       })
     );
+  });
+
+  test("temporarily lets Tab move focus after Escape", () => {
+    const keyHandlers: Array<(event: { browserEvent: { key: string } }) => void> =
+      [];
+    const blurHandlers: Array<() => void> = [];
+    const editor = {
+      onDidBlurEditorText: jest.fn((handler) => {
+        blurHandlers.push(handler);
+      }),
+      onKeyDown: jest.fn((handler) => {
+        keyHandlers.push(handler);
+      }),
+      updateOptions: jest.fn(),
+    };
+
+    configureMonacoTabFocusEscape(editor as any);
+
+    expect(editor.updateOptions).toHaveBeenCalledWith({ tabFocusMode: false });
+
+    keyHandlers[0]({ browserEvent: { key: "Escape" } });
+    expect(editor.updateOptions).toHaveBeenLastCalledWith({
+      tabFocusMode: true,
+    });
+
+    blurHandlers[0]();
+    expect(editor.updateOptions).toHaveBeenLastCalledWith({
+      tabFocusMode: false,
+    });
+  });
+
+  test("cancels Escape Tab focus mode on non-Tab input", () => {
+    const keyHandlers: Array<(event: { browserEvent: { key: string } }) => void> =
+      [];
+    const editor = {
+      onDidBlurEditorText: jest.fn(),
+      onKeyDown: jest.fn((handler) => {
+        keyHandlers.push(handler);
+      }),
+      updateOptions: jest.fn(),
+    };
+
+    configureMonacoTabFocusEscape(editor as any);
+
+    keyHandlers[0]({ browserEvent: { key: "Escape" } });
+    keyHandlers[0]({ browserEvent: { key: "a" } });
+
+    expect(editor.updateOptions).toHaveBeenLastCalledWith({
+      tabFocusMode: false,
+    });
   });
 });

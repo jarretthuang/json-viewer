@@ -43,3 +43,34 @@ test("edit tab can format and minimize JSON", async ({ page }) => {
     .poll(() => new URL(page.url()).searchParams.get("json"))
     .toBe(compressToEncodedURIComponent('{"a":1}'));
 });
+
+test("edit tab lets keyboard users leave Monaco after Escape then Tab", async ({
+  page,
+}) => {
+  await page.goto("/");
+
+  await page.getByRole("tab", { name: /^edit$/i }).click();
+
+  const editor = page.locator(".monaco-editor").first();
+  await expect(editor).toBeVisible();
+  await editor.click();
+
+  await expect
+    .poll(() =>
+      page.evaluate(() =>
+        Boolean(document.activeElement?.closest(".monaco-editor"))
+      )
+    )
+    .toBe(true);
+
+  await page.keyboard.press("Escape");
+  await page.keyboard.press("Tab");
+
+  await expect
+    .poll(() =>
+      page.evaluate(() =>
+        Boolean(document.activeElement?.closest(".monaco-editor"))
+      )
+    )
+    .toBe(false);
+});

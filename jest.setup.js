@@ -61,7 +61,10 @@ jest.mock('@monaco-editor/react', () => {
       },
     }),
     getValue: () => textarea?.value ?? '',
+    onDidBlurEditorText: jest.fn(),
     onDidFocusEditorText: jest.fn(),
+    onKeyDown: jest.fn(),
+    updateOptions: jest.fn(),
   });
 
   const MonacoEditorMock = ({

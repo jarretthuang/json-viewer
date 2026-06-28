@@ -60,6 +60,7 @@ export const JSON_EDITOR_OPTIONS: Monaco.editor.IStandaloneEditorConstructionOpt
       verticalScrollbarSize: 8,
     },
     tabSize: 2,
+    tabFocusMode: false,
     wordWrap: "off",
     wrappingIndent: "none",
   };
@@ -116,6 +117,43 @@ export function defineJsonViewerMonacoThemes(
       "editor.selectionBackground": "#63c2cd4d",
       "editor.inactiveSelectionBackground": "#63c2cd26",
     },
+  });
+}
+
+type MonacoTabFocusEditor = Pick<
+  Monaco.editor.IStandaloneCodeEditor,
+  "onDidBlurEditorText" | "onKeyDown" | "updateOptions"
+>;
+
+export function configureMonacoTabFocusEscape(
+  editor: MonacoTabFocusEditor
+): void {
+  let isWaitingForTabExit = false;
+
+  editor.updateOptions({ tabFocusMode: false });
+
+  editor.onKeyDown((event) => {
+    const key = event.browserEvent.key;
+
+    if (key === "Escape") {
+      isWaitingForTabExit = true;
+      editor.updateOptions({ tabFocusMode: true });
+      return;
+    }
+
+    if (isWaitingForTabExit && key !== "Tab") {
+      isWaitingForTabExit = false;
+      editor.updateOptions({ tabFocusMode: false });
+    }
+  });
+
+  editor.onDidBlurEditorText(() => {
+    if (!isWaitingForTabExit) {
+      return;
+    }
+
+    isWaitingForTabExit = false;
+    editor.updateOptions({ tabFocusMode: false });
   });
 }
 
@@ -232,6 +270,7 @@ function JsonViewerEditor({
       validate: true,
     });
 
+    configureMonacoTabFocusEscape(editor);
     editor.onDidFocusEditorText(clearDefaultText);
   };
 
