@@ -44,7 +44,7 @@ export const JSON_EDITOR_OPTIONS: Monaco.editor.IStandaloneEditorConstructionOpt
     glyphMargin: false,
     hideCursorInOverviewRuler: true,
     lineDecorationsWidth: 8,
-    lineNumbersMinChars: 4,
+    lineNumbersMinChars: 5,
     minimap: { enabled: false },
     overviewRulerBorder: false,
     renderLineHighlight: "line",

@@ -14,6 +14,7 @@ describe("JsonViewerEditor options", () => {
     expect(JSON_EDITOR_OPTIONS.folding).toBe(false);
     expect(JSON_EDITOR_OPTIONS.fontSize).toBe(16);
     expect(JSON_EDITOR_OPTIONS.formatOnPaste).toBe(false);
+    expect(JSON_EDITOR_OPTIONS.lineNumbersMinChars).toBe(5);
     expect(JSON_EDITOR_OPTIONS.ariaLabel).toBe("JSON editor");
     expect(JSON_EDITOR_OPTIONS.scrollbar).toEqual(
       expect.objectContaining({ alwaysConsumeMouseWheel: true })
