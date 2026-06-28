@@ -52,7 +52,7 @@ Performance depends on browser, hardware, and JSON shape. Large arrays are rende
 
 ## Development
 
-```
+```bash
 npm install
 npm run dev
 ```

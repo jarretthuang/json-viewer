@@ -1,6 +1,6 @@
 {
   "name": "json-viewer",
-  "version": "0.1.0",
+  "version": "2.0.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -9,6 +9,9 @@
     "lint": "next lint",
     "pretest": "node scripts/check-next-install.js",
     "pretest:ci": "node scripts/check-next-install.js",
+    "release:major": "npm version major",
+    "release:minor": "npm version minor",
+    "release:patch": "npm version patch",
     "test": "jest --runInBand",
     "test:cuj": "jest --ci --runInBand src/app/page.cuj.test.tsx",
     "test:e2e": "playwright test",
