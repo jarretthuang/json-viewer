@@ -1,6 +1,10 @@
 {
   "name": "JSON Viewer",
-  "short_name": "JSON",
+  "short_name": "JSON Viewer",
+  "description": "Ultra-fast online JSON viewer for validating, formatting, minifying, and exploring JSON.",
+  "id": "/",
+  "start_url": "/",
+  "scope": "/",
   "icons": [
     {
       "src": "/android-chrome-192x192.png",
@@ -8,12 +12,12 @@
       "type": "image/png"
     },
     {
-      "src": "/android-chrome-512x512.png",
-      "sizes": "512x512",
+      "src": "/android-chrome-256x256.png",
+      "sizes": "256x256",
       "type": "image/png"
     }
   ],
-  "theme_color": "#ffffff",
-  "background_color": "#ffffff",
+  "theme_color": "#fdfeff",
+  "background_color": "#fdfeff",
   "display": "standalone"
 }
