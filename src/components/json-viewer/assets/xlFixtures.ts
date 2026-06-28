@@ -17,6 +17,18 @@ export function createLargeArrayJson(itemCount: number): string {
   );
 }
 
+export function createLargeArrayJsonAtLeast(minLength: number): string {
+  let itemCount = Math.max(1, Math.ceil(minLength / 50));
+  let text = createLargeArrayJson(itemCount);
+
+  while (text.length < minLength) {
+    itemCount = Math.ceil(itemCount * 1.25);
+    text = createLargeArrayJson(itemCount);
+  }
+
+  return text;
+}
+
 export function createDeepObjectJson(depth: number): string {
   let text = "0";
 

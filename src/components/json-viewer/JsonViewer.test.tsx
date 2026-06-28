@@ -1,7 +1,9 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import JsonViewer from "./JsonViewer";
 import { JsonParseTaskResult } from "./utils/jsonParseWorkerMessages";
+import { createLargeArrayJsonAtLeast } from "./assets/xlFixtures";
+import { XL_JSON_TEXT_LENGTH } from "./utils/jsonPerformanceUtils";
 
 const mockCreateJsonParseTask = jest.fn();
 
@@ -48,4 +50,58 @@ describe("JsonViewer", () => {
       expect(screen.queryByRole("status")).not.toBeInTheDocument();
     });
   });
+
+  test("opens XL array JSON in lazy chunked view mode", async () => {
+    const user = userEvent.setup();
+    const createNotification = jest.fn();
+    const xlText = createLargeArrayJsonAtLeast(XL_JSON_TEXT_LENGTH);
+    const parsed = JSON.parse(xlText);
+
+    mockCreateJsonParseTask.mockImplementation((text: string) => ({
+      requestId: 1,
+      promise: Promise.resolve({
+        status: "success",
+        parsed,
+      }),
+      cancel: jest.fn(),
+    }));
+
+    render(<JsonViewer createNotification={createNotification} />);
+
+    fireEvent.change(screen.getByLabelText("JSON editor"), {
+      target: { value: xlText },
+    });
+    await user.click(screen.getByRole("tab", { name: /^view$/i }));
+
+    expect(mockCreateJsonParseTask).toHaveBeenCalledWith(xlText);
+
+    const tree = await screen.findByLabelText(/json viewer tree/i);
+    expect(createNotification).toHaveBeenCalledWith(
+      expect.objectContaining({
+        title: "Large JSON",
+      })
+    );
+    expect(
+      within(tree).getByText(`(${parsed.length.toLocaleString()})`)
+    ).toBeInTheDocument();
+    expect(within(tree).queryByText("[0...99]")).not.toBeInTheDocument();
+
+    fireEvent.click(getTreeItemContent("JSON"));
+    expect(await within(tree).findByText("[0...99]")).toBeInTheDocument();
+    expect(within(tree).queryByText("0")).not.toBeInTheDocument();
+
+    fireEvent.click(getTreeItemContent("[0...99]"));
+    expect(await within(tree).findByText("0")).toBeInTheDocument();
+  });
 });
+
+function getTreeItemContent(label: string): HTMLElement {
+  const labelElement = screen.getByText(label);
+  const contentElement = labelElement.closest(".MuiTreeItem-content");
+
+  if (!(contentElement instanceof HTMLElement)) {
+    throw new Error(`Could not find tree item content for ${label}`);
+  }
+
+  return contentElement;
+}
