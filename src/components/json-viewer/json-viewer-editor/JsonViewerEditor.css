@@ -1,0 +1,7 @@
+.JsonViewerEditor .monaco-editor .margin-view-overlays .line-numbers {
+  transform: translateX(4px);
+}
+
+.JsonViewerEditor .monaco-editor .sticky-widget .sticky-line-number-inner {
+  transform: translateX(4px);
+}

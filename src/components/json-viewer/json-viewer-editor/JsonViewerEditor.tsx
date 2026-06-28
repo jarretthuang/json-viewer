@@ -13,6 +13,7 @@ import { useTheme } from "next-themes";
 import type { OnChange, OnMount } from "@monaco-editor/react";
 import type * as Monaco from "monaco-editor";
 import { useEffect, useRef, useState } from "react";
+import "./JsonViewerEditor.css";
 
 const MonacoEditor = dynamic(() => import("@monaco-editor/react"), {
   ssr: false,
@@ -43,8 +44,8 @@ export const JSON_EDITOR_OPTIONS: Monaco.editor.IStandaloneEditorConstructionOpt
     formatOnType: false,
     glyphMargin: false,
     hideCursorInOverviewRuler: true,
-    lineDecorationsWidth: 8,
-    lineNumbersMinChars: 5,
+    lineDecorationsWidth: 14,
+    lineNumbersMinChars: 4,
     minimap: { enabled: false },
     overviewRulerBorder: false,
     renderLineHighlight: "line",
