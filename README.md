@@ -18,7 +18,7 @@
 
 ## Summary
 
-Ultra-fast web app for validating, formatting, minifying, and exploring JSON.
+**JSON Viewer** is an ultra-fast web app for validating, formatting, minifying, and exploring JSON.
 
 ## Features
 
