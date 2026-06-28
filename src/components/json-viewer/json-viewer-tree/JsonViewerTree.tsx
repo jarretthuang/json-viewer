@@ -8,6 +8,7 @@ import JsonViewerTreeItemLabel, {
   JsonValueType,
 } from "./JsonViewerTreeItemLabel";
 import { useMemo, useRef, useState } from "react";
+import type { ReactNode } from "react";
 import "./JsonViewerTree.css";
 import JsonViewerToolBar from "../json-viewer-tool-bar/JsonViewerToolBar";
 import { JsonViewerToolBarOption } from "../json-viewer-tool-bar/JsonViewerToolBarOption";
@@ -17,6 +18,7 @@ import CodeOffIcon from "@mui/icons-material/CodeOff";
 import UndoIcon from "@mui/icons-material/Undo";
 import { removeJsonItemAtPath } from "../utils/jsonUtils";
 import {
+  ARRAY_CHILD_CHUNK_SIZE,
   MAX_EXPAND_ALL_NODE_COUNT,
   shouldAllowExpandAll,
 } from "../utils/jsonPerformanceUtils";
@@ -26,6 +28,11 @@ type TreeMetadata = {
   expandableNodeIds: string[];
   nodeCount: number;
   isCapped: boolean;
+};
+
+type ArrayChunk = {
+  start: number;
+  end: number;
 };
 
 function hasObjectChildren(value: Record<string, unknown>): boolean {
@@ -90,7 +97,23 @@ function collectTreeMetadata(
 
     expandableIds.push(nodeId);
 
-    if (Array.isArray(childValue)) {
+    if (Array.isArray(childValue) && shouldChunkArray(childValue)) {
+      for (const chunk of getArrayChunks(childValue.length)) {
+        const chunkNodeId = getArrayChunkNodeId(nodeId, chunk);
+        nodeCount += 1;
+        if (nodeCount > nodeCountLimit) {
+          isCapped = true;
+          return;
+        }
+        nodeIds.push(chunkNodeId);
+        expandableIds.push(chunkNodeId);
+
+        for (let index = chunk.start; index <= chunk.end; index += 1) {
+          visit(childValue[index], index.toString(), chunkNodeId);
+          if (isCapped) return;
+        }
+      }
+    } else if (Array.isArray(childValue)) {
       for (let index = 0; index < childValue.length; index += 1) {
         visit(childValue[index], index.toString(), nodeId);
         if (isCapped) return;
@@ -113,6 +136,31 @@ function collectTreeMetadata(
     nodeCount,
     isCapped,
   };
+}
+
+function shouldChunkArray(value: unknown[]): boolean {
+  return value.length > ARRAY_CHILD_CHUNK_SIZE;
+}
+
+function getArrayChunks(length: number): ArrayChunk[] {
+  const chunks: ArrayChunk[] = [];
+
+  for (let start = 0; start < length; start += ARRAY_CHILD_CHUNK_SIZE) {
+    chunks.push({
+      start,
+      end: Math.min(start + ARRAY_CHILD_CHUNK_SIZE - 1, length - 1),
+    });
+  }
+
+  return chunks;
+}
+
+function getArrayChunkNodeId(parentNodeId: string, chunk: ArrayChunk): string {
+  return `${parentNodeId}.[${chunk.start}...${chunk.end}]`;
+}
+
+function getArrayChunkLabel(chunk: ArrayChunk): string {
+  return `[${chunk.start}...${chunk.end}]`;
 }
 
 function JsonViewerTree(props: any) {
@@ -356,6 +404,7 @@ function JsonViewerTree(props: any) {
             <JsonViewerTreeItemLabel
               type="array"
               name={key}
+              count={json.length}
               isUnescapedContent={isUnescapedContent}
               path={path}
               onKeyChange={handleKeyChange}
@@ -400,6 +449,19 @@ function JsonViewerTree(props: any) {
     path: (string | number)[]
   ) {
     if (Array.isArray(json)) {
+      if (shouldChunkArray(json)) {
+        return getArrayChunks(json.length).map((chunk) =>
+          populateArrayChunkTreeItem(
+            json,
+            chunk,
+            nodeId,
+            shouldUnescape,
+            isUnescapedContent,
+            path
+          )
+        );
+      }
+
       return json.map((itemInArray, index) =>
         populateTreeItems(
           itemInArray,
@@ -424,6 +486,84 @@ function JsonViewerTree(props: any) {
         true // Object keys are editable
       )
     );
+  }
+
+  function populateArrayChunkTreeItem(
+    json: any[],
+    chunk: ArrayChunk,
+    parentNodeId: string,
+    shouldUnescape: boolean,
+    isUnescapedContent: boolean,
+    path: (string | number)[]
+  ) {
+    const nodeId = getArrayChunkNodeId(parentNodeId, chunk);
+    const isExpanded = expanded.includes(nodeId);
+    expandableNodeIds.current.add(nodeId);
+
+    return (
+      <JsonViewerTreeItem
+        nodeId={nodeId}
+        key={nodeId}
+        label={
+          <JsonViewerTreeItemLabel
+            type="array"
+            name={getArrayChunkLabel(chunk)}
+            isSyntheticArrayChunk
+            hideTypeIcon
+            isUnescapedContent={isUnescapedContent}
+            path={path}
+            onKeyChange={handleKeyChange}
+            isKeyEditable={false}
+            isRemovable={false}
+            onRemove={handleItemRemove}
+          />
+        }
+      >
+        {isExpanded
+          ? renderArraySliceTreeItems(
+              json,
+              chunk,
+              nodeId,
+              shouldUnescape,
+              isUnescapedContent,
+              path
+            )
+          : [
+              <JsonViewerTreeItem
+                key={`${nodeId}.__lazy-placeholder`}
+                nodeId={`${nodeId}.__lazy-placeholder`}
+                className="hidden"
+              />,
+            ]}
+      </JsonViewerTreeItem>
+    );
+  }
+
+  function renderArraySliceTreeItems(
+    json: any[],
+    chunk: ArrayChunk,
+    nodeId: string,
+    shouldUnescape: boolean,
+    isUnescapedContent: boolean,
+    path: (string | number)[]
+  ) {
+    const items: ReactNode[] = [];
+
+    for (let index = chunk.start; index <= chunk.end; index += 1) {
+      items.push(
+        populateTreeItems(
+          json[index],
+          index.toString(),
+          nodeId,
+          shouldUnescape,
+          isUnescapedContent,
+          [...path, index],
+          false // Array keys (indices) are not editable
+        )
+      );
+    }
+
+    return items;
   }
 
   function renderToolBar() {

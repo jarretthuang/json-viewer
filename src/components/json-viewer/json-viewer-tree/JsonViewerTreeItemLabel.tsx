@@ -20,6 +20,9 @@ export type JsonValueType =
 export type JsonViewerTreeItemLabelProps = {
   type: JsonViewerTreeItemLabelType;
   name: string;
+  count?: number;
+  isSyntheticArrayChunk?: boolean;
+  hideTypeIcon?: boolean;
   value?: string;
   valueType?: JsonValueType;
   handleCopy?: (text: string) => void;
@@ -109,6 +112,10 @@ function JsonViewerTreeItemLabel(props: JsonViewerTreeItemLabelProps) {
   };
 
   const renderIcon = () => {
+    if (props.hideTypeIcon) {
+      return null;
+    }
+
     if (props.type === "object") {
       return (
         <Tooltip title="Object" placement="top">
@@ -197,6 +204,21 @@ function JsonViewerTreeItemLabel(props: JsonViewerTreeItemLabelProps) {
     }
   }
 
+  function renderCount() {
+    if (props.type !== "array" || _.isUndefined(props.count)) {
+      return null;
+    }
+
+    return (
+      <span
+        className="label-count ml-1 text-slate-500 dark:text-zinc-400"
+        aria-label={`${props.count} items`}
+      >
+        ({props.count.toLocaleString()})
+      </span>
+    );
+  }
+
   return (
     <div
       className="JsonViewerTreeItemLabel"
@@ -220,7 +242,11 @@ function JsonViewerTreeItemLabel(props: JsonViewerTreeItemLabelProps) {
           />
         ) : (
           <div
-            className={`label-name text-slate-800 dark:text-offWhite ${
+            className={`label-name ${
+              props.isSyntheticArrayChunk
+                ? "text-slate-500 dark:text-zinc-400"
+                : "text-slate-800 dark:text-offWhite"
+            } ${
               props.isKeyEditable
                 ? "cursor-pointer hover:rounded hover:bg-black/5 hover:dark:bg-white/10"
                 : "cursor-default"
@@ -236,6 +262,8 @@ function JsonViewerTreeItemLabel(props: JsonViewerTreeItemLabelProps) {
             {props.name}
           </div>
         )}
+
+        {renderCount()}
 
         {renderSeparator()}
 

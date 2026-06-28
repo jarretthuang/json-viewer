@@ -1,4 +1,5 @@
 import {
+  ARRAY_CHILD_CHUNK_SIZE,
   LARGE_JSON_TEXT_LENGTH,
   MAX_EXPAND_ALL_NODE_COUNT,
   MAX_HIGHLIGHT_TEXT_LENGTH,
@@ -48,5 +49,9 @@ describe("jsonPerformanceUtils", () => {
     expect(shouldAllowExpandAll(0)).toBe(false);
     expect(shouldAllowExpandAll(MAX_EXPAND_ALL_NODE_COUNT)).toBe(true);
     expect(shouldAllowExpandAll(MAX_EXPAND_ALL_NODE_COUNT + 1)).toBe(false);
+  });
+
+  test("defines a bounded array child chunk size", () => {
+    expect(ARRAY_CHILD_CHUNK_SIZE).toBe(100);
   });
 });
