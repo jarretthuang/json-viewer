@@ -59,6 +59,40 @@ test("edit tab can format and minimize JSON", async ({ page }) => {
     .toBe(compressToEncodedURIComponent('{"a":1}'));
 });
 
+test("format resets Monaco horizontal scroll to the left", async ({ page }) => {
+  await page.goto("/");
+
+  await page.getByRole("tab", { name: /^edit$/i }).click();
+
+  const editor = page.locator(".monaco-editor").first();
+  await expect(editor).toBeVisible();
+  await editor.click();
+
+  const modifier = process.platform === "darwin" ? "Meta" : "Control";
+  await page.keyboard.press(`${modifier}+A`);
+
+  const longKey = "longKey".repeat(180);
+  await page.keyboard.insertText(JSON.stringify({ [longKey]: 1 }));
+  await page.keyboard.press("End");
+
+  const getHorizontalScrollbarThumbLeft = () =>
+    page.evaluate(
+      () => {
+        const thumb = document.querySelector<HTMLElement>(
+          ".monaco-editor .scrollbar.horizontal .slider"
+        );
+
+        return thumb ? parseFloat(getComputedStyle(thumb).left) : 0;
+      }
+    );
+
+  await expect.poll(getHorizontalScrollbarThumbLeft).toBeGreaterThan(0);
+
+  await page.getByRole("button", { name: /^format$/i }).click();
+
+  await expect.poll(getHorizontalScrollbarThumbLeft).toBe(0);
+});
+
 test("edit tab lets keyboard users leave Monaco after Escape then Tab", async ({
   page,
 }) => {

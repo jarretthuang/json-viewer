@@ -5,6 +5,7 @@ import {
   configureMonacoTabFocusEscape,
   defineJsonViewerMonacoThemes,
   getMonacoTheme,
+  resetMonacoHorizontalScroll,
 } from "./JsonViewerEditor";
 
 describe("JsonViewerEditor options", () => {
@@ -114,5 +115,24 @@ describe("JsonViewerEditor options", () => {
     expect(editor.updateOptions).toHaveBeenLastCalledWith({
       tabFocusMode: false,
     });
+  });
+
+  test("resets Monaco horizontal scroll immediately and after layout settles", () => {
+    const originalRequestAnimationFrame = window.requestAnimationFrame;
+    window.requestAnimationFrame = jest.fn((callback) => {
+      callback(0);
+      return 1;
+    });
+    const editor = {
+      setScrollLeft: jest.fn(),
+    };
+
+    resetMonacoHorizontalScroll(editor as any);
+
+    expect(editor.setScrollLeft).toHaveBeenCalledTimes(2);
+    expect(editor.setScrollLeft).toHaveBeenNthCalledWith(1, 0);
+    expect(editor.setScrollLeft).toHaveBeenNthCalledWith(2, 0);
+
+    window.requestAnimationFrame = originalRequestAnimationFrame;
   });
 });

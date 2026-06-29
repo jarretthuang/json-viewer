@@ -127,6 +127,11 @@ type MonacoTabFocusEditor = Pick<
   "onDidBlurEditorText" | "onKeyDown" | "updateOptions"
 >;
 
+type MonacoHorizontalScrollEditor = Pick<
+  Partial<Monaco.editor.IStandaloneCodeEditor>,
+  "setScrollLeft"
+>;
+
 export function configureMonacoTabFocusEscape(
   editor: MonacoTabFocusEditor
 ): void {
@@ -156,6 +161,29 @@ export function configureMonacoTabFocusEscape(
 
     isWaitingForTabExit = false;
     editor.updateOptions({ tabFocusMode: false });
+  });
+}
+
+export function resetMonacoHorizontalScroll(
+  editor: MonacoHorizontalScrollEditor | null
+): void {
+  if (!editor || typeof editor.setScrollLeft !== "function") {
+    return;
+  }
+
+  const setScrollLeft = editor.setScrollLeft.bind(editor);
+
+  setScrollLeft(0);
+
+  if (
+    typeof window === "undefined" ||
+    typeof window.requestAnimationFrame !== "function"
+  ) {
+    return;
+  }
+
+  window.requestAnimationFrame(() => {
+    setScrollLeft(0);
   });
 }
 
@@ -231,6 +259,7 @@ function JsonViewerEditor({
       const formattedJsonString = JSON.stringify(parsedJson, null, 2);
       latestTextRef.current = formattedJsonString;
       updateText(formattedJsonString);
+      resetMonacoHorizontalScroll(editorRef.current);
     }
   };
 
