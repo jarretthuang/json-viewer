@@ -307,6 +307,7 @@ function JsonViewerEditor({
   const editorRef = useRef<Monaco.editor.IStandaloneCodeEditor | null>(null);
   const monacoRef = useRef<MonacoThemeApi | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const activeUploadRequestId = useRef(0);
   const latestTextRef = useRef(currentText);
   const isDefaultTextRef = useRef(isDefaultText);
   const { resolvedTheme } = useTheme();
@@ -401,8 +402,16 @@ function JsonViewerEditor({
       return;
     }
 
+    const uploadRequestId = activeUploadRequestId.current + 1;
+    activeUploadRequestId.current = uploadRequestId;
+
     try {
       const fileText = await readTextFile(file);
+
+      if (activeUploadRequestId.current !== uploadRequestId) {
+        return;
+      }
+
       latestTextRef.current = fileText;
       updateText(fileText);
       resetMonacoHorizontalScroll(editorRef.current);

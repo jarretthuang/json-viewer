@@ -138,6 +138,76 @@ describe("JsonViewer", () => {
       await screen.findByLabelText(/json viewer tree/i)
     ).toBeInTheDocument();
   });
+
+  test("ignores stale JSON file reads when a newer upload finishes first", async () => {
+    const originalFileReader = window.FileReader;
+    class MockFileReader {
+      static instances: MockFileReader[] = [];
+
+      error: DOMException | null = null;
+      result: string | ArrayBuffer | null = null;
+      private loadListeners: Array<() => void> = [];
+
+      constructor() {
+        MockFileReader.instances.push(this);
+      }
+
+      addEventListener(type: string, listener: () => void) {
+        if (type === "load") {
+          this.loadListeners.push(listener);
+        }
+      }
+
+      readAsText = jest.fn();
+
+      resolveWithText(text: string) {
+        this.result = text;
+        this.loadListeners.forEach((listener) => listener());
+      }
+    }
+
+    Object.defineProperty(window, "FileReader", {
+      configurable: true,
+      value: MockFileReader,
+    });
+
+    try {
+      const user = userEvent.setup();
+      const firstText = '{\n  "upload": "first"\n}';
+      const secondText = '{\n  "upload": "second"\n}';
+
+      render(<JsonViewer createNotification={jest.fn()} />);
+
+      const uploadInput = screen.getByLabelText("Upload JSON file");
+      await user.upload(
+        uploadInput,
+        new File([firstText], "first.json", { type: "application/json" })
+      );
+      await user.upload(
+        uploadInput,
+        new File([secondText], "second.json", { type: "application/json" })
+      );
+
+      expect(MockFileReader.instances).toHaveLength(2);
+
+      MockFileReader.instances[1].resolveWithText(secondText);
+
+      await waitFor(() => {
+        expect(screen.getByLabelText("JSON editor")).toHaveValue(secondText);
+      });
+
+      MockFileReader.instances[0].resolveWithText(firstText);
+
+      await waitFor(() => {
+        expect(screen.getByLabelText("JSON editor")).toHaveValue(secondText);
+      });
+    } finally {
+      Object.defineProperty(window, "FileReader", {
+        configurable: true,
+        value: originalFileReader,
+      });
+    }
+  });
 });
 
 function getTreeItemContent(label: string): HTMLElement {
