@@ -124,13 +124,86 @@ export function defineJsonViewerMonacoThemes(
 
 type MonacoTabFocusEditor = Pick<
   Monaco.editor.IStandaloneCodeEditor,
-  "onDidBlurEditorText" | "onKeyDown" | "updateOptions"
+  "getDomNode" | "onDidBlurEditorText" | "onKeyDown" | "updateOptions"
 >;
 
 type MonacoHorizontalScrollEditor = Pick<
   Partial<Monaco.editor.IStandaloneCodeEditor>,
   "setScrollLeft"
 >;
+
+const FOCUSABLE_SELECTOR = [
+  "a[href]",
+  "button",
+  "input",
+  "select",
+  "textarea",
+  "[contenteditable='true']",
+  "[tabindex]",
+].join(",");
+
+function isFocusableElement(element: Element): element is HTMLElement {
+  if (!(element instanceof HTMLElement)) {
+    return false;
+  }
+
+  if (
+    element.hidden ||
+    element.closest("[hidden]") ||
+    element.getAttribute("aria-disabled") === "true" ||
+    element.tabIndex < 0
+  ) {
+    return false;
+  }
+
+  if (
+    element instanceof HTMLButtonElement ||
+    element instanceof HTMLInputElement ||
+    element instanceof HTMLSelectElement ||
+    element instanceof HTMLTextAreaElement
+  ) {
+    if (element.disabled) {
+      return false;
+    }
+  }
+
+  const style = element.ownerDocument.defaultView?.getComputedStyle(element);
+  return style?.display !== "none" && style?.visibility !== "hidden";
+}
+
+function getFocusableElements(document: Document): HTMLElement[] {
+  return Array.from(document.querySelectorAll(FOCUSABLE_SELECTOR)).filter(
+    isFocusableElement
+  );
+}
+
+function focusOutsideEditor(
+  editorRoot: HTMLElement,
+  shouldFocusPrevious: boolean
+) {
+  const document = editorRoot.ownerDocument;
+  const focusableElements = getFocusableElements(document).filter(
+    (element) => !editorRoot.contains(element)
+  );
+
+  const target = shouldFocusPrevious
+    ? [...focusableElements]
+        .reverse()
+        .find((element) =>
+          Boolean(
+            editorRoot.compareDocumentPosition(element) &
+              Node.DOCUMENT_POSITION_PRECEDING
+          )
+        ) ?? focusableElements[focusableElements.length - 1]
+    : focusableElements.find((element) =>
+        Boolean(
+          editorRoot.compareDocumentPosition(element) &
+            Node.DOCUMENT_POSITION_FOLLOWING
+        )
+      ) ?? focusableElements[0];
+
+  target?.focus();
+}
 
 export function configureMonacoTabFocusEscape(
   editor: MonacoTabFocusEditor
@@ -145,6 +218,19 @@ export function configureMonacoTabFocusEscape(
     if (key === "Escape") {
       isWaitingForTabExit = true;
       editor.updateOptions({ tabFocusMode: true });
+      return;
+    }
+
+    if (isWaitingForTabExit && key === "Tab") {
+      isWaitingForTabExit = false;
+      editor.updateOptions({ tabFocusMode: false });
+      event.browserEvent.preventDefault();
+      event.browserEvent.stopPropagation();
+
+      const editorRoot = editor.getDomNode();
+      if (editorRoot) {
+        focusOutsideEditor(editorRoot, event.browserEvent.shiftKey);
+      }
       return;
     }
 
@@ -367,7 +453,8 @@ function JsonViewerEditor({
         ) : null}
       </div>
       <div id="json-viewer-editor-help" className="sr-only" aria-live="polite">
-        In the editor, Tab inserts indentation. Press Escape, then Tab, to move focus outside the editor.
+        In the editor, Tab inserts indentation. Press Escape, then Tab, to move
+        focus outside the editor.
       </div>
       {(!isMonacoReady || !isEditorMounted) && <LoadingEditorOverlay />}
     </div>

@@ -68,8 +68,9 @@ describe("JsonViewerEditor options", () => {
   });
 
   test("temporarily lets Tab move focus after Escape", () => {
-    const keyHandlers: Array<(event: { browserEvent: { key: string } }) => void> =
-      [];
+    const keyHandlers: Array<
+      (event: { browserEvent: { key: string } }) => void
+    > = [];
     const blurHandlers: Array<() => void> = [];
     const editor = {
       onDidBlurEditorText: jest.fn((handler) => {
@@ -78,6 +79,7 @@ describe("JsonViewerEditor options", () => {
       onKeyDown: jest.fn((handler) => {
         keyHandlers.push(handler);
       }),
+      getDomNode: jest.fn(),
       updateOptions: jest.fn(),
     };
 
@@ -85,7 +87,14 @@ describe("JsonViewerEditor options", () => {
 
     expect(editor.updateOptions).toHaveBeenCalledWith({ tabFocusMode: false });
 
-    keyHandlers[0]({ browserEvent: { key: "Escape" } });
+    keyHandlers[0]({
+      browserEvent: {
+        key: "Escape",
+        preventDefault: jest.fn(),
+        shiftKey: false,
+        stopPropagation: jest.fn(),
+      },
+    });
     expect(editor.updateOptions).toHaveBeenLastCalledWith({
       tabFocusMode: true,
     });
@@ -96,10 +105,72 @@ describe("JsonViewerEditor options", () => {
     });
   });
 
-  test("cancels Escape Tab focus mode on non-Tab input", () => {
-    const keyHandlers: Array<(event: { browserEvent: { key: string } }) => void> =
-      [];
+  test("moves focus outside Monaco on Escape then Tab", () => {
+    document.body.innerHTML = `
+      <button type="button">Before</button>
+      <div id="editor-root">
+        <textarea></textarea>
+      </div>
+      <button type="button" id="after-editor">After</button>
+    `;
+
+    const editorRoot = document.getElementById("editor-root") as HTMLElement;
+    const afterEditor = document.getElementById(
+      "after-editor"
+    ) as HTMLButtonElement;
+    const keyHandlers: Array<
+      (event: {
+        browserEvent: {
+          key: string;
+          preventDefault: () => void;
+          shiftKey: boolean;
+          stopPropagation: () => void;
+        };
+      }) => void
+    > = [];
     const editor = {
+      getDomNode: jest.fn(() => editorRoot),
+      onDidBlurEditorText: jest.fn(),
+      onKeyDown: jest.fn((handler) => {
+        keyHandlers.push(handler);
+      }),
+      updateOptions: jest.fn(),
+    };
+    const tabEvent = {
+      browserEvent: {
+        key: "Tab",
+        preventDefault: jest.fn(),
+        shiftKey: false,
+        stopPropagation: jest.fn(),
+      },
+    };
+
+    configureMonacoTabFocusEscape(editor as any);
+
+    keyHandlers[0]({
+      browserEvent: {
+        key: "Escape",
+        preventDefault: jest.fn(),
+        shiftKey: false,
+        stopPropagation: jest.fn(),
+      },
+    });
+    keyHandlers[0](tabEvent);
+
+    expect(tabEvent.browserEvent.preventDefault).toHaveBeenCalled();
+    expect(tabEvent.browserEvent.stopPropagation).toHaveBeenCalled();
+    expect(editor.updateOptions).toHaveBeenLastCalledWith({
+      tabFocusMode: false,
+    });
+    expect(document.activeElement).toBe(afterEditor);
+  });
+
+  test("cancels Escape Tab focus mode on non-Tab input", () => {
+    const keyHandlers: Array<
+      (event: { browserEvent: { key: string } }) => void
+    > = [];
+    const editor = {
+      getDomNode: jest.fn(),
       onDidBlurEditorText: jest.fn(),
       onKeyDown: jest.fn((handler) => {
         keyHandlers.push(handler);
