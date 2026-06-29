@@ -26,6 +26,50 @@ function createDeferred<T>() {
   return { promise, resolve };
 }
 
+function mockFileReader() {
+  const originalFileReader = window.FileReader;
+
+  class MockFileReader {
+    static instances: MockFileReader[] = [];
+
+    error: DOMException | null = null;
+    result: string | ArrayBuffer | null = null;
+    private loadListeners: Array<() => void> = [];
+
+    constructor() {
+      MockFileReader.instances.push(this);
+    }
+
+    addEventListener(type: string, listener: () => void) {
+      if (type === "load") {
+        this.loadListeners.push(listener);
+      }
+    }
+
+    readAsText = jest.fn();
+
+    resolveWithText(text: string) {
+      this.result = text;
+      this.loadListeners.forEach((listener) => listener());
+    }
+  }
+
+  Object.defineProperty(window, "FileReader", {
+    configurable: true,
+    value: MockFileReader,
+  });
+
+  return {
+    MockFileReader,
+    restore: () => {
+      Object.defineProperty(window, "FileReader", {
+        configurable: true,
+        value: originalFileReader,
+      });
+    },
+  };
+}
+
 describe("JsonViewer", () => {
   beforeEach(() => {
     mockCreateJsonParseTask.mockReset();
@@ -140,36 +184,7 @@ describe("JsonViewer", () => {
   });
 
   test("ignores stale JSON file reads when a newer upload finishes first", async () => {
-    const originalFileReader = window.FileReader;
-    class MockFileReader {
-      static instances: MockFileReader[] = [];
-
-      error: DOMException | null = null;
-      result: string | ArrayBuffer | null = null;
-      private loadListeners: Array<() => void> = [];
-
-      constructor() {
-        MockFileReader.instances.push(this);
-      }
-
-      addEventListener(type: string, listener: () => void) {
-        if (type === "load") {
-          this.loadListeners.push(listener);
-        }
-      }
-
-      readAsText = jest.fn();
-
-      resolveWithText(text: string) {
-        this.result = text;
-        this.loadListeners.forEach((listener) => listener());
-      }
-    }
-
-    Object.defineProperty(window, "FileReader", {
-      configurable: true,
-      value: MockFileReader,
-    });
+    const { MockFileReader, restore } = mockFileReader();
 
     try {
       const user = userEvent.setup();
@@ -202,10 +217,37 @@ describe("JsonViewer", () => {
         expect(screen.getByLabelText("JSON editor")).toHaveValue(secondText);
       });
     } finally {
-      Object.defineProperty(window, "FileReader", {
-        configurable: true,
-        value: originalFileReader,
+      restore();
+    }
+  });
+
+  test("ignores stale JSON file reads after the editor content changes", async () => {
+    const { MockFileReader, restore } = mockFileReader();
+
+    try {
+      const user = userEvent.setup();
+      const uploadedText = '{\n  "upload": "pending"\n}';
+      const editedText = '{\n  "edited": true\n}';
+
+      render(<JsonViewer createNotification={jest.fn()} />);
+
+      await user.upload(
+        screen.getByLabelText("Upload JSON file"),
+        new File([uploadedText], "pending.json", { type: "application/json" })
+      );
+      expect(MockFileReader.instances).toHaveLength(1);
+
+      fireEvent.change(screen.getByLabelText("JSON editor"), {
+        target: { value: editedText },
       });
+
+      MockFileReader.instances[0].resolveWithText(uploadedText);
+
+      await waitFor(() => {
+        expect(screen.getByLabelText("JSON editor")).toHaveValue(editedText);
+      });
+    } finally {
+      restore();
     }
   });
 });

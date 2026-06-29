@@ -358,10 +358,15 @@ function JsonViewerEditor({
   const getEditorText = () =>
     editorRef.current?.getValue() ?? latestTextRef.current;
 
+  const updateEditorText = (text: string) => {
+    activeUploadRequestId.current += 1;
+    latestTextRef.current = text;
+    updateText(text);
+  };
+
   const clearDefaultText = () => {
     if (isDefaultTextRef.current) {
-      latestTextRef.current = "";
-      updateText("");
+      updateEditorText("");
     }
   };
 
@@ -369,8 +374,7 @@ function JsonViewerEditor({
     const parsedJson = parseJson(text);
     if (parsedJson) {
       const formattedJsonString = JSON.stringify(parsedJson, null, 2);
-      latestTextRef.current = formattedJsonString;
-      updateText(formattedJsonString);
+      updateEditorText(formattedJsonString);
       resetMonacoHorizontalScroll(editorRef.current);
     }
   };
@@ -379,15 +383,13 @@ function JsonViewerEditor({
     const parsedJson = parseJson(text);
     if (parsedJson) {
       const formattedJsonString = JSON.stringify(parsedJson, null);
-      latestTextRef.current = formattedJsonString;
-      updateText(formattedJsonString);
+      updateEditorText(formattedJsonString);
     }
   };
 
   const handleEditorChange: OnChange = (value) => {
     const nextText = value ?? "";
-    latestTextRef.current = nextText;
-    updateText(nextText);
+    updateEditorText(nextText);
   };
 
   const handleUploadClick = () => {
@@ -459,14 +461,14 @@ function JsonViewerEditor({
       },
       {
         label: "XL example",
-        onClick: () => updateText(createXLExampleJson()),
+        onClick: () => updateEditorText(createXLExampleJson()),
         icon: <DescriptionOutlinedIcon />,
         ping: isDefaultText,
         title: "Load a 2 MB JSON example",
       },
       {
         label: "Example",
-        onClick: () => updateText(JSON.stringify(sampleJson)),
+        onClick: () => updateEditorText(JSON.stringify(sampleJson)),
         icon: <DataObjectOutlinedIcon />,
       },
       {
@@ -481,7 +483,7 @@ function JsonViewerEditor({
       },
       {
         label: "Clear",
-        onClick: () => updateText(""),
+        onClick: () => updateEditorText(""),
         icon: <CleaningServicesIcon />,
       },
       {
@@ -492,7 +494,7 @@ function JsonViewerEditor({
       {
         label: "Paste",
         onClick: () =>
-          navigator.clipboard.readText().then((text) => updateText(text)),
+          navigator.clipboard.readText().then((text) => updateEditorText(text)),
         icon: <ContentPasteIcon />,
       },
     ];
