@@ -489,11 +489,6 @@ function JsonViewerEditor({
         icon: <MinimizeIcon />,
       },
       {
-        label: "Clear",
-        onClick: () => updateEditorText(""),
-        icon: <CleaningServicesIcon />,
-      },
-      {
         label: "Copy",
         onClick: () => handleCopy(getEditorText()),
         icon: <ContentCopyIcon />,
@@ -503,6 +498,11 @@ function JsonViewerEditor({
         onClick: () =>
           navigator.clipboard.readText().then((text) => updateEditorText(text)),
         icon: <ContentPasteIcon />,
+      },
+      {
+        label: "Clear",
+        onClick: () => updateEditorText(""),
+        icon: <CleaningServicesIcon />,
       },
     ];
     return <JsonViewerToolBar options={options} />;
