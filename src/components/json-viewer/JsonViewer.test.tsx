@@ -1,4 +1,10 @@
-import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
+import {
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+  within,
+} from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import JsonViewer from "./JsonViewer";
 import { JsonParseTaskResult } from "./utils/jsonParseWorkerMessages";
@@ -38,14 +44,18 @@ describe("JsonViewer", () => {
 
     await user.click(screen.getByRole("tab", { name: /^view$/i }));
 
-    expect(screen.getByRole("status", { name: "Parsing JSON" })).toBeInTheDocument();
+    expect(
+      screen.getByRole("status", { name: "Parsing JSON" })
+    ).toBeInTheDocument();
 
     parseResult.resolve({
       status: "success",
       parsed: { a: 1 },
     });
 
-    expect(await screen.findByLabelText(/json viewer tree/i)).toBeInTheDocument();
+    expect(
+      await screen.findByLabelText(/json viewer tree/i)
+    ).toBeInTheDocument();
     await waitFor(() => {
       expect(screen.queryByRole("status")).not.toBeInTheDocument();
     });
@@ -92,6 +102,41 @@ describe("JsonViewer", () => {
 
     fireEvent.click(getTreeItemContent("[0...99]"));
     expect(await within(tree).findByText("0")).toBeInTheDocument();
+  });
+
+  test("uploads a JSON file into the editor before opening the tree view", async () => {
+    const user = userEvent.setup();
+    const uploadedText = '{\n  "uploaded": true\n}';
+    mockCreateJsonParseTask.mockImplementation((text: string) => ({
+      requestId: 1,
+      promise: Promise.resolve({
+        status: "success",
+        parsed: JSON.parse(text),
+      }),
+      cancel: jest.fn(),
+    }));
+
+    render(<JsonViewer createNotification={jest.fn()} />);
+
+    expect(
+      screen.getByRole("button", { name: /^upload$/i })
+    ).toBeInTheDocument();
+
+    await user.upload(
+      screen.getByLabelText("Upload JSON file"),
+      new File([uploadedText], "uploaded.json", { type: "application/json" })
+    );
+
+    await waitFor(() => {
+      expect(screen.getByLabelText("JSON editor")).toHaveValue(uploadedText);
+    });
+
+    await user.click(screen.getByRole("tab", { name: /^view$/i }));
+
+    expect(mockCreateJsonParseTask).toHaveBeenCalledWith(uploadedText);
+    expect(
+      await screen.findByLabelText(/json viewer tree/i)
+    ).toBeInTheDocument();
   });
 });
 
