@@ -46,7 +46,7 @@ test("edit tab can format and minimize JSON", async ({ page }) => {
 
   const modifier = process.platform === "darwin" ? "Meta" : "Control";
   await page.keyboard.press(`${modifier}+A`);
-  await page.keyboard.type('{"a":1}');
+  await page.keyboard.insertText('{"a":1}');
 
   await page.getByRole("button", { name: /^format$/i }).click();
   await expect
