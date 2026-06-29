@@ -183,6 +183,35 @@ describe("JsonViewer", () => {
     ).toBeInTheDocument();
   });
 
+  test("shows a loading state while a JSON file upload is pending", async () => {
+    const { MockFileReader, restore } = mockFileReader();
+
+    try {
+      const user = userEvent.setup();
+      const uploadedText = '{\n  "uploaded": true\n}';
+
+      render(<JsonViewer createNotification={jest.fn()} />);
+
+      await user.upload(
+        screen.getByLabelText("Upload JSON file"),
+        new File([uploadedText], "uploaded.json", { type: "application/json" })
+      );
+
+      expect(
+        screen.getByRole("status", { name: "Loading JSON file" })
+      ).toBeInTheDocument();
+
+      MockFileReader.instances[0].resolveWithText(uploadedText);
+
+      await waitFor(() => {
+        expect(screen.queryByRole("status")).not.toBeInTheDocument();
+      });
+      expect(screen.getByLabelText("JSON editor")).toHaveValue(uploadedText);
+    } finally {
+      restore();
+    }
+  });
+
   test("ignores stale JSON file reads when a newer upload finishes first", async () => {
     const { MockFileReader, restore } = mockFileReader();
 
@@ -239,6 +268,10 @@ describe("JsonViewer", () => {
 
       fireEvent.change(screen.getByLabelText("JSON editor"), {
         target: { value: editedText },
+      });
+
+      await waitFor(() => {
+        expect(screen.queryByRole("status")).not.toBeInTheDocument();
       });
 
       MockFileReader.instances[0].resolveWithText(uploadedText);

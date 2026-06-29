@@ -317,6 +317,7 @@ function JsonViewerEditor({
   const [isEditorMounted, setIsEditorMounted] = useState(
     process.env.NODE_ENV === "test"
   );
+  const [isUploadingJsonFile, setIsUploadingJsonFile] = useState(false);
 
   useEffect(() => {
     latestTextRef.current = currentText;
@@ -360,6 +361,7 @@ function JsonViewerEditor({
 
   const updateEditorText = (text: string) => {
     activeUploadRequestId.current += 1;
+    setIsUploadingJsonFile(false);
     latestTextRef.current = text;
     updateText(text);
   };
@@ -406,6 +408,7 @@ function JsonViewerEditor({
 
     const uploadRequestId = activeUploadRequestId.current + 1;
     activeUploadRequestId.current = uploadRequestId;
+    setIsUploadingJsonFile(true);
 
     try {
       const fileText = await readTextFile(file);
@@ -420,6 +423,10 @@ function JsonViewerEditor({
     } catch {
       // Keep the current editor contents if the browser cannot read the file.
     } finally {
+      if (activeUploadRequestId.current === uploadRequestId) {
+        setIsUploadingJsonFile(false);
+      }
+
       input.value = "";
     }
   };
@@ -531,6 +538,7 @@ function JsonViewerEditor({
         In the editor, Tab inserts indentation. Press Escape, then Tab, to move
         focus outside the editor.
       </div>
+      {isUploadingJsonFile && <LoadingOverlay label="Loading JSON file" />}
       {(!isMonacoReady || !isEditorMounted) && <LoadingEditorOverlay />}
     </div>
   );
