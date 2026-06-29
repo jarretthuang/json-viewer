@@ -4,6 +4,7 @@ import { createXLExampleJson } from "../assets/xlFixtures";
 import JsonViewerToolBar from "../json-viewer-tool-bar/JsonViewerToolBar";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import ContentPasteIcon from "@mui/icons-material/ContentPaste";
+import FileUploadOutlinedIcon from "@mui/icons-material/FileUploadOutlined";
 import MinimizeIcon from "@mui/icons-material/Minimize";
 import CleaningServicesIcon from "@mui/icons-material/CleaningServices";
 import FormatAlignRightIcon from "@mui/icons-material/FormatAlignRight";
@@ -14,7 +15,7 @@ import dynamic from "next/dynamic";
 import { useTheme } from "next-themes";
 import type { OnChange, OnMount } from "@monaco-editor/react";
 import type * as Monaco from "monaco-editor";
-import { useEffect, useRef, useState } from "react";
+import { type ChangeEvent, useEffect, useRef, useState } from "react";
 import "./JsonViewerEditor.css";
 
 const MonacoEditor = dynamic(() => import("@monaco-editor/react"), {
@@ -24,6 +25,7 @@ const MonacoEditor = dynamic(() => import("@monaco-editor/react"), {
 
 export type JsonViewerEditorProps = {
   currentText: string;
+  isActive: boolean;
   isDefaultText: boolean;
   updateText: (s: string) => void;
   handleCopy: (s: string) => void;
@@ -80,7 +82,9 @@ type MonacoThemeApi = {
   };
 };
 
-export function getMonacoTheme(resolvedTheme?: string):
+export function getMonacoTheme(
+  resolvedTheme?: string
+):
   | typeof JSON_VIEWER_LIGHT_MONACO_THEME
   | typeof JSON_VIEWER_DARK_MONACO_THEME {
   return resolvedTheme === "dark"
@@ -273,8 +277,30 @@ export function resetMonacoHorizontalScroll(
   });
 }
 
+export function readTextFile(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+
+    reader.addEventListener("load", () => {
+      if (typeof reader.result === "string") {
+        resolve(reader.result);
+        return;
+      }
+
+      reject(new Error("Selected file could not be read as text."));
+    });
+
+    reader.addEventListener("error", () => {
+      reject(reader.error ?? new Error("Selected file could not be read."));
+    });
+
+    reader.readAsText(file);
+  });
+}
+
 function JsonViewerEditor({
   currentText,
+  isActive,
   isDefaultText,
   updateText,
   handleCopy,
@@ -282,6 +308,9 @@ function JsonViewerEditor({
 }: JsonViewerEditorProps) {
   const editorRef = useRef<Monaco.editor.IStandaloneCodeEditor | null>(null);
   const monacoRef = useRef<MonacoThemeApi | null>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const activeUploadRequestId = useRef(0);
+  const isActiveRef = useRef(isActive);
   const latestTextRef = useRef(currentText);
   const isDefaultTextRef = useRef(isDefaultText);
   const { resolvedTheme } = useTheme();
@@ -291,6 +320,8 @@ function JsonViewerEditor({
   const [isEditorMounted, setIsEditorMounted] = useState(
     process.env.NODE_ENV === "test"
   );
+  const [isUploadingJsonFile, setIsUploadingJsonFile] = useState(false);
+  isActiveRef.current = isActive;
 
   useEffect(() => {
     latestTextRef.current = currentText;
@@ -329,13 +360,26 @@ function JsonViewerEditor({
     monacoRef.current?.editor.setTheme(getMonacoTheme(resolvedTheme));
   }, [resolvedTheme]);
 
+  useEffect(() => {
+    if (!isActive) {
+      activeUploadRequestId.current += 1;
+      setIsUploadingJsonFile(false);
+    }
+  }, [isActive]);
+
   const getEditorText = () =>
     editorRef.current?.getValue() ?? latestTextRef.current;
 
+  const updateEditorText = (text: string) => {
+    activeUploadRequestId.current += 1;
+    setIsUploadingJsonFile(false);
+    latestTextRef.current = text;
+    updateText(text);
+  };
+
   const clearDefaultText = () => {
     if (isDefaultTextRef.current) {
-      latestTextRef.current = "";
-      updateText("");
+      updateEditorText("");
     }
   };
 
@@ -343,8 +387,7 @@ function JsonViewerEditor({
     const parsedJson = parseJson(text);
     if (parsedJson) {
       const formattedJsonString = JSON.stringify(parsedJson, null, 2);
-      latestTextRef.current = formattedJsonString;
-      updateText(formattedJsonString);
+      updateEditorText(formattedJsonString);
       resetMonacoHorizontalScroll(editorRef.current);
     }
   };
@@ -353,15 +396,53 @@ function JsonViewerEditor({
     const parsedJson = parseJson(text);
     if (parsedJson) {
       const formattedJsonString = JSON.stringify(parsedJson, null);
-      latestTextRef.current = formattedJsonString;
-      updateText(formattedJsonString);
+      updateEditorText(formattedJsonString);
     }
   };
 
   const handleEditorChange: OnChange = (value) => {
     const nextText = value ?? "";
-    latestTextRef.current = nextText;
-    updateText(nextText);
+    updateEditorText(nextText);
+  };
+
+  const handleUploadClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileUpload = async (event: ChangeEvent<HTMLInputElement>) => {
+    const input = event.currentTarget;
+    const file = input.files?.[0];
+
+    if (!file) {
+      return;
+    }
+
+    const uploadRequestId = activeUploadRequestId.current + 1;
+    activeUploadRequestId.current = uploadRequestId;
+    setIsUploadingJsonFile(true);
+
+    try {
+      const fileText = await readTextFile(file);
+
+      if (
+        !isActiveRef.current ||
+        activeUploadRequestId.current !== uploadRequestId
+      ) {
+        return;
+      }
+
+      latestTextRef.current = fileText;
+      updateText(fileText);
+      resetMonacoHorizontalScroll(editorRef.current);
+    } catch {
+      // Keep the current editor contents if the browser cannot read the file.
+    } finally {
+      if (activeUploadRequestId.current === uploadRequestId) {
+        setIsUploadingJsonFile(false);
+      }
+
+      input.value = "";
+    }
   };
 
   const handleEditorMount: OnMount = (editor, monacoInstance) => {
@@ -394,27 +475,22 @@ function JsonViewerEditor({
   function renderToolBar() {
     const options = [
       {
+        label: "Upload",
+        onClick: handleUploadClick,
+        icon: <FileUploadOutlinedIcon />,
+        title: "Upload a JSON file",
+      },
+      {
         label: "XL example",
-        onClick: () => updateText(createXLExampleJson()),
+        onClick: () => updateEditorText(createXLExampleJson()),
         icon: <DescriptionOutlinedIcon />,
         ping: isDefaultText,
         title: "Load a 2 MB JSON example",
       },
       {
         label: "Example",
-        onClick: () => updateText(JSON.stringify(sampleJson)),
+        onClick: () => updateEditorText(JSON.stringify(sampleJson)),
         icon: <DataObjectOutlinedIcon />,
-      },
-      {
-        label: "Copy",
-        onClick: () => handleCopy(getEditorText()),
-        icon: <ContentCopyIcon />,
-      },
-      {
-        label: "Paste",
-        onClick: () =>
-          navigator.clipboard.readText().then((text) => updateText(text)),
-        icon: <ContentPasteIcon />,
       },
       {
         label: "Format",
@@ -427,8 +503,19 @@ function JsonViewerEditor({
         icon: <MinimizeIcon />,
       },
       {
+        label: "Copy",
+        onClick: () => handleCopy(getEditorText()),
+        icon: <ContentCopyIcon />,
+      },
+      {
+        label: "Paste",
+        onClick: () =>
+          navigator.clipboard.readText().then((text) => updateEditorText(text)),
+        icon: <ContentPasteIcon />,
+      },
+      {
         label: "Clear",
-        onClick: () => updateText(""),
+        onClick: () => updateEditorText(""),
         icon: <CleaningServicesIcon />,
       },
     ];
@@ -438,6 +525,15 @@ function JsonViewerEditor({
   return (
     <div className="JsonViewerEditor relative flex h-full w-full flex-col dark:bg-zinc-900 dark:text-blue-100">
       {renderToolBar()}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="application/json,.json"
+        aria-label="Upload JSON file"
+        className="sr-only"
+        tabIndex={-1}
+        onChange={handleFileUpload}
+      />
       <div className="h-[calc(100%-3rem)] w-full overflow-visible overscroll-x-contain md:h-[calc(100%-1.5rem)]">
         {isMonacoReady ? (
           <MonacoEditor
@@ -456,6 +552,7 @@ function JsonViewerEditor({
         In the editor, Tab inserts indentation. Press Escape, then Tab, to move
         focus outside the editor.
       </div>
+      {isUploadingJsonFile && <LoadingOverlay label="Loading JSON file" />}
       {(!isMonacoReady || !isEditorMounted) && <LoadingEditorOverlay />}
     </div>
   );

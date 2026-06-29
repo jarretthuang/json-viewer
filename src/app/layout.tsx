@@ -20,7 +20,7 @@ export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   applicationName: siteName,
   title: {
-    default: "JSON Viewer Online - Format, Validate & Explore JSON",
+    default: siteName,
     template: "%s | JSON Viewer",
   },
   description: siteDescription,
@@ -48,7 +48,7 @@ export const metadata: Metadata = {
     type: "website",
     url: siteUrl,
     siteName,
-    title: "JSON Viewer Online",
+    title: siteName,
     description: siteDescription,
     images: [
       {
@@ -61,7 +61,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary",
-    title: "JSON Viewer Online",
+    title: siteName,
     description: siteDescription,
     images: ["/android-chrome-256x256.png"],
   },

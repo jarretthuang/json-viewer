@@ -9,10 +9,7 @@ import { useSearchParams } from "next/navigation";
 import "./JsonViewer.css";
 import { WithNotification } from "../notification/Notification";
 import { copyTextToClipboard } from "@/utils/handleCopy";
-import {
-  parseJsonTextWithError,
-  stringifyJson,
-} from "./utils/jsonUtils";
+import { parseJsonTextWithError, stringifyJson } from "./utils/jsonUtils";
 import {
   buildUrlWithQueryParam,
   buildUrlWithoutQueryParam,
@@ -37,7 +34,8 @@ function JsonViewer({ createNotification }: WithNotification) {
 
   const initialQueryParams = useSearchParams();
   const initialJsonQueryParam = initialQueryParams.get(JSON_QUERY_PARAM);
-  const initialText = decodeJsonQueryParam(initialJsonQueryParam) ?? DEFAULT_TEXT;
+  const initialText =
+    decodeJsonQueryParam(initialJsonQueryParam) ?? DEFAULT_TEXT;
 
   const [currentText, updateText] = useState(initialText);
   const [jsonObject, updateJsonObject] = useState<unknown>(undefined);
@@ -110,6 +108,7 @@ function JsonViewer({ createNotification }: WithNotification) {
           <div className="absolute h-full w-full" hidden={!isInEditView}>
             <JsonViewerEditor
               currentText={currentText}
+              isActive={isInEditView}
               isDefaultText={isDefaultText}
               updateText={handleUpdateText}
               handleCopy={handleCopy}
@@ -200,7 +199,11 @@ function JsonViewer({ createNotification }: WithNotification) {
   function updateJsonUrlParam(text: string): void {
     const encodedText = encodeJsonQueryParam(text, MAX_QUERY_PARAM_LENGTH);
     const newUrl = encodedText
-      ? buildUrlWithQueryParam(window.location.href, JSON_QUERY_PARAM, encodedText)
+      ? buildUrlWithQueryParam(
+          window.location.href,
+          JSON_QUERY_PARAM,
+          encodedText
+        )
       : buildUrlWithoutQueryParam(window.location.href, JSON_QUERY_PARAM);
 
     window.history.pushState({ path: newUrl }, "", newUrl);
@@ -209,7 +212,11 @@ function JsonViewer({ createNotification }: WithNotification) {
   return (
     <div className="JsonViewer flex w-full flex-1 flex-col bg-powderBlue-50 px-2 pb-2 dark:bg-neutral-950">
       <div className="view-switcher flex h-14 w-full md:h-8">
-        <div className="buttons relative w-full justify-center" role="tablist" aria-label="JSON viewer mode">
+        <div
+          className="buttons relative w-full justify-center"
+          role="tablist"
+          aria-label="JSON viewer mode"
+        >
           <button
             type="button"
             role="tab"
