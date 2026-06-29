@@ -25,6 +25,7 @@ const MonacoEditor = dynamic(() => import("@monaco-editor/react"), {
 
 export type JsonViewerEditorProps = {
   currentText: string;
+  isActive: boolean;
   isDefaultText: boolean;
   updateText: (s: string) => void;
   handleCopy: (s: string) => void;
@@ -299,6 +300,7 @@ export function readTextFile(file: File): Promise<string> {
 
 function JsonViewerEditor({
   currentText,
+  isActive,
   isDefaultText,
   updateText,
   handleCopy,
@@ -308,6 +310,7 @@ function JsonViewerEditor({
   const monacoRef = useRef<MonacoThemeApi | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const activeUploadRequestId = useRef(0);
+  const isActiveRef = useRef(isActive);
   const latestTextRef = useRef(currentText);
   const isDefaultTextRef = useRef(isDefaultText);
   const { resolvedTheme } = useTheme();
@@ -318,6 +321,7 @@ function JsonViewerEditor({
     process.env.NODE_ENV === "test"
   );
   const [isUploadingJsonFile, setIsUploadingJsonFile] = useState(false);
+  isActiveRef.current = isActive;
 
   useEffect(() => {
     latestTextRef.current = currentText;
@@ -355,6 +359,13 @@ function JsonViewerEditor({
   useEffect(() => {
     monacoRef.current?.editor.setTheme(getMonacoTheme(resolvedTheme));
   }, [resolvedTheme]);
+
+  useEffect(() => {
+    if (!isActive) {
+      activeUploadRequestId.current += 1;
+      setIsUploadingJsonFile(false);
+    }
+  }, [isActive]);
 
   const getEditorText = () =>
     editorRef.current?.getValue() ?? latestTextRef.current;
@@ -413,7 +424,10 @@ function JsonViewerEditor({
     try {
       const fileText = await readTextFile(file);
 
-      if (activeUploadRequestId.current !== uploadRequestId) {
+      if (
+        !isActiveRef.current ||
+        activeUploadRequestId.current !== uploadRequestId
+      ) {
         return;
       }
 

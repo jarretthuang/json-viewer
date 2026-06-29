@@ -283,6 +283,51 @@ describe("JsonViewer", () => {
       restore();
     }
   });
+
+  test("ignores stale JSON file reads after switching to view mode", async () => {
+    const { MockFileReader, restore } = mockFileReader();
+
+    try {
+      const user = userEvent.setup();
+      const editorText = '{\n  "source": "editor"\n}';
+      const uploadedText = '{\n  "source": "upload"\n}';
+      mockCreateJsonParseTask.mockImplementation((text: string) => ({
+        requestId: 1,
+        promise: Promise.resolve({
+          status: "success",
+          parsed: JSON.parse(text),
+        }),
+        cancel: jest.fn(),
+      }));
+
+      render(<JsonViewer createNotification={jest.fn()} />);
+
+      fireEvent.change(screen.getByLabelText("JSON editor"), {
+        target: { value: editorText },
+      });
+      await user.upload(
+        screen.getByLabelText("Upload JSON file"),
+        new File([uploadedText], "pending.json", { type: "application/json" })
+      );
+
+      await user.click(screen.getByRole("tab", { name: /^view$/i }));
+
+      expect(mockCreateJsonParseTask).toHaveBeenCalledWith(editorText);
+      expect(
+        await screen.findByLabelText(/json viewer tree/i)
+      ).toBeInTheDocument();
+
+      MockFileReader.instances[0].resolveWithText(uploadedText);
+
+      await user.click(screen.getByRole("tab", { name: /^edit$/i }));
+
+      await waitFor(() => {
+        expect(screen.getByLabelText("JSON editor")).toHaveValue(editorText);
+      });
+    } finally {
+      restore();
+    }
+  });
 });
 
 function getTreeItemContent(label: string): HTMLElement {
