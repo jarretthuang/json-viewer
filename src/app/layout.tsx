@@ -14,7 +14,7 @@ const fontsCssClass = fonts.map((font) => font.className).join(" ");
 const siteUrl = "https://jsonviewer.io";
 const siteName = "JSON Viewer";
 const siteDescription =
-  "Ultra-fast online JSON viewer for validating, formatting, minifying, and exploring JSON payloads up to 10 MB.";
+  "Ultra-fast, ad-free online JSON viewer with the best UX for validating, formatting, minifying, and exploring large JSON strings.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),

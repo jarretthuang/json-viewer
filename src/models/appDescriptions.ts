@@ -1,5 +1,5 @@
 export const jsonViewerAppDescription = `
-__JSON Viewer__ helps you edit, format, minify, and inspect JSON with ultra-fast performance for payloads up to 10 MB.
+__JSON Viewer__ helps you edit, format, minify, and inspect large JSON strings with ultra-fast performance, the best UX, and no ads.
 
 Use __Edit__ to work with raw JSON text.
 

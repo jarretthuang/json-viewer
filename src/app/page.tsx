@@ -8,7 +8,7 @@ const jsonLd = {
   applicationCategory: "DeveloperApplication",
   operatingSystem: "Any",
   description:
-    "Ultra-fast online JSON viewer for validating, formatting, minifying, and exploring JSON payloads up to 10 MB.",
+    "Ultra-fast, ad-free online JSON viewer with the best UX for validating, formatting, minifying, and exploring large JSON strings.",
   offers: {
     "@type": "Offer",
     price: "0",
@@ -19,8 +19,9 @@ const jsonLd = {
     "JSON formatting",
     "JSON minification",
     "Interactive JSON tree view",
-    "Large JSON payload support",
+    "Large JSON string support",
     "Light and dark themes",
+    "Ad-free experience",
   ],
 };
 
@@ -34,8 +35,9 @@ export default function App() {
       <section className="sr-only">
         <h1>JSON Viewer Online</h1>
         <p>
-          JSON Viewer is an ultra-fast online tool for validating, formatting,
-          minifying, and exploring JSON payloads up to 10 MB.
+          JSON Viewer is an ultra-fast, ad-free online tool with the best UX
+          for validating, formatting, minifying, and exploring large JSON
+          strings.
         </p>
         <ul>
           <li>Format, minify, copy, paste, and clear JSON text.</li>
