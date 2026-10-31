@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 
 import { ReactNotificationOptions } from "react-notifications-component";
+import JsonViewerTreeErrorBoundary from "./json-viewer-tree/JsonViewerTreeErrorBoundary";
 import JsonViewerTree from "./json-viewer-tree/JsonViewerTree";
 import JsonViewerEditor from "./json-viewer-editor/JsonViewerEditor";
 import LoadingOverlay from "@/components/loading-overlay/LoadingOverlay";
@@ -119,11 +120,13 @@ function JsonViewer({ createNotification }: WithNotification) {
             {isParsingJson ? (
               <LoadingOverlay label="Parsing JSON" />
             ) : (
-              <JsonViewerTree
-                json={jsonObject}
-                handleCopy={handleCopy}
-                onJsonUpdate={handleJsonUpdate}
-              ></JsonViewerTree>
+              <JsonViewerTreeErrorBoundary>
+                <JsonViewerTree
+                  json={jsonObject}
+                  handleCopy={handleCopy}
+                  onJsonUpdate={handleJsonUpdate}
+                />
+              </JsonViewerTreeErrorBoundary>
             )}
           </div>
         </div>
