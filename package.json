@@ -27,6 +27,7 @@
     "@mui/lab": "^5.0.0-alpha.127",
     "@mui/material": "^5.12.1",
     "@react-spring/web": "^9.7.2",
+    "@sentry/nextjs": "^11.10.0",
     "@types/lodash": "^4.14.194",
     "@types/node": "18.16.0",
     "@types/react": "18.0.38",
