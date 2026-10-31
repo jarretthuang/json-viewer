@@ -75,6 +75,47 @@ describe("JsonViewer", () => {
     mockCreateJsonParseTask.mockReset();
   });
 
+  test("preserves the mounted editor after a tree render crash and recovers on View", async () => {
+    const text = '{"keep":"my pasted JSON"}';
+    // Simulate an unexpected render failure in the real tree's metadata walk.
+    const brokenJson = Object.defineProperty({}, "child", {
+      enumerable: true,
+      get() { throw new Error("Simulated tree render crash"); },
+    });
+    mockCreateJsonParseTask
+      .mockReturnValueOnce({
+        requestId: 1,
+        promise: Promise.resolve({ status: "success", parsed: brokenJson }),
+        cancel: jest.fn(),
+      })
+      .mockReturnValueOnce({
+        requestId: 2,
+        promise: Promise.resolve({ status: "success", parsed: JSON.parse(text) }),
+        cancel: jest.fn(),
+      });
+    const consoleError = jest.spyOn(console, "error").mockImplementation(() => {});
+    try {
+      render(<JsonViewer createNotification={jest.fn()} />);
+      const editor = await screen.findByLabelText("JSON editor");
+      fireEvent.change(editor, { target: { value: text } });
+      fireEvent.click(screen.getByRole("tab", { name: /^view$/i }));
+      expect(await screen.findByRole("alert")).toHaveTextContent("Your JSON is still available in Edit");
+      expect(screen.getByLabelText("JSON editor")).toBe(editor);
+      expect(editor).toHaveValue(text);
+
+      fireEvent.click(screen.getByRole("tab", { name: /^edit$/i }));
+      expect(editor).toBeVisible();
+      expect(editor).toHaveValue(text);
+      fireEvent.click(screen.getByRole("tab", { name: /^view$/i }));
+      expect(await screen.findByLabelText(/json viewer tree/i)).toBeInTheDocument();
+      expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+      expect(screen.getByLabelText("JSON editor")).toBe(editor);
+      expect(editor).toHaveValue(text);
+    } finally {
+      consoleError.mockRestore();
+    }
+  });
+
   test("shows a loading state while worker parsing is pending", async () => {
     const user = userEvent.setup();
     const parseResult = createDeferred<JsonParseTaskResult>();

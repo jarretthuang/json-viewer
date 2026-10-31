@@ -20,6 +20,7 @@ import { removeJsonItemAtPath } from "../utils/jsonUtils";
 import {
   ARRAY_CHILD_CHUNK_SIZE,
   MAX_EXPAND_ALL_NODE_COUNT,
+  MAX_TREE_DEPTH,
   shouldAllowExpandAll,
 } from "../utils/jsonPerformanceUtils";
 
@@ -57,7 +58,12 @@ function collectTreeMetadata(
   let nodeCount = 0;
   let isCapped = false;
 
-  function visit(value: any, currentKey: string, currentNodeIdPrefix: string) {
+  function visit(
+    value: any,
+    currentKey: string,
+    currentNodeIdPrefix: string,
+    depth: number
+  ) {
     if (isCapped) return;
 
     nodeCount += 1;
@@ -95,6 +101,8 @@ function collectTreeMetadata(
       return;
     }
 
+    if (depth >= MAX_TREE_DEPTH) return;
+
     expandableIds.push(nodeId);
 
     if (Array.isArray(childValue) && shouldChunkArray(childValue)) {
@@ -109,26 +117,26 @@ function collectTreeMetadata(
         expandableIds.push(chunkNodeId);
 
         for (let index = chunk.start; index <= chunk.end; index += 1) {
-          visit(childValue[index], index.toString(), chunkNodeId);
+          visit(childValue[index], index.toString(), chunkNodeId, depth + 1);
           if (isCapped) return;
         }
       }
     } else if (Array.isArray(childValue)) {
       for (let index = 0; index < childValue.length; index += 1) {
-        visit(childValue[index], index.toString(), nodeId);
+        visit(childValue[index], index.toString(), nodeId, depth + 1);
         if (isCapped) return;
       }
     } else {
       for (const childKey in childValue) {
         if (Object.prototype.hasOwnProperty.call(childValue, childKey)) {
-          visit(childValue[childKey], childKey, nodeId);
+          visit(childValue[childKey], childKey, nodeId, depth + 1);
           if (isCapped) return;
         }
       }
     }
   }
 
-  visit(json, key, nodeIdPrefix);
+  visit(json, key, nodeIdPrefix, 0);
 
   return {
     nodeIds: isCapped ? [] : nodeIds,
@@ -265,7 +273,8 @@ function JsonViewerTree(props: any) {
     shouldUnescape: boolean,
     isUnescapedContent: boolean = false,
     path: (string | number)[] = [],
-    isKeyEditable: boolean = false
+    isKeyEditable: boolean = false,
+    depth: number = 0
   ) {
     const isItemRemovable = path.length > 0 && !isUnescapedContent;
     const nodeId: string = nodeIdPrefix + "." + key;
@@ -302,7 +311,8 @@ function JsonViewerTree(props: any) {
         shouldUnescape,
         isUnescapedContent,
         path,
-        isKeyEditable
+        isKeyEditable,
+        depth
       );
     } else {
       const stringValue: string = json.toString();
@@ -327,7 +337,8 @@ function JsonViewerTree(props: any) {
               shouldUnescape,
               true,
               [], // Path lost for unescaped content
-              false // Not editable
+              false, // Not editable
+              depth
             );
           }
         } catch (e) {}
@@ -366,12 +377,23 @@ function JsonViewerTree(props: any) {
     shouldUnescape: boolean,
     isUnescapedContent: boolean = false,
     path: (string | number)[] = [],
-    isKeyEditable: boolean = false
+    isKeyEditable: boolean = false,
+    depth: number = 0
   ) {
     const isExpanded = expanded.includes(nodeId);
     const hasChildren = Array.isArray(json)
       ? json.length > 0
       : hasObjectChildren(json);
+
+    if (hasChildren && depth >= MAX_TREE_DEPTH) {
+      return (
+        <JsonViewerTreeItem
+          nodeId={nodeId}
+          key={nodeId}
+          label={`${key}: … (nested content truncated at ${MAX_TREE_DEPTH} levels; full JSON is available in Edit)`}
+        />
+      );
+    }
 
     if (hasChildren) {
       expandableNodeIds.current.add(nodeId);
@@ -383,7 +405,8 @@ function JsonViewerTree(props: any) {
           nodeId,
           shouldUnescape,
           isUnescapedContent,
-          path
+          path,
+          depth
         )
       : hasChildren
         ? [
@@ -446,7 +469,8 @@ function JsonViewerTree(props: any) {
     nodeId: string,
     shouldUnescape: boolean,
     isUnescapedContent: boolean,
-    path: (string | number)[]
+    path: (string | number)[],
+    depth: number
   ) {
     if (Array.isArray(json)) {
       if (shouldChunkArray(json)) {
@@ -457,7 +481,8 @@ function JsonViewerTree(props: any) {
             nodeId,
             shouldUnescape,
             isUnescapedContent,
-            path
+            path,
+            depth
           )
         );
       }
@@ -470,7 +495,8 @@ function JsonViewerTree(props: any) {
           shouldUnescape,
           isUnescapedContent,
           [...path, index],
-          false // Array keys (indices) are not editable
+          false, // Array keys (indices) are not editable
+          depth + 1
         )
       );
     }
@@ -483,7 +509,8 @@ function JsonViewerTree(props: any) {
         shouldUnescape,
         isUnescapedContent,
         [...path, key],
-        true // Object keys are editable
+        true, // Object keys are editable
+        depth + 1
       )
     );
   }
@@ -494,7 +521,8 @@ function JsonViewerTree(props: any) {
     parentNodeId: string,
     shouldUnescape: boolean,
     isUnescapedContent: boolean,
-    path: (string | number)[]
+    path: (string | number)[],
+    depth: number
   ) {
     const nodeId = getArrayChunkNodeId(parentNodeId, chunk);
     const isExpanded = expanded.includes(nodeId);
@@ -526,7 +554,8 @@ function JsonViewerTree(props: any) {
               nodeId,
               shouldUnescape,
               isUnescapedContent,
-              path
+              path,
+              depth
             )
           : [
               <JsonViewerTreeItem
@@ -545,7 +574,8 @@ function JsonViewerTree(props: any) {
     nodeId: string,
     shouldUnescape: boolean,
     isUnescapedContent: boolean,
-    path: (string | number)[]
+    path: (string | number)[],
+    depth: number
   ) {
     const items: ReactNode[] = [];
 
@@ -558,7 +588,8 @@ function JsonViewerTree(props: any) {
           shouldUnescape,
           isUnescapedContent,
           [...path, index],
-          false // Array keys (indices) are not editable
+          false, // Array keys (indices) are not editable
+          depth + 1
         )
       );
     }
