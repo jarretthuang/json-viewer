@@ -1,0 +1,29 @@
+name: Uptime
+
+on:
+  schedule:
+    - cron: '*/30 * * * *'
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: Check jsonviewer.io
+        run: |
+          if ! status=$(curl --silent --show-error --output /dev/null \
+            --write-out '%{http_code}' --connect-timeout 10 --max-time 30 \
+            https://jsonviewer.io); then
+            echo "::error::https://jsonviewer.io is unreachable"
+            exit 1
+          fi
+
+          if [[ "$status" != 2[0-9][0-9] ]]; then
+            echo "::error::https://jsonviewer.io returned HTTP $status"
+            exit 1
+          fi
+
+          echo "https://jsonviewer.io returned HTTP $status"
