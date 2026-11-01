@@ -81,7 +81,7 @@ export default function PrivacyPage() {
         <p>
           You can clear browser storage to remove saved preferences. To request
           access to, correction of, or deletion of personal information, contact{" "}
-          <a href="mailto:support@jhuang.ca">support@jhuang.ca</a>. Available
+          <a href="mailto:support@jsonviewer.io">support@jsonviewer.io</a>. Available
           rights and any exceptions depend on applicable law.
         </p>
       </section>
@@ -90,7 +90,7 @@ export default function PrivacyPage() {
         <p>
           We may update this policy as the service changes. Updates will appear
           on this page. For privacy questions, email{" "}
-          <a href="mailto:support@jhuang.ca">support@jhuang.ca</a>.
+          <a href="mailto:support@jsonviewer.io">support@jsonviewer.io</a>.
         </p>
       </section>
     </LegalPage>

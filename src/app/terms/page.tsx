@@ -40,7 +40,7 @@ export default function TermsPage() {
         <p>
           You may request a full refund of your USD 29 one-time Pro digital
           license within 14 days of purchase by emailing{" "}
-          <a href="mailto:support@jhuang.ca">support@jhuang.ca</a> with your
+          <a href="mailto:support@jsonviewer.io">support@jsonviewer.io</a> with your
           order reference and purchase email address. You do not need to provide
           a reason. Do not include payment card details.
         </p>
@@ -78,7 +78,7 @@ export default function TermsPage() {
           We may update the service and these terms. Revised terms will be
           posted here; changes do not remove refund rights for existing
           purchases. For support, license questions, or concerns about these
-          terms, email <a href="mailto:support@jhuang.ca">support@jhuang.ca</a>.
+          terms, email <a href="mailto:support@jsonviewer.io">support@jsonviewer.io</a>.
         </p>
       </section>
     </LegalPage>
