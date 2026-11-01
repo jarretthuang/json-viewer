@@ -5,6 +5,8 @@ export const JSON_URL_SYNC_DEBOUNCE_MS = 300;
 export const LARGE_JSON_URL_SYNC_DEBOUNCE_MS = 1_000;
 export const MAX_HIGHLIGHT_TEXT_LENGTH = 100_000;
 export const MAX_EXPAND_ALL_NODE_COUNT = 5_000;
+// Bound both metadata traversal and rendered nesting; root is depth zero.
+export const MAX_TREE_DEPTH = 50;
 export const ARRAY_CHILD_CHUNK_SIZE = 100;
 
 export function isLargeJsonText(text: string): boolean {
