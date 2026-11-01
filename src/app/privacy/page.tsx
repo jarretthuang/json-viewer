@@ -59,21 +59,17 @@ export default function PrivacyPage() {
         </p>
       </section>
       <section>
-        <h2>Support and purchases</h2>
+        <h2>Support</h2>
         <p>
           If you contact support, we receive your email address and any
-          information you provide. For Pro purchases and refunds, order and
-          license information may be used to verify your purchase and handle
-          your request. Payment providers process payment details under their
-          own privacy policies. Please do not send payment card details or
-          sensitive JSON by email.
+          information you provide. Please do not send sensitive JSON by email.
         </p>
       </section>
       <section>
         <h2>Use, retention, and your choices</h2>
         <p>
-          We use information to operate, secure, and improve the service,
-          provide support, and handle purchases. We retain it as needed for
+          We use information to operate, secure, and improve the service and
+          provide support. We retain it as needed for
           those purposes and applicable recordkeeping requirements. Service
           providers may process information in other countries. We do not sell
           your personal information.

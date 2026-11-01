@@ -4,7 +4,7 @@ import LegalPage from "@/components/legal/LegalPage";
 
 export const metadata: Metadata = {
   title: "Terms of Service",
-  description: "Terms for using JSON Viewer and the Pro license refund policy.",
+  description: "Terms for using JSON Viewer.",
   alternates: { canonical: "/terms" },
 };
 
@@ -22,35 +22,6 @@ export default function TermsPage() {
           for lawful purposes. You are responsible for your data and for having
           the right to use it. Do not disrupt the service, attempt unauthorized
           access, or use it to harm others. You retain ownership of your JSON.
-        </p>
-      </section>
-      <section>
-        <h2>Pro digital license</h2>
-        <p>
-          JSON Viewer Pro is a digital license priced at USD 29 as a one-time
-          payment, not a recurring subscription. Applicable taxes, if any, are
-          shown at checkout. Your purchase provides access to the Pro features
-          described at the time of purchase. It does not transfer ownership of
-          the service or permit resale of license keys, and does not promise
-          indefinite hosting or every future product or feature.
-        </p>
-      </section>
-      <section>
-        <h2>Refund policy</h2>
-        <p>
-          You may request a full refund of your USD 29 one-time Pro digital
-          license within 14 days of purchase by emailing{" "}
-          <a href="mailto:support@jsonviewer.io">support@jsonviewer.io</a> with your
-          order reference and purchase email address. You do not need to provide
-          a reason. Do not include payment card details.
-        </p>
-        <p>
-          Approved refunds are returned to the original payment method;
-          processing time depends on the payment provider. The refunded Pro
-          license will be deactivated. After 14 days, purchases are generally
-          non-refundable, except where required by law. Contact support for
-          duplicate charges or problems accessing your purchase. This policy
-          does not limit any mandatory consumer rights.
         </p>
       </section>
       <section>
@@ -76,9 +47,7 @@ export default function TermsPage() {
         <h2>Changes and contact</h2>
         <p>
           We may update the service and these terms. Revised terms will be
-          posted here; changes do not remove refund rights for existing
-          purchases. For support, license questions, or concerns about these
-          terms, email <a href="mailto:support@jsonviewer.io">support@jsonviewer.io</a>.
+          posted here. For support or concerns about these terms, email <a href="mailto:support@jsonviewer.io">support@jsonviewer.io</a>.
         </p>
       </section>
     </LegalPage>
