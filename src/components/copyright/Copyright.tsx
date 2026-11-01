@@ -6,6 +6,8 @@ function LegalLinks({ compact = false }: { compact?: boolean }) {
       <Link
         className="underline active:opacity-50 md:hover:opacity-50"
         href="/privacy"
+        target="_blank"
+        rel="noopener noreferrer"
       >
         {compact ? "Privacy" : "Privacy Policy"}
       </Link>
@@ -13,6 +15,8 @@ function LegalLinks({ compact = false }: { compact?: boolean }) {
       <Link
         className="underline active:opacity-50 md:hover:opacity-50"
         href="/terms"
+        target="_blank"
+        rel="noopener noreferrer"
       >
         {compact ? "Terms" : "Terms of Service"}
       </Link>
