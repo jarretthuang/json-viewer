@@ -38,7 +38,9 @@ body {
   left: 0;
   top: 0;
   height: 100svh;
-  width: 100dvw;
+  /* 100dvw includes scrollbar width, pushing the right-aligned navbar theme toggle
+     on long /privacy and /terms pages under the vertical scrollbar, clipping it. */
+  width: 100%;
   overflow-x: hidden;
   background-color: #fdfeff;
 }
