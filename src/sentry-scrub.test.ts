@@ -1,4 +1,25 @@
-import { scrubBreadcrumbUrl, stripJsonQueryParam } from './sentry-scrub';
+import { scrubBreadcrumbUrl, scrubErrorMessage, stripJsonQueryParam } from './sentry-scrub';
+
+describe('Sentry error message scrubbing', () => {
+  it.each([
+    'Invalid regular expression: /{"synthetic":"private"}/: Invalid escape',
+    'SyntaxError: Invalid regular expression: /[/: Unterminated character class',
+  ])('redacts regex patterns even in short messages', (message) => {
+    expect(scrubErrorMessage(message)).toBe('Invalid regular expression [redacted]');
+  });
+
+  it.each([
+    `Parse failed: { "synthetic": "${'x'.repeat(501)}" }`,
+    `Parse failed: "synthetic": "${'x'.repeat(501)}"`,
+  ])('redacts long JSON-looking messages without retaining a document prefix', (message) => {
+    expect(scrubErrorMessage(message)).toBe('Error message [redacted]');
+  });
+
+  it.each(['', 'Network request failed', 'x'.repeat(501), 'Unexpected token at position 12'])
+    ('preserves ordinary diagnostics', (message) => {
+      expect(scrubErrorMessage(message)).toBe(message);
+    });
+});
 
 describe('Sentry URL scrubbing', () => {
   it('removes every json parameter, including encoded keys, preserving other context', () => {

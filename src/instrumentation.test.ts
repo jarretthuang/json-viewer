@@ -74,6 +74,38 @@ describe('Sentry URL privacy hooks', () => {
     return jest.mocked(Sentry.init).mock.calls[0][0]!;
   }
 
+  it('redacts browser exception chains and duplicate event messages, preserving diagnostics', async () => {
+    const { beforeSend } = await initOptions('browser');
+    const message = 'Invalid regular expression: /{"synthetic":"private"}/: Invalid escape';
+    expect(await beforeSend!({
+      type: undefined,
+      message,
+      exception: { values: [
+        { type: 'SyntaxError', value: message },
+        { type: 'Error', value: 'Ordinary failure' },
+        { type: 'Error' },
+      ] },
+    }, {})).toEqual({
+      type: undefined,
+      message: 'Invalid regular expression [redacted]',
+      exception: { values: [
+        { type: 'SyntaxError', value: 'Invalid regular expression [redacted]' },
+        { type: 'Error', value: 'Ordinary failure' },
+        { type: 'Error' },
+      ] },
+    });
+  });
+
+  it('configures the four browser noise filters', async () => {
+    const { ignoreErrors } = await initOptions('browser');
+    expect(ignoreErrors).toEqual([
+      /Share canceled/,
+      /Document is not focused/,
+      /captured as exception/,
+      /reading 'isVisible'/,
+    ]);
+  });
+
   it.each(['browser', 'nodejs', 'edge'])('scrubs request URLs in %s', async (runtime) => {
     const { beforeSend } = await initOptions(runtime);
     const event = {
