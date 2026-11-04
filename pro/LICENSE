@@ -1,0 +1,16 @@
+jsonviewer.io Pro — Proprietary License
+Copyright (c) the respective copyright holders. All rights reserved.
+
+The source in this directory is visible so you may read and audit it.
+You may not redistribute, sublicense, sell, or use this code commercially
+without written permission or a commercial license from its copyright holders.
+A purchased license permits use only within the scope granted with that purchase.
+No rights to trademarks or product branding are granted.
+
+This license applies only to pro/. It does not change or relicense the
+MIT-licensed core outside this directory or third-party dependencies.
+Outside pull requests are not accepted into this directory.
+
+This software is provided as is, without warranties. To the extent permitted
+by law, the copyright holders are not liable for claims or damages arising
+from its use.
