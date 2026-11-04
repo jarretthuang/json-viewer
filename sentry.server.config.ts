@@ -1,5 +1,5 @@
 import * as Sentry from '@sentry/nextjs';
-import { stripJsonQueryParam } from './src/sentry-scrub';
+import { scrubBreadcrumbUrl, stripJsonQueryParam } from './src/sentry-scrub';
 
 if (process.env.SENTRY_DSN) {
   Sentry.init({
@@ -9,6 +9,16 @@ if (process.env.SENTRY_DSN) {
         event.request.url = stripJsonQueryParam(event.request.url);
       }
       return event;
+    },
+    beforeBreadcrumb(breadcrumb) {
+      if (breadcrumb.data) {
+        for (const key of ['url', 'to', 'from']) {
+          if (typeof breadcrumb.data[key] === 'string') {
+            breadcrumb.data[key] = scrubBreadcrumbUrl(breadcrumb.data[key]);
+          }
+        }
+      }
+      return breadcrumb;
     },
   });
 }

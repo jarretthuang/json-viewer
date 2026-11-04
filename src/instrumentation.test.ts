@@ -89,8 +89,8 @@ describe('Sentry URL privacy hooks', () => {
     }
   });
 
-  it('scrubs all browser breadcrumb URL fields and preserves other data', async () => {
-    const { beforeBreadcrumb } = await initOptions('browser');
+  it.each(['browser', 'nodejs', 'edge'])('scrubs all %s breadcrumb URL fields and preserves other data', async (runtime) => {
+    const { beforeBreadcrumb } = await initOptions(runtime);
     expect(beforeBreadcrumb!({
       category: 'navigation',
       data: {
