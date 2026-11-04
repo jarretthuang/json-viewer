@@ -12,39 +12,72 @@ beforeEach(() => {
 });
 afterEach(() => {
   global.fetch = originalFetch;
-  delete process.env.NEXT_PUBLIC_LEMON_SQUEEZY_CHECKOUT_URL;
 });
 it("shows an actionable not-configured state on license entry", async () => {
-  fetchMock.mockResolvedValue({ ok: false, json: async () => ({ error: "not_configured" }) });
+  fetchMock.mockResolvedValue({
+    ok: false,
+    json: async () => ({ error: "not_configured" }),
+  });
   render(<LicenseScreen />);
-  fireEvent.change(screen.getByLabelText("License key"), { target: { value: "example" } });
+  fireEvent.change(screen.getByLabelText("License key"), {
+    target: { value: "example" },
+  });
   fireEvent.click(screen.getByRole("button", { name: "Validate key" }));
-  await waitFor(() => expect(screen.getByRole("status")).toHaveTextContent("Licensing is not configured yet"));
-  expect(screen.getByRole("link", { name: "Lost my key?" })).toHaveAttribute("href", "/pro/lost-key");
+  await waitFor(() =>
+    expect(
+      screen.getByRole("status", { name: "License status" })
+    ).toHaveTextContent("Licensing is not configured yet")
+  );
+  expect(screen.getByRole("link", { name: "Lost my key?" })).toHaveAttribute(
+    "href",
+    "/pro/lost-key"
+  );
 });
-it("displays a recovered key without claiming email delivery", async () => {
-  fetchMock.mockResolvedValue({ ok: true, json: async () => ({ key: "recovered-key", delivery: "display" }) });
+it("explains that key recovery is unavailable", () => {
   render(<LostKeyScreen />);
-  fireEvent.change(screen.getByLabelText("Purchase email"), { target: { value: "buyer@example.com" } });
-  fireEvent.click(screen.getByRole("button", { name: "Find my key" }));
-  expect(await screen.findByText("recovered-key")).toBeInTheDocument();
-  expect(screen.getByRole("status")).toHaveTextContent("No new email was sent");
+  expect(
+    screen.getByText(/Automatic key recovery is unavailable/)
+  ).toBeInTheDocument();
+  expect(fetchMock).not.toHaveBeenCalled();
 });
 it("keeps completion unconfirmed until a verified adapter supplies it", () => {
   const view = render(<ThankYouScreen />);
-  expect(screen.getByText(/Purchase confirmation is not connected/)).toBeInTheDocument();
-  view.rerender(<ThankYouScreen completion={{ key: "verified-key", emailSent: true }} />);
+  expect(
+    screen.getByText(/Purchase confirmation is not connected/)
+  ).toBeInTheDocument();
+  view.rerender(
+    <ThankYouScreen completion={{ key: "verified-key", emailSent: true }} />
+  );
   expect(screen.getByText("verified-key")).toBeInTheDocument();
-  expect(screen.getByText("Your license key email has been sent.")).toBeInTheDocument();
+  expect(
+    screen.getByText("Your license key email has been sent.")
+  ).toBeInTheDocument();
 });
-it("offers hosted checkout to unlicensed users", () => {
-  process.env.NEXT_PUBLIC_LEMON_SQUEEZY_CHECKOUT_URL = "https://example.lemonsqueezy.com/checkout/buy/product";
+it("handles checkout not being configured without crashing", async () => {
+  fetchMock.mockResolvedValue({
+    ok: false,
+    json: async () => ({ error: "not_configured" }),
+  });
   render(<ProGate>Future feature</ProGate>);
-  expect(screen.queryByText("Future feature")).not.toBeInTheDocument();
-  expect(screen.getByRole("link", { name: "Upgrade to Pro" })).toHaveAttribute("href", process.env.NEXT_PUBLIC_LEMON_SQUEEZY_CHECKOUT_URL);
+  expect(screen.getByText(/Pro is a \$19.99 one-time/)).toBeInTheDocument();
+  fireEvent.click(screen.getByRole("button", { name: "Upgrade to Pro" }));
+  await waitFor(() =>
+    expect(
+      screen.getByRole("button", { name: "Upgrade to Pro" })
+    ).toBeDisabled()
+  );
+  expect(fetchMock).toHaveBeenCalledWith("/api/checkout/create", {
+    method: "POST",
+  });
+  expect(
+    screen.getByRole("status", { name: "Checkout status" })
+  ).toHaveTextContent("Checkout is not configured yet");
 });
 it("renders new feature content for a cached valid license", () => {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify({ key: "example", valid: true, checkedAt: Date.now() }));
+  localStorage.setItem(
+    STORAGE_KEY,
+    JSON.stringify({ key: "example", valid: true, checkedAt: Date.now() })
+  );
   render(<ProGate>Future feature</ProGate>);
   expect(screen.getByText("Future feature")).toBeInTheDocument();
   expect(fetchMock).not.toHaveBeenCalled();
