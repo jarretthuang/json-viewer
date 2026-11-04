@@ -22,70 +22,58 @@ Documented UI entry points: `src/app/pro/**` are thin route adapters importing
 Pro screens. License API routes may import `pro/licensing/server.ts`. No other
 core module imports Pro; no navbar change or existing feature gate is needed.
 
-## Configuration and operations
+## Stripe test-mode integration
 
-Server only: `LEMON_SQUEEZY_API_KEY`, `LEMON_SQUEEZY_STORE_ID`, and
-`LEMON_SQUEEZY_PRODUCT_ID`. All are required to enable the endpoints; store and
-product checks prevent accepting another seller's valid key. Optional
-`LEMON_SQUEEZY_TEST_MODE=true` permits test keys (default false).
-Public: `NEXT_PUBLIC_LEMON_SQUEEZY_CHECKOUT_URL`, the dashboard's HTTPS
-`*.lemonsqueezy.com/checkout/buy/...` share link. Missing configuration fails closed.
+Server-only Vercel variables: `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`,
+`LICENSE_KEY_SECRET`, `RESEND_API_KEY`. Generate a strong random license signing
+secret and retain it: rotating it invalidates issued keys. Never use a public
+Next.js variable for any secret. `.env*` remains ignored.
 
-Validation uses POST /v1/licenses/validate (form encoded; public License API,
-no bearer needed). The API key enables the integration and authenticates order
-lookup only. Positive validation is cached for 5 minutes by SHA-256 key digest,
-up to 1,000 entries. Browser validation is cached for 24 hours, including across
-reloads; failed periodic validation closes the gate and retries after 5 minutes.
-Browser storage is a convenience gate, not tamper-resistant authorization.
+Price/product constants live in `src/lib/pro-config.ts`. These currently identify
+the sandbox $19.99 USD one-time product. Moving to live mode requires live IDs,
+keys, webhook registration and explicit launch review; there is no test-only
+branch in the integration code. Checkout enables Managed Payments explicitly.
 
-Per-process sliding windows allow 20 validations or 5 recovery requests per
-10 minutes per IP. Maps are bounded and expired entries pruned. Vercel's trusted
-`x-vercel-forwarded-for` is used only on Vercel; elsewhere all requests share a
-bucket. Multi-instance deployment needs shared rate limiting before scale.
-Only fixed operation/error codes are logged, never bodies, keys, emails or IPs.
-Responses are no-store; customer records are not persisted.
+Webhook signatures are checked against the raw request body. Both successful
+Checkout events retrieve the session and verify paid status, mode, quantity,
+price and product before issuing a key. The thank-you page uses the same checks;
+it is dynamic and never trusts the redirect alone. Treat session IDs as bearer
+purchase-confirmation credentials; never share the confirmation URL.
 
-## Provider choices and remaining launch work
+Keys are `base64url(payload).base64url(HMAC-SHA256(payload))`. The v1 payload
+contains a version and HMAC of `session_id|email`, with no timestamps or personal
+data. This produces the same key on every retry, including across serverless
+instances. Validation checks the signature with a timing-safe comparison.
+There is no license database. `activations: 1` is an honor-system value, not a
+measured device count. Activation limits, revocation and email-to-key lookup
+require a store later. Refunds are logged with a fixed code; revocation is future
+work. Browser validation/cache behavior is unchanged.
 
-Docs checked 2026-11-04:
-- https://docs.lemonsqueezy.com/api/license-api/validate-license-key
-- https://docs.lemonsqueezy.com/api/orders/list-all-orders
-- https://docs.lemonsqueezy.com/api/license-keys/list-all-license-keys
-- https://docs.lemonsqueezy.com/help/orders/resend-receipt
-- https://docs.lemonsqueezy.com/help/checkout/hosted-checkout
-- https://docs.lemonsqueezy.com/help/licensing/generating-license-keys
+Resend sends from `support@jsonviewer.io` with idempotency key
+`pro-license/<session_id>`. Provider-side idempotency suppresses duplicate email
+effects within Resend's 24-hour retention window, including concurrent requests.
+Deterministic license issuance remains idempotent indefinitely; exactly-once
+email beyond that window requires durable state. Delivery failures return 502 so
+Stripe can retry. With no Resend key, email is skipped and logged with a fixed
+code; the thank-you page still shows the key. The page does not claim email was
+sent. Stripe receipt emails contain purchase details, not our license key;
+automatic recovery is explicitly unavailable. Keep the separate license email
+and confirmation-page key safe.
 
-No public resend endpoint is documented (receipt resend is a dashboard action).
-The requested fallback returns the matching key for display, not an email-sent
-claim. This email-only recovery does not prove mailbox ownership and exposes a
-key to anyone who knows the purchase email; replace it with provider My Orders
-magic-link recovery before public launch if that tradeoff is unacceptable.
-Lookup is restricted to paid, unrefunded orders and configured product/store/mode.
-Pagination is bounded to 10 pages of 100 per collection, returning an upstream
-error rather than silently reporting no match when the bound is exceeded.
+Buyer payment records remain at Stripe; the application persists no buyer data.
+Email delivery necessarily sends the buyer email and key to Resend. No JSON
+editor content is involved, and no existing free feature is gated.
 
-Hosted checkout avoids loading Lemon.js or a third-party overlay in the editor.
-Configure the $29 one-time product, license generation, receipt delivery and
-checkout URL in the future account. No price or purchase is created by this code.
-The thank-you screen supports a future verified completion adapter; redirect
-wiring and trustworthy key/email-delivery confirmation remain outstanding.
-Never put license keys in query strings. Without verified completion data the
-screen explicitly says completion is not connected; it does not claim an email
-was sent. Real validation/revocation, recovery, checkout, email delivery and
-post-purchase handoff require the account and cannot yet be tested end to end.
+Validation retains bounded per-process rate limiting (20 requests per 10 minutes,
+trusted Vercel IP header only on Vercel). Multi-instance rate limiting needs a
+shared store. Logs contain fixed codes only, never emails, bodies, keys or secrets.
 
-## Foundation audit
+Before testing real purchases, configure the product's eligible Managed Payments
+tax code, register `/api/stripe/webhook` for completed/async success/async failure
+and refund events, configure Vercel variables, and verify the Resend domain.
+No real Checkout, webhook or email delivery has been verified without credentials.
 
-The privacy policy already disclosed Vercel Web Analytics on the base branch;
-no legal-page changes or new tracking were needed. `noImplicitAny` is enabled
-with Jest/Prism types and a notification declaration; the fixes stayed below
-the 20-file cutoff.
-
-The requested history keyword scan was run once during the resumed audit:
-`git log -p | grep -iE 'api[_-]?key|secret|token|password' | head -50`.
-Its 50 returned lines contain dependency names/registry URLs (tokenizers), Sentry
-DSN documentation, literal `SECRET` URL-scrubbing fixtures, a syntax-highlight
-`token` assertion, and privacy guidance about passwords/API keys. No credential
-values were found in those results. This truncated keyword scan is not proof
-that the entire history is secret-free. `.env`, `.env.production`, and `*.key`
-are ignored.
+References:
+- https://docs.stripe.com/payments/managed-payments/set-up
+- https://docs.stripe.com/webhooks/signature
+- https://resend.com/docs/dashboard/emails/idempotency-keys

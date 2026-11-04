@@ -1,6 +1,8 @@
 "use client";
 import { useState, type ReactNode } from "react";
 import Link from "next/link";
+import { CheckoutButton } from "./ProGate";
+import { PRO_PRICE_DISPLAY } from "@/lib/pro-config";
 import { usePro, type LicenseError } from "./usePro";
 const messages: Record<LicenseError, string> = {
   invalid_key: "This license key is invalid, expired, or disabled.",
@@ -36,6 +38,8 @@ export function LicenseScreen() {
         Enter your license key to enable future Pro features on this browser.
         Existing JSON tools stay free.
       </p>
+      <p>Pro is {PRO_PRICE_DISPLAY} USD, one time.</p>
+      <CheckoutButton />
       <form
         className="space-y-4"
         onSubmit={async (event) => {
@@ -81,7 +85,7 @@ export function LicenseScreen() {
           Clear key
         </button>
       </form>
-      <p role="status">
+      <p role="status" aria-label="License status">
         {message || (isPro ? "Pro is enabled on this browser." : "")}
       </p>
       <Link className="underline" href="/pro/lost-key">
@@ -91,78 +95,26 @@ export function LicenseScreen() {
   );
 }
 export function LostKeyScreen() {
-  const [email, setEmail] = useState("");
-  const [busy, setBusy] = useState(false);
-  const [key, setKey] = useState("");
-  const [message, setMessage] = useState("");
   return (
     <Frame title="Find your license key">
-      <p>Use the email from your purchase. Your key will be displayed here.</p>
-      <form
-        className="space-y-4"
-        onSubmit={async (event) => {
-          event.preventDefault();
-          setBusy(true);
-          setKey("");
-          setMessage("");
-          try {
-            const response = await fetch("/api/license/resend", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ email }),
-              cache: "no-store",
-              signal: AbortSignal.timeout(30_000),
-            });
-            const result = await response.json();
-            if (response.ok && typeof result.key === "string") {
-              setKey(result.key);
-              setEmail("");
-              setMessage("Your key was found. No new email was sent.");
-            } else
-              setMessage(
-                result.error === "not_found"
-                  ? "No eligible license was found for that email."
-                  : messages[result.error as LicenseError] ||
-                      messages.network_error
-              );
-          } catch {
-            setMessage(messages.network_error);
-          } finally {
-            setBusy(false);
-          }
-        }}
-      >
-        <label htmlFor="purchase-email" className="block">
-          Purchase email
-        </label>
-        <input
-          id="purchase-email"
-          className={inputClass}
-          type="email"
-          autoComplete="email"
-          maxLength={254}
-          required
-          value={email}
-          onChange={(event) => setEmail(event.target.value)}
-        />
-        <button className={buttonClass} disabled={busy}>
-          {busy ? "Finding key…" : "Find my key"}
-        </button>
-      </form>
-      <p role="status">{message}</p>
-      {key && <code className="block break-all rounded border p-4">{key}</code>}
+      <p>
+        Automatic key recovery is unavailable. Find your Stripe receipt email
+        for purchase details and your separate JSON Viewer Pro license email for
+        the key. Keep the key from the purchase confirmation page safe.
+      </p>
       <Link href="/pro" className="underline">
         Enter your key
       </Link>
     </Frame>
   );
 }
-// Only a future server-verified purchase adapter may supply completion.
+// Completion is supplied only by the server-verified Stripe adapter.
 export function ThankYouScreen({
   completion,
 }: {
   completion?: { key: string; emailSent: boolean };
 }) {
+  const [copied, setCopied] = useState(false);
   return (
     <Frame title="Thank you for choosing Pro">
       {completion ? (
@@ -171,6 +123,20 @@ export function ThankYouScreen({
           <code className="block break-all rounded border p-4">
             {completion.key}
           </code>
+          <button
+            className={buttonClass}
+            onClick={async () => {
+              try {
+                await navigator.clipboard.writeText(completion.key);
+                setCopied(true);
+              } catch {
+                setCopied(false);
+              }
+            }}
+          >
+            {copied ? "Copied" : "Copy license key"}
+          </button>
+          <p>Keep this key safe.</p>
           <p>
             {completion.emailSent
               ? "Your license key email has been sent."
@@ -180,7 +146,7 @@ export function ThankYouScreen({
       ) : (
         <p>
           Purchase confirmation is not connected yet. After purchasing, find
-          your key in your Lemon Squeezy receipt email.
+          your purchase details in your Stripe receipt email.
         </p>
       )}
       <Link href="/pro" className="underline">
