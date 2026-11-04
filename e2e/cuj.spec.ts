@@ -165,3 +165,36 @@ test("navbar overlay covers Monaco find widget", async ({ page }) => {
     )
     .toBe("navbar-expanded-panel");
 });
+
+test("tree keyboard expansion toggles once with Enter and Space", async ({ page }) => {
+  await page.goto("/");
+  await page.getByRole("button", { name: /^example$/i }).click();
+  await page.getByRole("tab", { name: /^view$/i }).click();
+
+  const root = page.getByRole("treeitem").first();
+  await root.focus();
+  await expect(root).toHaveAttribute("aria-expanded", "false");
+  await page.keyboard.press("Enter");
+  await expect(root).toHaveAttribute("aria-expanded", "true");
+  await page.keyboard.press("Space");
+  await expect(root).toHaveAttribute("aria-expanded", "false");
+});
+
+test("validation notifications appear and dismiss without crashing", async ({ page }) => {
+  const errors: string[] = [];
+  page.on("pageerror", (error) => errors.push(error.message));
+  await page.goto("/");
+  await page.getByRole("tab", { name: /^edit$/i }).click();
+  await page.locator(".monaco-editor").first().click();
+  const modifier = process.platform === "darwin" ? "Meta" : "Control";
+  await page.keyboard.press(`${modifier}+A`);
+  await page.keyboard.insertText('{"invalid":');
+  await page.getByRole("button", { name: /^format$/i }).click();
+
+  const notification = page.locator(".notification-message");
+  await expect(notification).toBeVisible();
+  await notification.click();
+  await expect(notification).toBeHidden();
+  await expect(page.getByRole("tab", { name: /^edit$/i })).toBeVisible();
+  expect(errors).toEqual([]);
+});

@@ -1,0 +1,44 @@
+diff --git a/node_modules/react-notifications/lib/Notification.js b/node_modules/react-notifications/lib/Notification.js
+index 88936d1..e4781b7 100644
+--- a/node_modules/react-notifications/lib/Notification.js
++++ b/node_modules/react-notifications/lib/Notification.js
+@@ -100,6 +100,7 @@ var Notification = /*#__PURE__*/function (_React$Component) {
+         className: "title"
+       }, title) : null;
+       return /*#__PURE__*/_react.default.createElement("div", {
++        ref: this.props.nodeRef,
+         className: className,
+         onClick: this.handleClick
+       }, /*#__PURE__*/_react.default.createElement("div", {
+diff --git a/node_modules/react-notifications/lib/Notifications.js b/node_modules/react-notifications/lib/Notifications.js
+index 0ffd944..6f1085e 100644
+--- a/node_modules/react-notifications/lib/Notifications.js
++++ b/node_modules/react-notifications/lib/Notifications.js
+@@ -56,6 +56,7 @@ var Notifications = /*#__PURE__*/function (_React$Component) {
+     }
+ 
+     _this = _super.call.apply(_super, [this].concat(args));
++    _this.nodeRefs = new Map();
+ 
+     _defineProperty(_assertThisInitialized(_this), "handleRequestHide", function (notification) {
+       return function () {
+@@ -84,14 +85,19 @@ var Notifications = /*#__PURE__*/function (_React$Component) {
+       });
+       var items = notifications.map(function (notification) {
+         var key = notification.id || new Date().getTime();
++        if (!_this2.nodeRefs.has(key)) _this2.nodeRefs.set(key, _react.default.createRef());
++        var nodeRef = _this2.nodeRefs.get(key);
+         return /*#__PURE__*/_react.default.createElement(_reactTransitionGroup.CSSTransition, {
+           key: key,
++          nodeRef: nodeRef,
++          onExited: function () { _this2.nodeRefs.delete(key); },
+           classNames: "notification",
+           timeout: {
+             enter: enterTimeout,
+             exit: leaveTimeout
+           }
+         }, /*#__PURE__*/_react.default.createElement(_Notification.default, {
++          nodeRef: nodeRef,
+           type: notification.type,
+           title: notification.title,
+           message: notification.message,

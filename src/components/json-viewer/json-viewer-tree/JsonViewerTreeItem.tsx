@@ -1,5 +1,5 @@
 "use client";
-import { TreeItemProps, treeItemClasses } from "@mui/lab/TreeItem";
+import { TreeItemProps, treeItemClasses } from "@mui/x-tree-view/TreeItem";
 import { TreeItem } from "@mui/x-tree-view";
 import { alpha, styled } from "@mui/material/styles";
 import Collapse from "@mui/material/Collapse";
@@ -28,14 +28,14 @@ function TransitionComponent(props: TransitionProps) {
 }
 
 const JsonViewerTreeItem = styled((props: JsonViewerTreeItemProps) => (
-  <TreeItem {...props} TransitionComponent={TransitionComponent} />
+  <TreeItem {...props} slots={{ groupTransition: TransitionComponent }} />
 ))(({ theme }) => ({
   [`& .${treeItemClasses.iconContainer}`]: {
     "& .close": {
       opacity: 0.3,
     },
   },
-  [`& .${treeItemClasses.group}`]: {
+  [`& .${treeItemClasses.groupTransition}`]: {
     paddingLeft: "0.7rem",
     borderLeft: `1px dashed ${alpha(theme.palette.text.primary, 0.4)}`,
   },

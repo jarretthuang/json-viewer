@@ -177,6 +177,8 @@ export default function NavBar({
       <nav className="NavBar group h-12 md:h-6" data-expanded={expanded}>
         <ul className="flex h-full w-full items-center justify-between">
           <li className="p-2">
+            {/* A full navigation intentionally resets the editor and its history. */}
+            {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
             <a
               href="/"
               className="group flex items-center gap-1"

@@ -52,7 +52,7 @@ e2e/                             Playwright end-to-end coverage
 ## Implementation Notes
 
 - Sentry error reporting is optional. Set `SENTRY_DSN` at build time (for the browser bundle) and runtime (for server/edge reporting). It is a public ingestion DSN, not an auth token. Without it, SDK initialization is skipped. Tracing, replay, and source-map uploads are not enabled.
-- Sentry uses `src/instrumentation.ts` for server/edge initialization and `src/instrumentation-client.ts`, injected by `withSentryConfig` for Next.js 14 webpack builds, for browser initialization.
+- Sentry uses `src/instrumentation.ts` for server/edge initialization and the native `src/instrumentation-client.ts` entry point in Next.js 15.3+, for browser initialization.
 
 - Monaco editor setup lives in `src/components/json-viewer/json-viewer-editor/JsonViewerEditor.tsx`.
 - Tree rendering lives in `src/components/json-viewer/json-viewer-tree/JsonViewerTree.tsx`.
@@ -121,3 +121,7 @@ git push --follow-tags
 ```
 
 Pushing a `vX.Y.Z` tag triggers `.github/workflows/release.yml`, which validates the tag against `package.json`, runs lint/tests/build, and creates a GitHub Release.
+
+## React 19 Compatibility
+
+- `patches/react-notifications+1.7.4.patch` supplies DOM refs to notification transitions because React 19 removed `findDOMNode`. `npm ci` applies it through `postinstall`; retain the patch until the dependency supports React 19. Browser coverage verifies notification display and dismissal.
