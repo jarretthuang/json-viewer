@@ -4,6 +4,8 @@ import App from './page';
 import { XL_EXAMPLE_JSON_TEXT_LENGTH } from '@/components/json-viewer/assets/xlFixtures';
 
 describe('CUJ regression coverage', () => {
+  // Full app renders and user interactions need headroom on loaded CI runners.
+  jest.setTimeout(15_000);
   test('app loads and JSON tree renders from editor sample', async () => {
     const user = userEvent.setup();
     render(<App />);
