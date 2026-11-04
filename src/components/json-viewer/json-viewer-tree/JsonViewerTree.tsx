@@ -1,5 +1,5 @@
 "use client";
-import { TreeView } from "@mui/x-tree-view";
+import { SimpleTreeView } from "@mui/x-tree-view";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import JsonViewerTreeItem from "./JsonViewerTreeItem";
@@ -217,20 +217,21 @@ function JsonViewerTree(props: any) {
 
   function populateTree(json: Object) {
     return (
-      <TreeView
+      <SimpleTreeView
         className="main-tree-view"
         aria-label="json viewer tree"
-        defaultCollapseIcon={<ExpandMoreIcon />}
-        defaultExpandIcon={<ChevronRightIcon />}
+        slots={{ collapseIcon: ExpandMoreIcon, expandIcon: ChevronRightIcon }}
         sx={{ flexGrow: 1, overflowY: "auto" }}
-        expanded={expanded}
-        onNodeFocus={(_, nodeId) => {
+        expandedItems={expanded}
+        onItemFocus={(_, nodeId) => {
           setFocusedNodeId(nodeId);
         }}
-        onNodeToggle={(_, nodeIds) => {
+        onExpandedItemsChange={(_, nodeIds) => {
           setExpanded(nodeIds);
         }}
-        onKeyDown={(e) => {
+        onKeyDownCapture={(e) => {
+          // Handle tree navigation before MUI, while leaving inline inputs alone.
+          if ((e.target as HTMLElement).getAttribute("role") !== "treeitem") return;
           if ((e.key === "Enter" || e.key === " ") && focusedNodeId) {
             if (expandableNodeIds.current.has(focusedNodeId)) {
               e.preventDefault();
@@ -249,7 +250,7 @@ function JsonViewerTree(props: any) {
         }}
       >
         {renderTreeItems(json, unescaped)}
-      </TreeView>
+      </SimpleTreeView>
     );
   }
 
@@ -282,7 +283,7 @@ function JsonViewerTree(props: any) {
     if (_.isNull(json) || _.isUndefined(json)) {
       return (
         <JsonViewerTreeItem
-          nodeId={nodeId}
+          itemId={nodeId}
           key={nodeId}
           label={
             <JsonViewerTreeItemLabel
@@ -346,7 +347,7 @@ function JsonViewerTree(props: any) {
 
       return (
         <JsonViewerTreeItem
-          nodeId={nodeId}
+          itemId={nodeId}
           key={nodeId}
           label={
             <JsonViewerTreeItemLabel
@@ -388,7 +389,7 @@ function JsonViewerTree(props: any) {
     if (hasChildren && depth >= MAX_TREE_DEPTH) {
       return (
         <JsonViewerTreeItem
-          nodeId={nodeId}
+          itemId={nodeId}
           key={nodeId}
           label={`${key}: … (nested content truncated at ${MAX_TREE_DEPTH} levels; full JSON is available in Edit)`}
         />
@@ -412,7 +413,7 @@ function JsonViewerTree(props: any) {
         ? [
             <JsonViewerTreeItem
               key={`${nodeId}.__lazy-placeholder`}
-              nodeId={`${nodeId}.__lazy-placeholder`}
+              itemId={`${nodeId}.__lazy-placeholder`}
               className="hidden"
             />,
           ]
@@ -421,7 +422,7 @@ function JsonViewerTree(props: any) {
     if (Array.isArray(json)) {
       return (
         <JsonViewerTreeItem
-          nodeId={nodeId}
+          itemId={nodeId}
           key={nodeId}
           label={
             <JsonViewerTreeItemLabel
@@ -443,7 +444,7 @@ function JsonViewerTree(props: any) {
     } else {
       return (
         <JsonViewerTreeItem
-          nodeId={nodeId}
+          itemId={nodeId}
           key={nodeId}
           label={
             <JsonViewerTreeItemLabel
@@ -530,7 +531,7 @@ function JsonViewerTree(props: any) {
 
     return (
       <JsonViewerTreeItem
-        nodeId={nodeId}
+        itemId={nodeId}
         key={nodeId}
         label={
           <JsonViewerTreeItemLabel
@@ -560,7 +561,7 @@ function JsonViewerTree(props: any) {
           : [
               <JsonViewerTreeItem
                 key={`${nodeId}.__lazy-placeholder`}
-                nodeId={`${nodeId}.__lazy-placeholder`}
+                itemId={`${nodeId}.__lazy-placeholder`}
                 className="hidden"
               />,
             ]}

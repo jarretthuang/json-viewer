@@ -24,7 +24,7 @@
     @apply dark:hover:bg-cyan-900;
   }
 
-  .JsonViewerTree .MuiCollapse-root.MuiTreeItem-group {
+  .JsonViewerTree .MuiCollapse-root.MuiTreeItem-groupTransition {
     @apply dark:border-l-zinc-700;
   }
 

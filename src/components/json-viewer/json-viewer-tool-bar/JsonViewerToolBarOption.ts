@@ -3,7 +3,7 @@ import { ReactElement } from "react";
 export type JsonViewerToolBarOption = {
   label: string;
   onClick: () => void;
-  icon?: ReactElement;
+  icon?: ReactElement<any>;
   hidden?: boolean;
   disabled?: boolean;
   ping?: boolean;

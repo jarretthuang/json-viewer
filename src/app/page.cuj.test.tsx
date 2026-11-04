@@ -1,4 +1,4 @@
-import { render, screen, waitFor, within } from '@testing-library/react';
+import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import App from './page';
 import { XL_EXAMPLE_JSON_TEXT_LENGTH } from '@/components/json-viewer/assets/xlFixtures';
@@ -61,7 +61,8 @@ describe('CUJ regression coverage', () => {
     await user.click(screen.getByRole('button', { name: /^example$/i }));
     await user.click(screen.getByRole('tab', { name: /^view$/i }));
 
-    await user.click(screen.getByText('JSON'));
+    // MUI v7 focuses the tree item itself rather than the tree container.
+    act(() => screen.getAllByRole('treeitem')[0].focus());
     await user.keyboard('{Enter}');
 
     expect(await screen.findByText('web-app')).toBeInTheDocument();
