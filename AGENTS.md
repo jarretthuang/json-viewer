@@ -51,6 +51,9 @@ e2e/                             Playwright end-to-end coverage
 
 ## Implementation Notes
 
+- Sentry error reporting is optional. Set `SENTRY_DSN` at build time (for the browser bundle) and runtime (for server/edge reporting). It is a public ingestion DSN, not an auth token. Without it, SDK initialization is skipped. Tracing, replay, and source-map uploads are not enabled.
+- Sentry uses `src/instrumentation.ts` for server/edge initialization and `src/instrumentation-client.ts`, injected by `withSentryConfig` for Next.js 14 webpack builds, for browser initialization.
+
 - Monaco editor setup lives in `src/components/json-viewer/json-viewer-editor/JsonViewerEditor.tsx`.
 - Tree rendering lives in `src/components/json-viewer/json-viewer-tree/JsonViewerTree.tsx`.
 - Large JSON performance thresholds live in `src/components/json-viewer/utils/jsonPerformanceUtils.ts`.
