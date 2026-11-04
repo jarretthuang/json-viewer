@@ -198,3 +198,36 @@ test("validation notifications appear and dismiss without crashing", async ({ pa
   await expect(page.getByRole("tab", { name: /^edit$/i })).toBeVisible();
   expect(errors).toEqual([]);
 });
+
+test("Monaco search handles special characters and invalid regex patterns", async ({ page }) => {
+  const errors: string[] = [];
+  page.on("pageerror", (error) => errors.push(error.message));
+  await page.goto("/");
+  await page.getByRole("button", { name: /^example$/i }).click();
+  await page.getByRole("tab", { name: /^edit$/i }).click();
+
+  const editor = page.locator(".monaco-editor").first();
+  await expect(editor).toBeVisible();
+  await editor.click();
+  // Support Monaco's platform-specific find binding on local and CI browsers.
+  await page.keyboard.press("Meta+f");
+  await page.keyboard.press("Control+f");
+
+  const findWidget = editor.locator(".find-widget");
+  const search = findWidget.getByRole("textbox", { name: "Find", exact: true });
+  await expect(search).toBeVisible();
+  for (const value of ["{", "[", "\\"]) {
+    await search.fill(value);
+    await expect(findWidget.locator(".matchesCount")).toHaveText(/\d+ of \d+/);
+  }
+
+  await findWidget.getByRole("checkbox", { name: /use regular expression/i }).click();
+  for (const value of ["{", "[", "\\"]) {
+    await search.fill(value);
+    await expect(search).toHaveAttribute("aria-invalid", "true");
+  }
+  await search.fill("servlet");
+  await expect(search).not.toHaveAttribute("aria-invalid", "true");
+  await expect(findWidget.locator(".matchesCount")).toHaveText(/\d+ of \d+/);
+  expect(errors).toEqual([]);
+});
