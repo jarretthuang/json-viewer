@@ -119,3 +119,9 @@ npm run benchmark -- --base-url=http://127.0.0.1:3000 --runs=10 --payloads=1,5,1
 ## License
 
 Copyright @[Jarrett Huang](https://github.com/jarretthuang), under the [MIT License](https://github.com/jarretthuang/json-viewer/blob/main/LICENSE).
+
+## Licensing
+
+The core (everything outside `pro/`) is MIT-licensed and available for source
+review. `pro/` is proprietary under [pro/LICENSE](pro/LICENSE). No outside pull
+requests are merged into `pro/`.
