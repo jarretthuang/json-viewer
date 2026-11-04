@@ -90,9 +90,6 @@ describe("JsonViewerEditor options", () => {
     keyHandlers[0]({
       browserEvent: {
         key: "Escape",
-        preventDefault: jest.fn(),
-        shiftKey: false,
-        stopPropagation: jest.fn(),
       },
     });
     expect(editor.updateOptions).toHaveBeenLastCalledWith({

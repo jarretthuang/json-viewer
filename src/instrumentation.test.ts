@@ -109,15 +109,17 @@ describe('Sentry URL privacy hooks', () => {
   it.each(['browser', 'nodejs', 'edge'])('scrubs request URLs in %s', async (runtime) => {
     const { beforeSend } = await initOptions(runtime);
     const event = {
+      type: undefined,
       message: 'Failure',
       request: { url: 'https://jsonviewer.io/?json=COMPRESSED&theme=dark', method: 'GET' },
     };
     expect(await beforeSend!(event, {})).toEqual({
+      type: undefined,
       message: 'Failure',
       request: { url: 'https://jsonviewer.io/?theme=dark', method: 'GET' },
     });
     for (const untouched of [{}, { request: {} }, { request: { url: 'invalid URL' } }]) {
-      expect(await beforeSend!(untouched, {})).toEqual(untouched);
+      expect(await beforeSend!({ type: undefined, ...untouched }, {})).toEqual(untouched);
     }
   });
 
