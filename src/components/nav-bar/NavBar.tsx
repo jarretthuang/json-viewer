@@ -99,7 +99,7 @@ export default function NavBar({
   const renderExpandedContent = () => {
     return (
       <div className="content items-center overflow-hidden">
-        <div className="flex items-center">
+        <div className="flex items-end">
           <span className="title w-min whitespace-nowrap">JSON Viewer</span>
           <ProBadge onClick={closeOverlay} />
         </div>
@@ -188,7 +188,7 @@ export default function NavBar({
     <>
       <nav className="NavBar group h-12 md:h-6" data-expanded={expanded}>
         <ul className="flex h-full w-full items-center justify-between">
-          <li className="p-2">
+          <li className="gap-1 p-2">
             {/* A full navigation intentionally resets the editor and its history. */}
             {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
             <a
@@ -203,11 +203,17 @@ export default function NavBar({
                 width={30}
                 height={30}
               />
-              <span className="text-[25px] font-bold opacity-50 group-hover:opacity-60">
-                jsonviewer.io
-              </span>
             </a>
-            <ProBadge />
+            <div className="flex items-end">
+              {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
+              <a
+                href="/"
+                className="text-[25px] font-bold opacity-50 hover:opacity-60"
+              >
+                jsonviewer.io
+              </a>
+              <ProBadge />
+            </div>
           </li>
           {showAnyAction && (
             <li className="flex h-full justify-end p-1">

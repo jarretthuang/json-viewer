@@ -50,6 +50,8 @@ describe("Pro navigation", () => {
       if (isPro) {
         expect(badge).toHaveAttribute("href", "/pro");
         expect(badge?.parentElement?.closest("a")).toBeNull();
+        expect(badge?.parentElement).toHaveClass("flex", "items-end");
+        expect(badge?.previousElementSibling).toHaveTextContent("jsonviewer.io");
       } else {
         expect(badge).not.toBeInTheDocument();
       }
@@ -80,10 +82,11 @@ describe("Pro navigation", () => {
         );
       }
       expect(link).toHaveClass(
-        "ml-1", "self-end", "rounded-full", "px-1.5", "py-px", "text-xs", "font-semibold",
-        "border", "border-mono-800/20", "dark:border-mono-300/20", "shadow-sm"
+        "ml-1", "rounded-full", "px-1.5", "py-px", "text-xs", "font-semibold",
+        "bg-sky-700", "text-white", "hover:bg-sky-800", "shadow-sm", "leading-none"
       );
-      expect(link).not.toHaveClass("mb-1.5");
+      expect(link).not.toHaveClass("mb-1.5", "self-end", "border");
+      expect(titleRow).toHaveClass("flex", "items-end");
       expect(link).not.toHaveClass("underline");
       if (badge) {
         expect(link.className).toBe(badge.className);
