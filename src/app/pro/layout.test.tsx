@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, within } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import { usePro } from "../../../pro/licensing/usePro";
 import ProLayout from "./layout";
 import ProPage from "./page";
@@ -36,7 +36,10 @@ test.each([
     .toHaveAttribute("href", "/");
   expect(nav.compareDocumentPosition(screen.getByRole("main")))
     .toBe(Node.DOCUMENT_POSITION_FOLLOWING);
-  expect(within(nav).getByRole("button", { name: "Share URL" })).toBeInTheDocument();
+  for (const name of ["Go back", "Go forward", "Share URL", "More options"]) {
+    expect(within(nav).queryByRole("button", { name })).not.toBeInTheDocument();
+  }
+  expect(within(nav).getByRole("button", { name: /theme/i })).toBeInTheDocument();
   const badge = within(nav).queryByRole("link", { name: "Pro" });
   if (enabled && isPro) {
     expect(badge).toHaveAttribute("href", "/pro");
@@ -44,17 +47,6 @@ test.each([
     expect(badge).toHaveAttribute("rel", "noopener noreferrer");
   } else {
     expect(badge).not.toBeInTheDocument();
-  }
-
-  fireEvent.click(within(nav).getByRole("button", { name: "More options" }));
-  const proLink = within(screen.getByRole("dialog")).queryByRole("link", { name: /Pro/ });
-  if (enabled) {
-    expect(proLink).toHaveTextContent(isPro ? "Pro" : "Upgrade to Pro");
-    expect(proLink).toHaveAttribute("href", "/pro");
-    expect(proLink).toHaveAttribute("target", "_blank");
-    expect(proLink).toHaveAttribute("rel", "noopener noreferrer");
-  } else {
-    expect(proLink).not.toBeInTheDocument();
   }
 });
 
