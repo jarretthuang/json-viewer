@@ -20,6 +20,7 @@ afterEach(() => {
   jest.restoreAllMocks();
 });
 it("mints deterministic, self-validating keys without customer information", async () => {
+  delete process.env.NEXT_PUBLIC_PRO_ENABLED;
   const key = mintLicense("cs_test_order", "buyer@example.com");
   expect(key).toBe(mintLicense("cs_test_order", "buyer@example.com"));
   expect(key.length).toBeLessThan(256);

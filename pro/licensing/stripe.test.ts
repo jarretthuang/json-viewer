@@ -43,6 +43,7 @@ const request = (signature: string | null = "valid-signature") =>
   });
 beforeEach(() => {
   jest.clearAllMocks();
+  process.env.NEXT_PUBLIC_PRO_ENABLED = "true";
   process.env.STRIPE_SECRET_KEY = "sk_test_fixture";
   process.env.STRIPE_WEBHOOK_SECRET = "whsec_fixture";
   process.env.LICENSE_KEY_SECRET = "license-test-fixture";

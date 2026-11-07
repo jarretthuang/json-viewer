@@ -2,6 +2,7 @@
 
 import _ from "lodash";
 import Link from "next/link";
+import { isProEnabled } from "@/lib/feature-flags";
 import { usePro } from "../../../pro/licensing/usePro";
 import Copyright from "../copyright/Copyright";
 import Image from "next/image";
@@ -117,13 +118,15 @@ export default function NavBar({
             />
           </a>
         </div>
-        <Link
-          href="/pro"
-          onClick={closeOverlay}
-          className="my-3 underline underline-offset-4 hover:opacity-60"
-        >
-          {isPro ? "Pro" : "Upgrade to Pro"}
-        </Link>
+        {isProEnabled() && (
+          <Link
+            href="/pro"
+            onClick={closeOverlay}
+            className="my-3 underline underline-offset-4 hover:opacity-60"
+          >
+            {isPro ? "Pro" : "Upgrade to Pro"}
+          </Link>
+        )}
         <div className="inner-content overflow-auto px-10">
           <ReactMarkdown>{jsonViewerAppDescription}</ReactMarkdown>
         </div>
@@ -206,7 +209,7 @@ export default function NavBar({
                 jsonviewer.io
               </span>
             </a>
-            {isPro && (
+            {isProEnabled() && isPro && (
               <Link
                 href="/pro"
                 className="ml-2 rounded-full border border-current px-2 py-0.5 text-xs font-semibold leading-none opacity-50 hover:opacity-70"
