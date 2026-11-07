@@ -1,9 +1,7 @@
 "use client";
 
 import _ from "lodash";
-import Link from "next/link";
-import { isProEnabled } from "@/lib/feature-flags";
-import { usePro } from "../../../pro/licensing/usePro";
+import ProBadge from "./ProBadge";
 import Copyright from "../copyright/Copyright";
 import Image from "next/image";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -37,7 +35,6 @@ export default function NavBar({
   showActions = true,
   actionVisibility,
 }: NavBarProps) {
-  const { isPro } = usePro();
   const closeOverlay = () => expand(false);
   const [expanded, expand] = useState(false);
   const [onShare, setOnShare] = useState<number | undefined>(undefined);
@@ -100,7 +97,10 @@ export default function NavBar({
   const renderExpandedContent = () => {
     return (
       <div className="content items-center overflow-hidden">
-        <span className="title w-min whitespace-nowrap">JSON Viewer</span>{" "}
+        <div className="flex items-center">
+          <span className="title w-min whitespace-nowrap">JSON Viewer</span>
+          <ProBadge showUpgrade onClick={closeOverlay} />
+        </div>
         <div className="flex items-center gap-1">
           <span>by</span>
           <a
@@ -118,15 +118,6 @@ export default function NavBar({
             />
           </a>
         </div>
-        {isProEnabled() && (
-          <Link
-            href="/pro"
-            onClick={closeOverlay}
-            className="my-3 underline underline-offset-4 hover:opacity-60"
-          >
-            {isPro ? "Pro" : "Upgrade to Pro"}
-          </Link>
-        )}
         <div className="inner-content overflow-auto px-10">
           <ReactMarkdown>{jsonViewerAppDescription}</ReactMarkdown>
         </div>
@@ -209,14 +200,7 @@ export default function NavBar({
                 jsonviewer.io
               </span>
             </a>
-            {isProEnabled() && isPro && (
-              <Link
-                href="/pro"
-                className="mb-1.5 ml-2 self-end rounded-full border border-current px-1.5 py-px text-[10px] font-medium leading-none opacity-50 hover:opacity-70"
-              >
-                Pro
-              </Link>
-            )}
+            <ProBadge />
           </li>
           {showAnyAction && (
             <li className="flex h-full justify-end p-1">

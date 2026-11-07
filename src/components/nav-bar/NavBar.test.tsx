@@ -24,7 +24,7 @@ describe("Pro navigation", () => {
       render(<NavBar />);
       expect(
         within(screen.getByRole("navigation")).queryByRole("link", {
-          name: "Pro",
+          name: /Pro/,
         })
       ).not.toBeInTheDocument();
       fireEvent.click(screen.getByRole("button", { name: "More options" }));
@@ -46,7 +46,7 @@ describe("Pro navigation", () => {
       render(<NavBar />);
 
       const nav = screen.getByRole("navigation");
-      const badge = within(nav).queryByRole("link", { name: "Pro" });
+      const badge = within(nav).queryByRole("link", { name: /Pro/ });
       if (isPro) {
         expect(badge).toHaveAttribute("href", "/pro");
         expect(badge?.parentElement?.closest("a")).toBeNull();
@@ -60,6 +60,13 @@ describe("Pro navigation", () => {
         name: isPro ? "Pro" : "Upgrade to Pro",
       });
       expect(link).toHaveAttribute("href", "/pro");
+      const title = within(dialog).getByText("JSON Viewer", { exact: true });
+      expect(link.parentElement).toBe(title.parentElement);
+      expect(link).toHaveClass("rounded-full", "text-[10px]");
+      expect(link).not.toHaveClass("underline");
+      if (badge) {
+        expect(link.className).toBe(badge.className);
+      }
       // Prevent jsdom navigation while exercising the overlay's click handler.
       link.addEventListener("click", (event) => event.preventDefault());
       fireEvent.click(link);
