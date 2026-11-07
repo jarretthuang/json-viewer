@@ -1,5 +1,6 @@
 import "server-only";
 import Stripe from "stripe";
+import { randomUUID } from "node:crypto";
 import { Resend } from "resend";
 import { STRIPE_PRICE_ID, STRIPE_PRODUCT_ID } from "@/lib/pro-config";
 import { mintLicense } from "./keys";
@@ -31,11 +32,16 @@ export async function paidLicense(stripe: Stripe, sessionId: string) {
     email: session.customer_details.email,
   };
 }
-export async function fulfill(stripe: Stripe, sessionId: string) {
+export async function fulfill(
+  stripe: Stripe,
+  sessionId: string,
+  recovery = false
+) {
   const license = await paidLicense(stripe, sessionId);
   if (!license) return;
   if (!process.env.RESEND_API_KEY) {
     console.info("[stripe] license_email_not_configured");
+    if (recovery) throw new Error("email_delivery_failed");
     return;
   }
   const result = await new Resend(process.env.RESEND_API_KEY).emails.send(
@@ -45,7 +51,28 @@ export async function fulfill(stripe: Stripe, sessionId: string) {
       subject: "Your JSON Viewer Pro license key",
       text: `Thank you for choosing JSON Viewer Pro. Keep this key safe:\n\n${license.key}\n\nActivate it at https://jsonviewer.io/pro`,
     },
-    { idempotencyKey: `pro-license/${sessionId}` }
+    {
+      idempotencyKey: recovery
+        ? `pro-recovery/${randomUUID()}`
+        : `pro-license/${sessionId}`,
+    }
   );
   if (result.error) throw new Error("email_delivery_failed");
+}
+
+// Paginate both lists: an older purchase or duplicate customer must remain recoverable.
+export async function recoverLicense(stripe: Stripe, email: string) {
+  for await (const customer of stripe.customers.list({ email, limit: 100 })) {
+    for await (const session of stripe.checkout.sessions.list({
+      customer: customer.id,
+      status: "complete",
+      limit: 100,
+    })) {
+      const license = await paidLicense(stripe, session.id);
+      if (license && license.email.toLowerCase() === email.toLowerCase()) {
+        await fulfill(stripe, session.id, true);
+        return;
+      }
+    }
+  }
 }
