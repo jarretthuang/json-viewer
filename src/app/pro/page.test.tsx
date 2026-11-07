@@ -15,9 +15,10 @@ test("shows only an unavailable message while Pro is off", () => {
   render(<ProPage />);
   expect(screen.getByText("Pro isn't available yet.")).toBeInTheDocument();
   expect(screen.queryByTestId("license-screen")).not.toBeInTheDocument();
+  expect(screen.queryByRole("button")).not.toBeInTheDocument();
 });
 
-test("renders the existing license screen while Pro is on", () => {
+test("renders the redesigned license screen while Pro is on", () => {
   process.env.NEXT_PUBLIC_PRO_ENABLED = "true";
   render(<ProPage />);
   expect(screen.getByTestId("license-screen")).toBeInTheDocument();

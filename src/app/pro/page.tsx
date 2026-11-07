@@ -7,7 +7,7 @@ export const metadata = {
 export default function ProPage() {
   if (!isProEnabled()) {
     return (
-      <main className="mx-auto max-w-xl px-6 py-16">
+      <main className="mx-auto max-w-[576px] px-[24px] py-[40px] text-[16px] sm:py-[64px]">
         <p>Pro isn&apos;t available yet.</p>
       </main>
     );
