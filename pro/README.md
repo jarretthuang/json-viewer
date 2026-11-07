@@ -60,17 +60,7 @@ requests share one bucket. Multi-instance limiting needs a shared store.
 
 ## Current status and future work
 
-Pro tools are coming soon. Automatic key recovery is available at `/pro/lost-key`
-through Stripe lookup by email and a bounded scan of completed checkout sessions
-for guest purchases. Paid purchases deterministically re-mint the same key and
-re-send it without a database, with generic responses and resend rate limiting.
-Refund events are logged; revocation is future work. Live mode needs live
-product/price IDs, webhook configuration and keys in Vercel, plus explicit
-launch review.
-
-Reported sandbox verification on November 6, 2026: a sandbox purchase completed,
-the webhook fired, the license email arrived and the key validated
-on `/pro`.
+Pro tools are coming soon. Refund events are logged; revocation is future work. Live mode needs live product/price IDs, webhook configuration and keys in Vercel, plus explicit launch review.
 
 ## Future extension points (not built)
 
