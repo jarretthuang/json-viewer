@@ -11,9 +11,9 @@ afterEach(() => {
 
 const mockUsePro = jest.mocked(usePro);
 
-describe("Pro navigation", () => {
+describe("PRO navigation", () => {
   test.each([false, true])(
-    "hides Pro links while disabled even when isPro is %s",
+    "hides PRO links while disabled even when isPro is %s",
     (isPro) => {
       delete process.env.NEXT_PUBLIC_PRO_ENABLED;
       mockUsePro.mockReturnValue({
@@ -24,12 +24,12 @@ describe("Pro navigation", () => {
       render(<NavBar />);
       expect(
         within(screen.getByRole("navigation")).queryByRole("link", {
-          name: /Pro/,
+          name: /PRO/,
         })
       ).not.toBeInTheDocument();
       fireEvent.click(screen.getByRole("button", { name: "More options" }));
       expect(
-        within(screen.getByRole("dialog")).queryByRole("link", { name: /Pro/ })
+        within(screen.getByRole("dialog")).queryByRole("link", { name: /PRO/ })
       ).not.toBeInTheDocument();
     }
   );
@@ -46,7 +46,7 @@ describe("Pro navigation", () => {
       render(<NavBar />);
 
       const nav = screen.getByRole("navigation");
-      const badge = within(nav).queryByRole("link", { name: /Pro/ });
+      const badge = within(nav).queryByRole("link", { name: /PRO/ });
       if (isPro) {
         expect(badge).toHaveAttribute("href", "/pro");
         expect(badge).toHaveAttribute("target", "_blank");
@@ -58,7 +58,8 @@ describe("Pro navigation", () => {
         const home = within(nav).getByRole("link", { name: "Go to JSON Viewer home" });
         expect(home).toContainElement(within(nav).getByAltText("JSON Viewer logo"));
         expect(home).toContainElement(within(nav).getByText("jsonviewer.io"));
-        expect(badge?.previousElementSibling).toHaveTextContent("jsonviewer.io");
+        expect(badge?.previousElementSibling).toBe(home);
+        expect(badge).toHaveAccessibleName("PRO");
       } else {
         expect(badge).not.toBeInTheDocument();
       }
@@ -66,7 +67,7 @@ describe("Pro navigation", () => {
       fireEvent.click(screen.getByRole("button", { name: "More options" }));
       const dialog = screen.getByRole("dialog");
       const link = within(dialog).getByRole("link", {
-        name: isPro ? "Pro" : "Upgrade to Pro",
+        name: isPro ? "PRO" : "Upgrade to PRO",
       });
       expect(link).toHaveAttribute("href", "/pro");
       expect(link).toHaveAttribute("target", "_blank");
@@ -76,7 +77,7 @@ describe("Pro navigation", () => {
       const byline = within(dialog).getByRole("link", {
         name: "Open JH Labs homepage",
       }).parentElement!;
-      expect(within(dialog).getAllByRole("link", { name: /Pro/ })).toHaveLength(1);
+      expect(within(dialog).getAllByRole("link", { name: /PRO/ })).toHaveLength(1);
       if (isPro) {
         expect(link.parentElement).toBe(titleRow);
         expect(byline.nextElementSibling).toHaveClass("inner-content");
@@ -90,13 +91,15 @@ describe("Pro navigation", () => {
           "[&>a]:mb-0", "[&>a]:ml-0", "[&>a]:self-auto"
         );
       }
-      expect(link).toHaveClass(
-        "ml-1", "rounded-full", "px-3", "py-1", "text-xs", "font-semibold",
-        "border-2", "border-mono-800/50", "bg-white/70", "text-mono-800/75",
-        "shadow-sm", "leading-none", "hover:bg-white/90", "hover:text-mono-800/90",
-        "dark:bg-white/[0.08]", "dark:border-mono-300/[0.55]", "dark:text-mono-300/75",
-        "dark:hover:bg-white/[0.12]", "dark:hover:text-mono-300/90"
-      );
+      expect(link).toHaveAccessibleName(isPro ? "PRO" : "Upgrade to PRO");
+      const svg = link.querySelector("svg")!;
+      expect(svg).toHaveAttribute("viewBox", `0 0 ${isPro ? 81.075 : 220.3} 29`);
+      expect(svg).toHaveAttribute("aria-hidden", "true");
+      expect(svg).toHaveClass("h-[0.8055555556rem]", "w-auto", "font-semibold");
+      expect(svg.querySelector("rect")).toHaveAttribute("stroke-width", "1");
+      expect(svg.querySelector("text")).toHaveTextContent(isPro ? "PRO" : "Upgrade to PRO");
+      expect(svg.querySelector("text")).toHaveAttribute("font-size", "25");
+      expect(svg.querySelector("text")).toHaveAttribute("text-rendering", "geometricPrecision");
       expect(link).not.toHaveClass("mb-1.5", "self-end");
       expect(titleRow).toHaveClass("flex", "items-center");
       expect(link).not.toHaveClass("underline");
