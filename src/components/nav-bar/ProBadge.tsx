@@ -20,15 +20,49 @@ export default function ProBadge({
     return null;
   }
 
+  const label = isPro ? "PRO" : "Upgrade to PRO";
+  // Chromium, app font at 600 / 25px: text widths 52.075 and 191.300.
+  // Add 13.5 units of padding and a 1-unit border on each side.
+  const width = isPro ? 81.075 : 220.3;
+  // SVG height: 29px at the reference root font-size of 36px.
+
   return (
     <Link
       href="/pro"
       target="_blank"
       rel="noopener noreferrer"
       onClick={onClick}
-      className="ml-1 rounded-full border-2 border-mono-800/50 bg-white/70 px-3 py-1 text-xs font-semibold leading-none text-mono-800/75 shadow-sm hover:bg-white/90 hover:text-mono-800/90 dark:border-mono-300/[0.55] dark:bg-white/[0.08] dark:text-mono-300/75 dark:hover:bg-white/[0.12] dark:hover:text-mono-300/90"
+      aria-label={label}
+      className="group/pro-badge ml-1 inline-flex rounded-full shadow-sm"
     >
-      {isPro ? "Pro" : "Upgrade to Pro"}
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox={`0 0 ${width} 29`}
+        aria-hidden="true"
+        focusable="false"
+        className="block h-[0.8055555556rem] w-auto font-semibold"
+      >
+        <rect
+          x="0.5"
+          y="0.5"
+          width={width - 1}
+          height="28"
+          rx="14.5"
+          strokeWidth="1"
+          className="fill-white/70 stroke-mono-800/30 group-hover/pro-badge:fill-white/90 dark:fill-white/[0.08] dark:stroke-mono-300/[0.35] dark:group-hover/pro-badge:fill-white/[0.12]"
+        />
+        <text
+          x={width / 2}
+          y="14.5"
+          textAnchor="middle"
+          dominantBaseline="central"
+          fontSize="25"
+          textRendering="geometricPrecision"
+          className="fill-mono-800/75 group-hover/pro-badge:fill-mono-800/90 dark:fill-mono-300/75 dark:group-hover/pro-badge:fill-mono-300/90"
+        >
+          {label}
+        </text>
+      </svg>
     </Link>
   );
 }

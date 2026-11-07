@@ -82,7 +82,7 @@ export async function licenseRequest(
         throw new Error("not_configured");
       await recoverLicense(stripe, email);
       return reply({
-        message: "If that email purchased Pro, the key has been sent.",
+        message: "If that email purchased PRO, the key has been sent.",
       });
     } catch {
       console.warn("[license] recovery_unavailable");

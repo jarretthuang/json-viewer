@@ -13,7 +13,7 @@ afterEach(() => {
   process.env = { ...originalEnv };
 });
 
-describe.each(["Pro", "Legal"])("%s page navigation", (page) => {
+describe.each(["PRO", "Legal"])("%s page navigation", (page) => {
   test.each([
     [false, false],
     [false, true],
@@ -29,7 +29,7 @@ describe.each(["Pro", "Legal"])("%s page navigation", (page) => {
         clearKey: jest.fn(),
       });
       render(
-        page === "Pro" ? (
+        page === "PRO" ? (
           <ProLayout>
             <main>Route content</main>
           </ProLayout>
@@ -59,7 +59,7 @@ describe.each(["Pro", "Legal"])("%s page navigation", (page) => {
       expect(
         within(nav).getByRole("button", { name: /theme/i })
       ).toBeInTheDocument();
-      const badge = within(nav).queryByRole("link", { name: "Pro" });
+      const badge = within(nav).queryByRole("link", { name: "PRO" });
       if (enabled && isPro) {
         expect(badge).toHaveAttribute("href", "/pro");
         expect(badge).toHaveAttribute("target", "_blank");
@@ -71,7 +71,7 @@ describe.each(["Pro", "Legal"])("%s page navigation", (page) => {
   );
 });
 
-test("keeps navigation above the unavailable page while Pro is off", () => {
+test("keeps navigation above the unavailable page while PRO is off", () => {
   delete process.env.NEXT_PUBLIC_PRO_ENABLED;
   mockUsePro.mockReturnValue({
     isPro: false,
@@ -84,5 +84,5 @@ test("keeps navigation above the unavailable page while Pro is off", () => {
     </ProLayout>
   );
   expect(screen.getByRole("navigation")).toBeInTheDocument();
-  expect(screen.getByText("Pro isn't available yet.")).toBeInTheDocument();
+  expect(screen.getByText("PRO isn't available yet.")).toBeInTheDocument();
 });
