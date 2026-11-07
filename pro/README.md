@@ -60,6 +60,8 @@ requests share one bucket. Multi-instance limiting needs a shared store.
 
 ### Refunds and revocation
 
+Recovery skips revoked keys and keeps searching.
+
 Full refunds add the license key's SHA-256 hash to the Vercel KV set
 `pro:revoked-keys:v1`; validation checks this set and revoked keys are not
 re-sent. Link an Upstash Redis store in Vercel and configure `KV_REST_API_URL`

@@ -391,6 +391,35 @@ it("does not revoke an ineligible purchase", async () => {
   expect((await webhook(request())).status).toBe(200);
   expect(mockSadd).not.toHaveBeenCalled();
 });
+it.each(["customer", "guest"])(
+  "skips a revoked purchase before a valid purchase during %s recovery",
+  async (source) => {
+    const { recoverLicense } = await import("./stripe");
+    process.env.KV_REST_API_URL = "https://kv.example.com";
+    process.env.KV_REST_API_TOKEN = "test-token";
+    const revoked = { ...paid, id: "cs_revoked" };
+    mockRetrieve.mockImplementation(async (id) => id === revoked.id ? revoked : paid);
+    const revokedLicense = await paidLicense(getStripe()!, revoked.id);
+    const validLicense = await paidLicense(getStripe()!, paid.id);
+    mockSismember.mockImplementation(async (_set, hash) =>
+      Number(hash === revokedKeyHash(revokedLicense!.key))
+    );
+    if (source === "customer")
+      mockCustomers.mockReturnValue(iterable([{ id: "cus_buyer" }]));
+    mockSessions.mockReturnValue(iterable([revoked, paid]));
+
+    await expect(recoverLicense(getStripe()!, "buyer@example.com")).resolves.toBeUndefined();
+
+    expect(mockSend).toHaveBeenCalledTimes(1);
+    const message = mockSend.mock.calls[0][0];
+    expect(message.text).toContain(validLicense!.key);
+    expect(message.html).toContain(validLicense!.key);
+    expect(message.text).not.toContain(revokedLicense!.key);
+    expect(message.html).not.toContain(revokedLicense!.key);
+    expect(console.info).toHaveBeenCalledWith("[stripe] recovery_revoked_key_skipped");
+  }
+);
+
 it("does not resend revoked keys and preserves the generic response", async () => {
   const { POST } = await import("../../src/app/api/license/resend/route");
   jest.spyOn(Date, "now").mockReturnValue(Date.now() + 22 * 60_000);
@@ -398,12 +427,13 @@ it("does not resend revoked keys and preserves the generic response", async () =
   process.env.KV_REST_API_TOKEN = "test-token";
   mockSismember.mockResolvedValue(1);
   mockCustomers.mockReturnValue(iterable([{ id: "cus_buyer" }]));
-  mockSessions.mockReturnValue(iterable([{ id: paid.id }]));
+  mockSessions.mockReturnValue(iterable([paid, { ...paid, id: "cs_other_revoked" }]));
+  mockRetrieve.mockImplementation(async (id) => ({ ...paid, id }));
   const response = await POST(recoveryRequest());
   expect(response.status).toBe(200);
   expect(await response.json()).toEqual({ message: "If that email purchased PRO, the key has been sent." });
   expect(mockSend).not.toHaveBeenCalled();
-  expect(console.info).toHaveBeenCalledWith("[stripe] revoked_key_not_sent");
+  expect(console.info).toHaveBeenCalledWith("[stripe] recovery_revoked_key_skipped");
 });
 
 it("hashes revoked keys with SHA-256 hex", () => {

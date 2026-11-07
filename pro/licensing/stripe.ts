@@ -85,6 +85,10 @@ export async function recoverLicense(stripe: Stripe, email: string) {
       })) {
         const license = await paidLicense(stripe, session.id);
         if (license && license.email.toLowerCase() === normalizedEmail) {
+          if (await isLicenseKeyRevoked(license.key)) {
+            console.info("[stripe] recovery_revoked_key_skipped");
+            continue;
+          }
           await fulfill(stripe, session.id, true);
           return;
         }
@@ -102,8 +106,12 @@ export async function recoverLicense(stripe: Stripe, email: string) {
     if (session.customer_details?.email?.toLowerCase() === normalizedEmail) {
       const license = await paidLicense(stripe, session.id);
       if (license && license.email.toLowerCase() === normalizedEmail) {
-        await fulfill(stripe, session.id, true);
-        return;
+        if (await isLicenseKeyRevoked(license.key)) {
+          console.info("[stripe] recovery_revoked_key_skipped");
+        } else {
+          await fulfill(stripe, session.id, true);
+          return;
+        }
       }
     }
     if (++scanned >= 1_000) break;
