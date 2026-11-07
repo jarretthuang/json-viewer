@@ -1,79 +1,72 @@
-# Pro infrastructure
+# Pro licensing and billing
 
-## Extension contract (v1)
+`pro/` contains proprietary Pro licensing and Stripe billing for jsonviewer.io,
+with a one-time $19.99 USD license. The open-core licensing split is described in
+[LICENSE](LICENSE) and the root README's [Licensing section](../README.md#licensing).
+The JSON editor, tree and toolbar do not import `pro/`; the navbar and Next.js
+route adapters do import its licensing code.
 
-The MIT editor/tree/toolbar never import `pro/`. Future core extension types belong
-with the core and accept optional props with empty defaults. A Pro composition
-root supplies implementations; the core remains independently buildable.
+## Purchase flow and code layout
 
-- Node decoration: `decorateNode({ path, value, kind }): ReactNode`, where path is
-  a readonly array of string/number segments, value is read-only JSON, and kind is
-  object/array/string/number/boolean/null. Render only for mounted visible nodes,
-  beside the existing label; never replace editing, expansion, or copy controls.
-- Toolbar: `toolbarExtensions: readonly { id, label, disabled?, onSelect }[]`.
-  Append accessible buttons after free actions. Actions receive a read-only JSON
-  snapshot through the composition root; no global registration or mutation.
-- Extensions must not parse whole documents per node, traverse collapsed trees,
-  remove chunking, bypass large-payload guards, or send JSON over the network.
-- Gate only new Pro actions in that composition root. No existing free action
-  depends on a license. These slots are a design contract, not installed features.
+- `/pro` uses `POST /api/checkout/create` to open a one-time Stripe Checkout
+  session with Managed Payments enabled.
+- `POST /api/stripe/webhook` verifies the Stripe signature against the raw request
+  body. Completed and asynchronous-success checkout events retrieve the session,
+  verify paid status, payment mode, quantity, price and product, then mint a key
+  and email it through Resend. Missing Resend configuration skips email; delivery
+  errors return 502 so Stripe can retry.
+- `/pro/thank-you?session_id=…` independently retrieves and verifies the purchase
+  and re-mints the key for display. It does not confirm email delivery.
 
-Documented UI entry points: `src/app/pro/**` are thin route adapters importing
-Pro screens. License API routes may import `pro/licensing/server.ts`. No other
-core module imports Pro; no navbar change or existing feature gate is needed.
+`pro/licensing/` holds the screens, checkout button, browser license state,
+key signing/verification, validation handler and Stripe/Resend helpers.
+`src/app/pro/**` supplies page adapters; `src/app/api/**` supplies checkout,
+webhook and license endpoints. `src/lib/pro-config.ts` defines the displayed
+price and Stripe product/price IDs.
 
-## Stripe test-mode integration
+## License keys
 
-Server-only Vercel variables: `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`,
-`LICENSE_KEY_SECRET`, `RESEND_API_KEY`. Generate a strong random license signing
-secret and retain it: rotating it invalidates issued keys. Never use a public
-Next.js variable for any secret. `.env*` remains ignored.
+Keys are self-validating HMAC-SHA256 signatures. The payload contains a version
+and an HMAC derived from `session_id|email`, without personal data or timestamps.
+The same purchase re-mints the same key while the signing secret is unchanged;
+there is no license database. `POST /api/license/validate` verifies the key.
+`usePro` stores it in browser local storage and revalidates after 24 hours.
+The response's `activations: 1` is an honor-system placeholder, not a measured
+device count.
 
-Price/product constants live in `src/lib/pro-config.ts`. These currently identify
-the sandbox $19.99 USD one-time product. Moving to live mode requires live IDs,
-keys, webhook registration and explicit launch review; there is no test-only
-branch in the integration code. Checkout enables Managed Payments explicitly.
+## Configuration and security
 
-Webhook signatures are checked against the raw request body. Both successful
-Checkout events retrieve the session and verify paid status, mode, quantity,
-price and product before issuing a key. The thank-you page uses the same checks;
-it is dynamic and never trusts the redirect alone. Treat session IDs as bearer
-purchase-confirmation credentials; never share the confirmation URL.
+Server-only Vercel variables are `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`,
+`LICENSE_KEY_SECRET` and `RESEND_API_KEY`. Rotating `LICENSE_KEY_SECRET`
+invalidates issued keys. Never put a secret in a public `NEXT_PUBLIC_*` variable.
 
-Keys are `base64url(payload).base64url(HMAC-SHA256(payload))`. The v1 payload
-contains a version and HMAC of `session_id|email`, with no timestamps or personal
-data. This produces the same key on every retry, including across serverless
-instances. Validation checks the signature with a timing-safe comparison.
-There is no license database. `activations: 1` is an honor-system value, not a
-measured device count. Activation limits, revocation and email-to-key lookup
-require a store later. Refunds are logged with a fixed code; revocation is future
-work. Browser validation/cache behavior is unchanged.
+`NEXT_PUBLIC_PRO_ENABLED=true` enables the badge, `/pro` purchase/activation
+screen and checkout creation. Unset means off. License validation remains
+ungated; the thank-you and lost-key routes are also independent of this flag.
 
-Resend sends from `support@jsonviewer.io` with idempotency key
-`pro-license/<session_id>`. Provider-side idempotency suppresses duplicate email
-effects within Resend's 24-hour retention window, including concurrent requests.
-Deterministic license issuance remains idempotent indefinitely; exactly-once
-email beyond that window requires durable state. Delivery failures return 502 so
-Stripe can retry. With no Resend key, email is skipped and logged with a fixed
-code; the thank-you page still shows the key. The page does not claim email was
-sent. Stripe receipt emails contain purchase details, not our license key;
-automatic recovery is explicitly unavailable. Keep the separate license email
-and confirmation-page key safe.
+The thank-you `session_id` is a bearer purchase-confirmation credential: never
+share the confirmation URL. Licensing and billing logs contain fixed codes only,
+never emails, request bodies, keys or secrets. Validation is limited to 20
+requests per 10 minutes per IP within each process on Vercel; outside Vercel,
+requests share one bucket. Multi-instance limiting needs a shared store.
 
-Buyer payment records remain at Stripe; the application persists no buyer data.
-Email delivery necessarily sends the buyer email and key to Resend. No JSON
-editor content is involved, and no existing free feature is gated.
+## Current status and future work
 
-Validation retains bounded per-process rate limiting (20 requests per 10 minutes,
-trusted Vercel IP header only on Vercel). Multi-instance rate limiting needs a
-shared store. Logs contain fixed codes only, never emails, bodies, keys or secrets.
+Pro tools are coming soon. Automatic key recovery is currently unavailable;
+[issue #63](https://github.com/jarretthuang/json-viewer/issues/63) plans Stripe
+lookup by email, deterministic re-minting and re-sending without a database.
+Refund events are logged; revocation is future work. Live mode needs live
+product/price IDs, webhook configuration and keys in Vercel, plus explicit
+launch review.
 
-Before testing real purchases, configure the product's eligible Managed Payments
-tax code, register `/api/stripe/webhook` for completed/async success/async failure
-and refund events, configure Vercel variables, and verify the Resend domain.
-No real Checkout, webhook or email delivery has been verified without credentials.
+Reported sandbox verification on November 6, 2026: a $22.39 purchase including BC
+tax completed, the webhook fired, the license email arrived and the key validated
+on `/pro`.
 
-References:
-- https://docs.stripe.com/payments/managed-payments/set-up
-- https://docs.stripe.com/webhooks/signature
-- https://resend.com/docs/dashboard/emails/idempotency-keys
+## Future extension points (not built)
+
+The proposed node-decoration and toolbar slots would add annotations beside tree
+labels and new Pro actions after free toolbar actions, starting with diff/compare.
+Extensions would receive a read-only JSON snapshot, avoid whole-document parsing
+per node, preserve large-payload guards and keep JSON off the network. Only new
+Pro actions would be license-gated. These slots are not implemented.
