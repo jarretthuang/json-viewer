@@ -6,6 +6,9 @@ const mockCreate = jest.fn();
 const mockRetrieve = jest.fn();
 const mockConstruct = jest.fn();
 const mockSend = jest.fn();
+const mockSadd = jest.fn();
+const mockSismember = jest.fn();
+jest.mock("@vercel/kv", () => ({ kv: { sadd: (...args: unknown[]) => mockSadd(...args), sismember: (...args: unknown[]) => mockSismember(...args) } }));
 jest.mock("stripe", () =>
   jest.fn().mockImplementation(() => ({
     customers: { list: mockCustomers },
@@ -27,6 +30,7 @@ import { POST as webhook } from "../../src/app/api/stripe/webhook/route";
 import { getStripe, paidLicense } from "./stripe";
 import { STRIPE_PRICE_ID, STRIPE_PRODUCT_ID } from "@/lib/pro-config";
 import { verifyLicense } from "./keys";
+import { revokedKeyHash } from "./revocation";
 const originalEnv = { ...process.env };
 const paid = {
   id: "cs_test_order",
@@ -50,6 +54,10 @@ const request = (signature: string | null = "valid-signature") =>
   });
 beforeEach(() => {
   jest.clearAllMocks();
+  delete process.env.KV_REST_API_URL;
+  delete process.env.KV_REST_API_TOKEN;
+  mockSadd.mockReset().mockResolvedValue(1);
+  mockSismember.mockReset().mockResolvedValue(0);
   process.env.NEXT_PUBLIC_PRO_ENABLED = "true";
   process.env.STRIPE_SECRET_KEY = "sk_test_fixture";
   process.env.STRIPE_WEBHOOK_SECRET = "whsec_fixture";
@@ -326,4 +334,73 @@ it("exhausts the five-attempt resend bucket", async () => {
   for (let i = 0; i < 5; i++)
     expect((await POST(recoveryRequest())).status).toBe(200);
   expect((await POST(recoveryRequest())).status).toBe(429);
+});
+
+function refund(amountRefunded = 100) {
+  process.env.KV_REST_API_URL = "https://kv.example.com";
+  process.env.KV_REST_API_TOKEN = "test-token";
+  mockConstruct.mockReturnValue({
+    type: "charge.refunded",
+    data: { object: { amount: 100, amount_refunded: amountRefunded, payment_intent: "pi_test" } },
+  });
+  mockSessions.mockResolvedValue({ data: [{ id: paid.id }] });
+}
+it("revokes only the hash on full refunds and safely handles redelivery", async () => {
+  refund();
+  for (let i = 0; i < 2; i++) expect((await webhook(request())).status).toBe(200);
+  const license = await paidLicense(getStripe()!, paid.id);
+  expect(mockSadd).toHaveBeenCalledWith("pro:revoked-keys:v1", revokedKeyHash(license!.key));
+  expect(mockSadd).toHaveBeenCalledTimes(2);
+  expect(mockSessions).toHaveBeenCalledWith({ payment_intent: "pi_test", limit: 1 });
+  expect(mockSend).not.toHaveBeenCalled();
+});
+it("does not revoke partial refunds", async () => {
+  refund(50);
+  expect((await webhook(request())).status).toBe(200);
+  expect(mockSadd).not.toHaveBeenCalled();
+  expect(mockSessions).not.toHaveBeenCalled();
+});
+it("acknowledges refunds without KV and logs a fixed code", async () => {
+  refund();
+  delete process.env.KV_REST_API_TOKEN;
+  expect((await webhook(request())).status).toBe(200);
+  expect(mockSadd).not.toHaveBeenCalled();
+  expect(console.info).toHaveBeenCalledWith("[stripe] revocation_not_configured");
+});
+it("retries KV failures without logging private data", async () => {
+  refund();
+  mockSadd.mockRejectedValue(new Error("private-data"));
+  expect((await webhook(request())).status).toBe(502);
+  expect(console.warn).toHaveBeenCalledWith("[stripe] fulfillment_unavailable");
+});
+it("acknowledges a refund without a checkout session", async () => {
+  refund();
+  mockSessions.mockResolvedValue({ data: [] });
+  expect((await webhook(request())).status).toBe(200);
+  expect(console.info).toHaveBeenCalledWith("[stripe] refund_session_not_found");
+  expect(mockSadd).not.toHaveBeenCalled();
+});
+it("does not revoke an ineligible purchase", async () => {
+  refund();
+  mockRetrieve.mockResolvedValue({ ...paid, payment_status: "unpaid" });
+  expect((await webhook(request())).status).toBe(200);
+  expect(mockSadd).not.toHaveBeenCalled();
+});
+it("does not resend revoked keys and preserves the generic response", async () => {
+  const { POST } = await import("../../src/app/api/license/resend/route");
+  jest.spyOn(Date, "now").mockReturnValue(Date.now() + 22 * 60_000);
+  process.env.KV_REST_API_URL = "https://kv.example.com";
+  process.env.KV_REST_API_TOKEN = "test-token";
+  mockSismember.mockResolvedValue(1);
+  mockCustomers.mockReturnValue(iterable([{ id: "cus_buyer" }]));
+  mockSessions.mockReturnValue(iterable([{ id: paid.id }]));
+  const response = await POST(recoveryRequest());
+  expect(response.status).toBe(200);
+  expect(await response.json()).toEqual({ message: "If that email purchased PRO, the key has been sent." });
+  expect(mockSend).not.toHaveBeenCalled();
+  expect(console.info).toHaveBeenCalledWith("[stripe] revoked_key_not_sent");
+});
+
+it("hashes revoked keys with SHA-256 hex", () => {
+  expect(revokedKeyHash("abc")).toBe("ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad");
 });

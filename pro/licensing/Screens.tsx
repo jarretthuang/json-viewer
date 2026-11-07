@@ -43,6 +43,9 @@ function Purchase() {
       <p className="text-[14px] text-slate-600 dark:text-neutral-400">
         Existing JSON tools stay free. License key delivered by email.
       </p>
+      <p className="text-[14px] text-slate-600 dark:text-neutral-400">
+        14-day refund policy. See <Link href="/terms" className="underline">Terms</Link> for details.
+      </p>
     </>
   );
 }

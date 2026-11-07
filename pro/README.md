@@ -58,9 +58,20 @@ never emails, request bodies, keys or secrets. Validation is limited to 20
 requests per 10 minutes per IP within each process on Vercel; outside Vercel,
 requests share one bucket. Multi-instance limiting needs a shared store.
 
+### Refunds and revocation
+
+Full refunds add the license key's SHA-256 hash to the Vercel KV set
+`pro:revoked-keys:v1`; validation checks this set and revoked keys are not
+re-sent. Link an Upstash Redis store in Vercel and configure `KV_REST_API_URL`
+and `KV_REST_API_TOKEN`. Without both variables, revocation is skipped and the
+refund webhook logs a fixed code; validation continues to accept signed keys.
+KV errors return 502 from the webhook so Stripe retries. Partial refunds do not
+revoke licenses. The human issuing the refund enforces the 14-day window;
+code does not enforce it. Fair use is a stated policy only.
+
 ## Current status and future work
 
-Pro tools are coming soon. Refund events are logged; revocation is future work. Live mode needs live product/price IDs, webhook configuration and keys in Vercel, plus explicit launch review.
+Pro tools are coming soon. Live mode needs live product/price IDs, webhook configuration and keys in Vercel, plus explicit launch review.
 
 Reported sandbox verification on November 6, 2026: a sandbox purchase completed,
 the webhook fired, the license email arrived and the key validated
