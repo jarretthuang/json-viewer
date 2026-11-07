@@ -59,6 +59,22 @@ export default function PrivacyPage() {
         </p>
       </section>
       <section>
+        <h2>Pro purchases</h2>
+        <p>
+          The email address you enter at checkout is used to deliver your license
+          key and for lost-key recovery. Payments are processed by Stripe through
+          Stripe Managed Payments, which also handles tax. Card details are never
+          sent to or stored by our servers. Stripe&apos;s own{" "}
+          <a href="https://stripe.com/privacy">Privacy Policy</a> applies to payment
+          data. Stripe may use your location to calculate applicable taxes.
+        </p>
+        <p>
+          Your license key is stored in your browser&apos;s localStorage so Pro
+          stays active on that browser. No account is created and no password is
+          set.
+        </p>
+      </section>
+      <section>
         <h2>Support</h2>
         <p>
           If you contact support, we receive your email address and any
