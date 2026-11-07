@@ -91,7 +91,7 @@ describe("Pro navigation", () => {
         );
       }
       expect(link).toHaveClass(
-        "ml-1", "rounded-full", "px-3", "py-1", "text-xs", "font-semibold",
+        "ml-1", "rounded-full", "px-[12px]", "py-[4px]", "text-[12px]", "font-semibold",
         "border-2", "border-mono-800/50", "bg-white/70", "text-mono-800/75",
         "shadow-sm", "leading-none", "hover:bg-white/90", "hover:text-mono-800/90",
         "dark:bg-white/[0.08]", "dark:border-mono-300/[0.55]", "dark:text-mono-300/75",

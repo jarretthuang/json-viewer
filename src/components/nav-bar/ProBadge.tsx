@@ -20,13 +20,14 @@ export default function ProBadge({
     return null;
   }
 
+  // Fixed px keeps the 4vmin root font-size from scaling pill text and padding.
   return (
     <Link
       href="/pro"
       target="_blank"
       rel="noopener noreferrer"
       onClick={onClick}
-      className="ml-1 rounded-full border-2 border-mono-800/50 bg-white/70 px-3 py-1 text-xs font-semibold leading-none text-mono-800/75 shadow-sm hover:bg-white/90 hover:text-mono-800/90 dark:border-mono-300/[0.55] dark:bg-white/[0.08] dark:text-mono-300/75 dark:hover:bg-white/[0.12] dark:hover:text-mono-300/90"
+      className="ml-1 rounded-full border-2 border-mono-800/50 bg-white/70 px-[12px] py-[4px] text-[12px] font-semibold leading-none text-mono-800/75 shadow-sm hover:bg-white/90 hover:text-mono-800/90 dark:border-mono-300/[0.55] dark:bg-white/[0.08] dark:text-mono-300/75 dark:hover:bg-white/[0.12] dark:hover:text-mono-300/90"
     >
       {isPro ? "Pro" : "Upgrade to Pro"}
     </Link>
