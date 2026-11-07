@@ -25,6 +25,19 @@ export default function TermsPage() {
         </p>
       </section>
       <section>
+        <h2>Pro license</h2>
+        <p>
+          Pro is a one-time purchase of $19.99 USD, plus applicable taxes. There
+          is no subscription and no recurring charge. One license key activates
+          Pro on the browser where it is entered. No account is required.
+        </p>
+        <p>
+          The license grants access to Pro features as they become available.
+          Currently, the license activates Pro; the first Pro features, starting
+          with JSON diff/compare, are still being built.
+        </p>
+      </section>
+      <section>
         <h2>Privacy and your data</h2>
         <p>
           Our <a href="/privacy">Privacy Policy</a> explains data handling and

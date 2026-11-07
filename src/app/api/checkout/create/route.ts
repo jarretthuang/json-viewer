@@ -1,10 +1,11 @@
+import { isProEnabled } from "@/lib/feature-flags";
 import { NextResponse } from "next/server";
 import { getStripe } from "../../../../../pro/licensing/stripe";
 import { STRIPE_PRICE_ID } from "@/lib/pro-config";
 export const runtime = "nodejs";
 export async function POST(request: Request) {
   const stripe = getStripe();
-  if (!stripe || !process.env.LICENSE_KEY_SECRET)
+  if (!isProEnabled() || !stripe || !process.env.LICENSE_KEY_SECRET)
     return NextResponse.json({ error: "not_configured" }, { status: 503 });
   try {
     const site = new URL(request.url).origin;

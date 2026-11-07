@@ -1,6 +1,8 @@
 "use client";
 
 import _ from "lodash";
+import ProBadge from "./ProBadge";
+import { usePro } from "../../../pro/licensing/usePro";
 import Copyright from "../copyright/Copyright";
 import Image from "next/image";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -34,6 +36,8 @@ export default function NavBar({
   showActions = true,
   actionVisibility,
 }: NavBarProps) {
+  const { isPro } = usePro();
+  const closeOverlay = () => expand(false);
   const [expanded, expand] = useState(false);
   const [onShare, setOnShare] = useState<number | undefined>(undefined);
   const overlayRef = useRef<HTMLDivElement | null>(null);
@@ -95,7 +99,10 @@ export default function NavBar({
   const renderExpandedContent = () => {
     return (
       <div className="content items-center overflow-hidden">
-        <span className="title w-min whitespace-nowrap">JSON Viewer</span>{" "}
+        <div className="flex items-center">
+          <span className="title w-min whitespace-nowrap">JSON Viewer</span>
+          <ProBadge onClick={closeOverlay} />
+        </div>
         <div className="flex items-center gap-1">
           <span>by</span>
           <a
@@ -113,6 +120,11 @@ export default function NavBar({
             />
           </a>
         </div>
+        {!isPro && (
+          <div className="my-3 flex justify-center [&>a]:mb-0 [&>a]:ml-0 [&>a]:self-auto">
+            <ProBadge showUpgrade onClick={closeOverlay} />
+          </div>
+        )}
         <div className="inner-content overflow-auto px-10">
           <ReactMarkdown>{jsonViewerAppDescription}</ReactMarkdown>
         </div>
@@ -195,6 +207,7 @@ export default function NavBar({
                 jsonviewer.io
               </span>
             </a>
+            <ProBadge />
           </li>
           {showAnyAction && (
             <li className="flex h-full justify-end p-1">
@@ -218,7 +231,7 @@ export default function NavBar({
               type="button"
               className="nav-close-button"
               aria-label="Close information panel"
-              onClick={() => expand(!expanded)}
+              onClick={closeOverlay}
             >
               <CloseIcon className="opacity-50 hover:opacity-60 md:p-0.5" />
             </button>
