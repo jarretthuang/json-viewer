@@ -33,6 +33,12 @@ export default function TermsPage() {
           One license key activates Pro on the browser where it is entered. No account is required.
         </p>
         <p>
+          One license is for one person. You may activate it in any browser or on any device you personally use. Do not share your license key with others or post it publicly. A team needs one license per person.
+        </p>
+        <p>
+          Refunds: if you request a refund within 14 days of purchase, we will refund the full purchase price to your original payment method and your license key will stop working. To request a refund, email support@jsonviewer.io from the email address used for the purchase.
+        </p>
+        <p>
           The license grants access to Pro features as they become available.
           Currently, the license activates Pro; the first Pro features, starting
           with JSON diff/compare, are still being built.
