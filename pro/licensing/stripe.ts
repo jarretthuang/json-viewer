@@ -4,6 +4,7 @@ import { randomUUID } from "node:crypto";
 import { Resend } from "resend";
 import { STRIPE_PRICE_ID, STRIPE_PRODUCT_ID } from "@/lib/pro-config";
 import { mintLicense } from "./keys";
+import { licenseEmailHtml, licenseEmailText } from "./email";
 export function getStripe() {
   return process.env.STRIPE_SECRET_KEY
     ? new Stripe(process.env.STRIPE_SECRET_KEY)
@@ -49,7 +50,8 @@ export async function fulfill(
       from: "JSON Viewer <support@jsonviewer.io>",
       to: license.email,
       subject: "Your JSON Viewer PRO license key",
-      text: `Thank you for choosing JSON Viewer PRO. Keep this key safe:\n\n${license.key}\n\nActivate it at https://jsonviewer.io/pro`,
+      text: licenseEmailText(license.key),
+      html: licenseEmailHtml(license.key),
     },
     {
       idempotencyKey: recovery
