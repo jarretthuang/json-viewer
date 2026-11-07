@@ -50,7 +50,12 @@ describe("Pro navigation", () => {
       if (isPro) {
         expect(badge).toHaveAttribute("href", "/pro");
         expect(badge?.parentElement?.closest("a")).toBeNull();
-        expect(badge?.parentElement).toHaveClass("flex", "items-end");
+        expect(badge?.parentElement?.tagName).toBe("LI");
+        expect(badge?.parentElement).toHaveClass("p-2");
+        expect(badge?.parentElement).not.toHaveClass("gap-1");
+        const home = within(nav).getByRole("link", { name: "Go to JSON Viewer home" });
+        expect(home).toContainElement(within(nav).getByAltText("JSON Viewer logo"));
+        expect(home).toContainElement(within(nav).getByText("jsonviewer.io"));
         expect(badge?.previousElementSibling).toHaveTextContent("jsonviewer.io");
       } else {
         expect(badge).not.toBeInTheDocument();
@@ -83,11 +88,17 @@ describe("Pro navigation", () => {
       }
       expect(link).toHaveClass(
         "ml-1", "rounded-full", "px-1.5", "py-px", "text-xs", "font-semibold",
-        "bg-sky-700", "text-white", "hover:bg-sky-800", "shadow-sm", "leading-none"
+        "border", "border-mono-800/30", "bg-white/70", "text-mono-800/75",
+        "shadow-sm", "leading-none", "hover:bg-white/90", "hover:text-mono-800/90",
+        "dark:bg-white/[0.08]", "dark:border-mono-300/[0.35]", "dark:text-mono-300/75",
+        "dark:hover:bg-white/[0.12]", "dark:hover:text-mono-300/90"
       );
-      expect(link).not.toHaveClass("mb-1.5", "self-end", "border");
-      expect(titleRow).toHaveClass("flex", "items-end");
+      expect(link).not.toHaveClass("mb-1.5", "self-end");
+      expect(titleRow).toHaveClass("flex", "items-center");
       expect(link).not.toHaveClass("underline");
+      expect(link.className.split(/\s+/)).not.toEqual(
+        expect.arrayContaining([expect.stringMatching(/^(?:dark:|hover:)*opacity-/)])
+      );
       if (badge) {
         expect(link.className).toBe(badge.className);
       }
