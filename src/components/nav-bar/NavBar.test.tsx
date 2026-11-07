@@ -80,7 +80,8 @@ describe("Pro navigation", () => {
         );
       }
       expect(link).toHaveClass(
-        "ml-1", "self-end", "rounded-full", "px-1.5", "py-px", "text-xs", "font-semibold"
+        "ml-1", "self-end", "rounded-full", "px-1.5", "py-px", "text-xs", "font-semibold",
+        "border", "border-mono-800/20", "dark:border-mono-300/20", "shadow-sm"
       );
       expect(link).not.toHaveClass("mb-1.5");
       expect(link).not.toHaveClass("underline");
