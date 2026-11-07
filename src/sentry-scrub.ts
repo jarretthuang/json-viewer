@@ -1,3 +1,16 @@
+/** JSON-VIEWER-A leaked pasted document content through a regex exception message. */
+export function scrubErrorMessage(message: string): string {
+  if (/Invalid regular expression/i.test(message)) {
+    // Never preserve a slice of the pattern: even a short one can contain user data.
+    return 'Invalid regular expression [redacted]';
+  }
+  // Long messages containing JSON object/key syntax may embed a pasted document.
+  if (message.length > 500 && /\{\s*"|"[^"\r\n]*"\s*:/.test(message)) {
+    return 'Error message [redacted]';
+  }
+  return message;
+}
+
 /** Remove the document from request URLs while preserving other URL context. */
 export function stripJsonQueryParam(url: string): string {
   try {
