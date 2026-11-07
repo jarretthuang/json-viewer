@@ -62,6 +62,10 @@ requests share one bucket. Multi-instance limiting needs a shared store.
 
 Pro tools are coming soon. Refund events are logged; revocation is future work. Live mode needs live product/price IDs, webhook configuration and keys in Vercel, plus explicit launch review.
 
+Reported sandbox verification on November 6, 2026: a sandbox purchase completed,
+the webhook fired, the license email arrived and the key validated
+on `/pro`.
+
 ## Future extension points (not built)
 
 The proposed node-decoration and toolbar slots would add annotations beside tree
