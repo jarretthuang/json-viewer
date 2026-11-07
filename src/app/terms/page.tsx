@@ -1,6 +1,7 @@
 /* Starting draft only; not legal advice. Review before publication. */
 import type { Metadata } from "next";
 import LegalPage from "@/components/legal/LegalPage";
+import { PRO_PRICE_DISPLAY } from "@/lib/pro-config";
 
 export const metadata: Metadata = {
   title: "Terms of Service",
@@ -27,9 +28,9 @@ export default function TermsPage() {
       <section>
         <h2>Pro license</h2>
         <p>
-          Pro is a one-time purchase of $19.99 USD, plus applicable taxes. There
-          is no subscription and no recurring charge. One license key activates
-          Pro on the browser where it is entered. No account is required.
+          Pro is a one-time purchase of {PRO_PRICE_DISPLAY} USD, plus
+          applicable taxes. There is no subscription and no recurring charge.
+          One license key activates Pro on the browser where it is entered. No account is required.
         </p>
         <p>
           The license grants access to Pro features as they become available.

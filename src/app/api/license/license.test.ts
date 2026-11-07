@@ -54,15 +54,23 @@ it("rejects invalid keys", async () => {
     activations: 0,
   });
 });
-it("does not pretend to resend or expose a key by email lookup", async () => {
+it("returns a generic retry when recovery is not configured", async () => {
+  delete process.env.STRIPE_SECRET_KEY;
+  jest.spyOn(console, "warn").mockImplementation(() => {});
   const result = await resend(request({ email: "buyer@example.com" }));
   expect(result.status).toBe(503);
   expect(await result.json()).toMatchObject({
-    error: "unavailable",
-    message: expect.stringContaining("Stripe receipt"),
+    message: "Could not send right now. Please try again later.",
   });
 });
 it("limits validation requests", async () => {
   for (let i = 0; i < 20; i++) await validate(request({}));
   expect((await validate(request({}))).status).toBe(429);
 });
+
+it.each([{}, { email: 5 }, { email: "invalid" }, { email: "x".repeat(3000) }])(
+  "rejects malformed recovery input %j",
+  async (body) => {
+    expect((await resend(request(body))).status).toBe(400);
+  }
+);

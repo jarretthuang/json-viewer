@@ -169,12 +169,62 @@ export function LicenseScreen() {
   );
 }
 export function LostKeyScreen() {
+  const [email, setEmail] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [message, setMessage] = useState("");
   return (
     <Frame title="Find your license key">
       <p>
-        Automatic key recovery is unavailable. Find your Stripe receipt email
-        for purchase details and your separate JSON Viewer Pro license email for
-        the key. Keep the key from the purchase confirmation page safe.
+        Enter your purchase email to recover your JSON Viewer Pro license key.
+      </p>
+      <form
+        className="space-y-[16px]"
+        onSubmit={async (event) => {
+          event.preventDefault();
+          setBusy(true);
+          setMessage("");
+          try {
+            const response = await fetch("/api/license/resend", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ email }),
+            });
+            setMessage(
+              response.ok
+                ? "If that email purchased Pro, the key has been sent."
+                : response.status === 429
+                ? messages.rate_limited
+                : "Could not send right now. Please try again later."
+            );
+          } catch {
+            setMessage("Could not send right now. Please try again later.");
+          } finally {
+            setBusy(false);
+          }
+        }}
+      >
+        <label
+          className="block text-[14px] font-medium"
+          htmlFor="purchase-email"
+        >
+          Purchase email
+        </label>
+        <input
+          id="purchase-email"
+          className={inputClass}
+          type="email"
+          autoComplete="email"
+          required
+          maxLength={254}
+          value={email}
+          onChange={(event) => setEmail(event.target.value)}
+        />
+        <button className={buttonClass} disabled={busy}>
+          {busy ? "Sending…" : "Send license key"}
+        </button>
+      </form>
+      <p role="status" aria-label="Recovery status" className="text-[14px]">
+        {message}
       </p>
       <Link href="/pro" className="underline">
         Enter your key

@@ -1,16 +1,23 @@
 /** @jest-environment node */
 jest.mock("server-only", () => ({}), { virtual: true });
+const mockCustomers = jest.fn();
+const mockSessions = jest.fn();
 const mockCreate = jest.fn();
 const mockRetrieve = jest.fn();
 const mockConstruct = jest.fn();
 const mockSend = jest.fn();
 jest.mock("stripe", () =>
-  jest
-    .fn()
-    .mockImplementation(() => ({
-      checkout: { sessions: { create: mockCreate, retrieve: mockRetrieve } },
-      webhooks: { constructEvent: mockConstruct },
-    }))
+  jest.fn().mockImplementation(() => ({
+    customers: { list: mockCustomers },
+    checkout: {
+      sessions: {
+        create: mockCreate,
+        retrieve: mockRetrieve,
+        list: mockSessions,
+      },
+    },
+    webhooks: { constructEvent: mockConstruct },
+  }))
 );
 jest.mock("resend", () => ({
   Resend: jest.fn().mockImplementation(() => ({ emails: { send: mockSend } })),
@@ -48,6 +55,8 @@ beforeEach(() => {
   process.env.STRIPE_WEBHOOK_SECRET = "whsec_fixture";
   process.env.LICENSE_KEY_SECRET = "license-test-fixture";
   process.env.RESEND_API_KEY = "re_fixture";
+  mockCustomers.mockReturnValue(iterable([]));
+  mockSessions.mockReturnValue(iterable([]));
   mockRetrieve.mockResolvedValue(paid);
   mockConstruct.mockReturnValue({
     type: "checkout.session.completed",
@@ -163,4 +172,158 @@ it("returns retryable failure on email errors without logging payment data", asy
   mockSend.mockResolvedValue({ error: { message: "private-data" } });
   expect((await webhook(request())).status).toBe(502);
   expect(console.warn).toHaveBeenCalledWith("[stripe] fulfillment_unavailable");
+});
+
+const recoveryRequest = (email = "buyer@example.com") =>
+  new Request("https://jsonviewer.io/api/license/resend", {
+    method: "POST",
+    body: JSON.stringify({ email }),
+  });
+const iterable = (values: object[]) => ({
+  async *[Symbol.asyncIterator]() {
+    yield* values;
+  },
+});
+it("recovers a paid Pro purchase while sales are disabled and uses a fresh delivery key", async () => {
+  const { POST } = await import("../../src/app/api/license/resend/route");
+  process.env.NEXT_PUBLIC_PRO_ENABLED = "false";
+  mockCustomers.mockReturnValue(iterable([{ id: "cus_buyer" }]));
+  mockSessions.mockReturnValue(iterable([{ id: paid.id }]));
+  const response = await POST(recoveryRequest());
+  expect(response.status).toBe(200);
+  expect(await response.json()).toEqual({
+    message: "If that email purchased Pro, the key has been sent.",
+  });
+  expect(mockCustomers).toHaveBeenCalledWith({
+    email: "buyer@example.com",
+    limit: 100,
+  });
+  expect(mockSessions).toHaveBeenCalledWith({
+    customer: "cus_buyer",
+    status: "complete",
+    limit: 100,
+  });
+  expect(mockSend.mock.calls[0][0].text).toContain(
+    (await paidLicense(getStripe()!, paid.id))!.key
+  );
+  expect(mockSend.mock.calls[0][1].idempotencyKey).toMatch(/^pro-recovery\//);
+});
+it("returns the identical success for an email with no purchase", async () => {
+  const { POST } = await import("../../src/app/api/license/resend/route");
+  mockCustomers.mockReturnValue(iterable([]));
+  const response = await POST(recoveryRequest());
+  expect(response.status).toBe(200);
+  expect(await response.json()).toEqual({
+    message: "If that email purchased Pro, the key has been sent.",
+  });
+  expect(mockSend).not.toHaveBeenCalled();
+});
+it("returns a generic retry on delivery failure without private logs", async () => {
+  const { POST } = await import("../../src/app/api/license/resend/route");
+  mockCustomers.mockReturnValue(iterable([{ id: "cus_buyer" }]));
+  mockSessions.mockReturnValue(iterable([{ id: paid.id }]));
+  mockSend.mockResolvedValue({ error: { message: "private" } });
+  const response = await POST(recoveryRequest());
+  expect(response.status).toBe(503);
+  expect(await response.json()).toEqual({
+    message: "Could not send right now. Please try again later.",
+  });
+  expect(console.warn).toHaveBeenCalledWith("[license] recovery_unavailable");
+});
+it("searches past ineligible sessions and duplicate customers", async () => {
+  const { recoverLicense } = await import("./stripe");
+  mockCustomers.mockReturnValue(
+    iterable([{ id: "cus_old" }, { id: "cus_buyer" }])
+  );
+  mockSessions
+    .mockReturnValueOnce(
+      iterable([{ id: "cs_unpaid" }, { id: "cs_other_email" }])
+    )
+    .mockReturnValueOnce(iterable([{ id: paid.id }]));
+  mockRetrieve.mockImplementation(async (id) =>
+    id === "cs_unpaid"
+      ? { ...paid, payment_status: "unpaid" }
+      : id === "cs_other_email"
+      ? { ...paid, customer_details: { email: "other@example.com" } }
+      : paid
+  );
+  await recoverLicense(getStripe()!, "buyer@example.com");
+  expect(mockSessions).toHaveBeenCalledTimes(2);
+  expect(mockSend).toHaveBeenCalledTimes(1);
+  expect(mockSend.mock.calls[0][0].to).toBe("buyer@example.com");
+});
+
+it("recovers a customerless paid session using its email case-insensitively", async () => {
+  const { POST } = await import("../../src/app/api/license/resend/route");
+  const guest = { ...paid, customer: null };
+  mockSessions.mockReturnValue(iterable([guest]));
+  mockRetrieve.mockResolvedValue(guest);
+  const response = await POST(recoveryRequest("BUYER@example.com"));
+  expect(response.status).toBe(200);
+  expect(await response.json()).toEqual({
+    message: "If that email purchased Pro, the key has been sent.",
+  });
+  expect(mockSessions).toHaveBeenCalledWith({ status: "complete", limit: 100 });
+  expect(mockRetrieve).toHaveBeenCalledWith(guest.id, {
+    expand: ["line_items.data.price"],
+  });
+  expect(mockSend).toHaveBeenCalledTimes(1);
+  expect(mockSend.mock.calls[0][0].to).toBe("buyer@example.com");
+  expect(mockSend.mock.calls[0][1].idempotencyKey).toMatch(/^pro-recovery\//);
+});
+it("finds a lowercase customer for a mixed-case recovery entry", async () => {
+  const { recoverLicense } = await import("./stripe");
+  mockCustomers.mockImplementation(({ email }) =>
+    iterable(email === "buyer@example.com" ? [{ id: "cus_buyer" }] : [])
+  );
+  mockSessions.mockReturnValue(iterable([{ id: paid.id }]));
+  await recoverLicense(getStripe()!, "Buyer@Example.com");
+  expect(mockCustomers.mock.calls.map(([params]) => params.email)).toEqual([
+    "Buyer@Example.com", "buyer@example.com",
+  ]);
+  expect(mockSend).toHaveBeenCalledTimes(1);
+});
+it("deduplicates customers returned for both email spellings", async () => {
+  const { recoverLicense } = await import("./stripe");
+  mockCustomers.mockReturnValue(iterable([{ id: "cus_buyer" }]));
+  await recoverLicense(getStripe()!, "Buyer@Example.com");
+  expect(mockSessions.mock.calls.filter(([params]) => params.customer)).toHaveLength(1);
+  expect(mockSend).not.toHaveBeenCalled();
+});
+it("skips ineligible guest matches and stops after the first paid match", async () => {
+  const { recoverLicense } = await import("./stripe");
+  mockSessions.mockReturnValue(iterable([
+    { ...paid, id: "cs_unpaid" }, paid, { ...paid, id: "cs_later" },
+  ]));
+  mockRetrieve.mockImplementation(async (id) =>
+    id === "cs_unpaid" ? { ...paid, payment_status: "unpaid" } : paid
+  );
+  await recoverLicense(getStripe()!, "buyer@example.com");
+  expect(mockSend).toHaveBeenCalledTimes(1);
+  expect(mockRetrieve).not.toHaveBeenCalledWith("cs_later", expect.anything());
+});
+it("stops the paginated guest scan after 1,000 sessions", async () => {
+  const { recoverLicense } = await import("./stripe");
+  let visited = 0;
+  mockSessions.mockReturnValue({
+    async *[Symbol.asyncIterator]() {
+      for (let i = 0; i < 1_001; i++) {
+        visited++;
+        yield i === 1_000 ? paid : { id: `cs_other_${i}` };
+      }
+    },
+  });
+  await recoverLicense(getStripe()!, "buyer@example.com");
+  expect(visited).toBe(1_000);
+  expect(mockRetrieve).not.toHaveBeenCalled();
+  expect(mockSend).not.toHaveBeenCalled();
+});
+
+it("exhausts the five-attempt resend bucket", async () => {
+  const { POST } = await import("../../src/app/api/license/resend/route");
+  jest.spyOn(Date, "now").mockReturnValue(Date.now() + 11 * 60_000);
+  mockCustomers.mockReturnValue(iterable([]));
+  for (let i = 0; i < 5; i++)
+    expect((await POST(recoveryRequest())).status).toBe(200);
+  expect((await POST(recoveryRequest())).status).toBe(429);
 });

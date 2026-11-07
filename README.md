@@ -123,5 +123,4 @@ Copyright @[Jarrett Huang](https://github.com/jarretthuang), under the [MIT Lice
 
 ## Licensing
 
-The core (everything outside `pro/`) is MIT-licensed and available for source
-review. `pro/` is proprietary under [pro/LICENSE](pro/LICENSE).
+The core (everything outside `pro/`) is MIT-licensed. `pro/` is proprietary under [pro/LICENSE](pro/LICENSE).

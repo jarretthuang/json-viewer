@@ -2,6 +2,7 @@ import "server-only";
 import { createHash } from "node:crypto";
 import { NextResponse } from "next/server";
 
+import { getStripe, recoverLicense } from "./stripe";
 import { verifyLicense } from "./keys";
 const WINDOW = 10 * 60_000;
 const attempts = new Map<string, number[]>();
@@ -63,15 +64,34 @@ export async function licenseRequest(
 ) {
   if (limited(request, operation))
     return reply({ valid: false, error: "rate_limited" }, 429);
-  if (operation === "resend")
-    return reply(
-      {
-        error: "unavailable",
-        message:
-          "Automatic key recovery is unavailable. Find your Stripe receipt email for purchase details and your separate Pro license email for the key.",
-      },
-      503
-    );
+  if (operation === "resend") {
+    try {
+      const email = await field(request, "email");
+      if (
+        !email ||
+        email.length > 254 ||
+        !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+      )
+        return reply({ error: "bad_request" }, 400);
+      const stripe = getStripe();
+      if (
+        !stripe ||
+        !process.env.LICENSE_KEY_SECRET ||
+        !process.env.RESEND_API_KEY
+      )
+        throw new Error("not_configured");
+      await recoverLicense(stripe, email);
+      return reply({
+        message: "If that email purchased Pro, the key has been sent.",
+      });
+    } catch {
+      console.warn("[license] recovery_unavailable");
+      return reply(
+        { message: "Could not send right now. Please try again later." },
+        503
+      );
+    }
+  }
   let input: string | null;
   try {
     input = await field(request, "key");
