@@ -74,6 +74,7 @@ e2e/                             Playwright end-to-end coverage
 
 - Keep the README concise and user-facing.
 - Put maintainer or agent process details in this `AGENTS.md` file instead of the README.
+- Outside pull requests are not merged into `pro/`.
 - Keep performance claims grounded in measured behavior or explicit implementation details.
 - Update `CHANGELOG.md` when preparing a release, not for every ordinary commit.
 
