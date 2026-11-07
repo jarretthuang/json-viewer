@@ -48,8 +48,8 @@ export async function fulfill(
     {
       from: "JSON Viewer <support@jsonviewer.io>",
       to: license.email,
-      subject: "Your JSON Viewer Pro license key",
-      text: `Thank you for choosing JSON Viewer Pro. Keep this key safe:\n\n${license.key}\n\nActivate it at https://jsonviewer.io/pro`,
+      subject: "Your JSON Viewer PRO license key",
+      text: `Thank you for choosing JSON Viewer PRO. Keep this key safe:\n\n${license.key}\n\nActivate it at https://jsonviewer.io/pro`,
     },
     {
       idempotencyKey: recovery

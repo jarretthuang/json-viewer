@@ -11,9 +11,9 @@ afterEach(() => {
 
 const mockUsePro = jest.mocked(usePro);
 
-describe("Pro navigation", () => {
+describe("PRO navigation", () => {
   test.each([false, true])(
-    "hides Pro links while disabled even when isPro is %s",
+    "hides PRO links while disabled even when isPro is %s",
     (isPro) => {
       delete process.env.NEXT_PUBLIC_PRO_ENABLED;
       mockUsePro.mockReturnValue({
@@ -24,12 +24,12 @@ describe("Pro navigation", () => {
       render(<NavBar />);
       expect(
         within(screen.getByRole("navigation")).queryByRole("link", {
-          name: /Pro/,
+          name: /PRO/,
         })
       ).not.toBeInTheDocument();
       fireEvent.click(screen.getByRole("button", { name: "More options" }));
       expect(
-        within(screen.getByRole("dialog")).queryByRole("link", { name: /Pro/ })
+        within(screen.getByRole("dialog")).queryByRole("link", { name: /PRO/ })
       ).not.toBeInTheDocument();
     }
   );
@@ -46,7 +46,7 @@ describe("Pro navigation", () => {
       render(<NavBar />);
 
       const nav = screen.getByRole("navigation");
-      const badge = within(nav).queryByRole("link", { name: /Pro/ });
+      const badge = within(nav).queryByRole("link", { name: /PRO/ });
       if (isPro) {
         expect(badge).toHaveAttribute("href", "/pro");
         expect(badge).toHaveAttribute("target", "_blank");
@@ -66,7 +66,7 @@ describe("Pro navigation", () => {
       fireEvent.click(screen.getByRole("button", { name: "More options" }));
       const dialog = screen.getByRole("dialog");
       const link = within(dialog).getByRole("link", {
-        name: isPro ? "Pro" : "Upgrade to Pro",
+        name: isPro ? "PRO" : "Upgrade to PRO",
       });
       expect(link).toHaveAttribute("href", "/pro");
       expect(link).toHaveAttribute("target", "_blank");
@@ -76,7 +76,7 @@ describe("Pro navigation", () => {
       const byline = within(dialog).getByRole("link", {
         name: "Open JH Labs homepage",
       }).parentElement!;
-      expect(within(dialog).getAllByRole("link", { name: /Pro/ })).toHaveLength(1);
+      expect(within(dialog).getAllByRole("link", { name: /PRO/ })).toHaveLength(1);
       if (isPro) {
         expect(link.parentElement).toBe(titleRow);
         expect(byline.nextElementSibling).toHaveClass("inner-content");

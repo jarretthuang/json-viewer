@@ -44,7 +44,7 @@ it("renders and submits email recovery with generic confirmation", async () => {
   await waitFor(() =>
     expect(
       screen.getByRole("status", { name: "Recovery status" })
-    ).toHaveTextContent("If that email purchased Pro, the key has been sent.")
+    ).toHaveTextContent("If that email purchased PRO, the key has been sent.")
   );
   expect(fetchMock).toHaveBeenCalledWith(
     "/api/license/resend",
@@ -90,12 +90,12 @@ it("handles checkout not being configured without crashing", async () => {
   });
   render(<ProGate>Future feature</ProGate>);
   expect(
-    screen.getByText(`Pro is a ${PRO_PRICE_DISPLAY} one-time`, { exact: false })
+    screen.getByText(`PRO is a ${PRO_PRICE_DISPLAY} one-time`, { exact: false })
   ).toBeInTheDocument();
-  fireEvent.click(screen.getByRole("button", { name: "Upgrade to Pro" }));
+  fireEvent.click(screen.getByRole("button", { name: "Upgrade to PRO" }));
   await waitFor(() =>
     expect(
-      screen.getByRole("button", { name: "Upgrade to Pro" })
+      screen.getByRole("button", { name: "Upgrade to PRO" })
     ).toBeDisabled()
   );
   expect(fetchMock).toHaveBeenCalledWith("/api/checkout/create", {
@@ -118,11 +118,11 @@ it("renders new feature content for a cached valid license", () => {
 it("presents the quiet upgrade with honest rollout copy and activation controls", () => {
   render(<LicenseScreen />);
   expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(
-    "JSON Viewer Pro"
+    "JSON Viewer PRO"
   );
-  expect(screen.getByRole("button", { name: "Upgrade to Pro" })).toBeVisible();
+  expect(screen.getByRole("button", { name: "Upgrade to PRO" })).toBeVisible();
   expect(
-    screen.queryByRole("link", { name: "Upgrade to Pro" })
+    screen.queryByRole("link", { name: "Upgrade to PRO" })
   ).not.toBeInTheDocument();
   expect(screen.getByText(PRO_PRICE_DISPLAY)).toBeInTheDocument();
   expect(screen.getByText(/USD · one-time purchase/)).toBeInTheDocument();
@@ -161,9 +161,9 @@ it("prioritizes management and collapses purchasing for an activated browser", (
   );
   render(<LicenseScreen />);
   expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(
-    "Your Pro license"
+    "Your PRO license"
   );
-  expect(screen.getByText("Pro is enabled on this browser.")).toBeVisible();
+  expect(screen.getByText("PRO is enabled on this browser.")).toBeVisible();
   expect(
     screen.getByRole("region", { name: "Manage your license" })
   ).toBeVisible();
@@ -176,7 +176,7 @@ it("prioritizes management and collapses purchasing for an activated browser", (
     screen.getByRole("status", { name: "License status" })
   ).toHaveTextContent("Saved license cleared.");
   expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(
-    "JSON Viewer Pro"
+    "JSON Viewer PRO"
   );
 });
 
@@ -197,7 +197,7 @@ it("validates a key, clears the input, and switches to management", async () => 
     ).toHaveTextContent("License validated and saved on this browser.")
   );
   expect(screen.getByLabelText("License key")).toHaveValue("");
-  expect(screen.getByText("Pro is enabled on this browser.")).toBeVisible();
+  expect(screen.getByText("PRO is enabled on this browser.")).toBeVisible();
   expect(fetchMock).toHaveBeenCalledWith(
     "/api/license/validate",
     expect.objectContaining({
@@ -213,10 +213,10 @@ it("retains checkout unavailable handling on the redesigned page", async () => {
     json: async () => ({ error: "not_configured" }),
   });
   render(<LicenseScreen />);
-  fireEvent.click(screen.getByRole("button", { name: "Upgrade to Pro" }));
+  fireEvent.click(screen.getByRole("button", { name: "Upgrade to PRO" }));
   await waitFor(() =>
     expect(
-      screen.getByRole("button", { name: "Upgrade to Pro" })
+      screen.getByRole("button", { name: "Upgrade to PRO" })
     ).toBeDisabled()
   );
   expect(

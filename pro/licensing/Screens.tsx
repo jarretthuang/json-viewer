@@ -52,10 +52,10 @@ export function LicenseScreen() {
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
   return (
-    <Frame title={isPro ? "Your Pro license" : "JSON Viewer Pro"}>
+    <Frame title={isPro ? "Your PRO license" : "JSON Viewer PRO"}>
       {isPro ? (
         <p className="rounded border border-powderBlue-200 bg-powderBlue-100/20 p-[16px] font-medium dark:border-neutral-700 dark:bg-neutral-900">
-          Pro is enabled on this browser.
+          PRO is enabled on this browser.
         </p>
       ) : (
         <p className="text-slate-600 dark:text-neutral-400">
@@ -175,7 +175,7 @@ export function LostKeyScreen() {
   return (
     <Frame title="Find your license key">
       <p>
-        Enter your purchase email to recover your JSON Viewer Pro license key.
+        Enter your purchase email to recover your JSON Viewer PRO license key.
       </p>
       <form
         className="space-y-[16px]"
@@ -191,7 +191,7 @@ export function LostKeyScreen() {
             });
             setMessage(
               response.ok
-                ? "If that email purchased Pro, the key has been sent."
+                ? "If that email purchased PRO, the key has been sent."
                 : response.status === 429
                 ? messages.rate_limited
                 : "Could not send right now. Please try again later."
@@ -240,7 +240,7 @@ export function ThankYouScreen({
 }) {
   const [copied, setCopied] = useState(false);
   return (
-    <Frame title="Thank you for choosing Pro">
+    <Frame title="Thank you for choosing PRO">
       {completion ? (
         <>
           <p>Your license key:</p>

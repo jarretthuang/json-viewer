@@ -36,7 +36,7 @@ export function CheckoutButton() {
           }
         }}
       >
-        {busy ? "Opening checkout…" : "Upgrade to Pro"}
+        {busy ? "Opening checkout…" : "Upgrade to PRO"}
       </button>
       <p role="status" aria-label="Checkout status">
         {message}
@@ -48,10 +48,10 @@ export function ProGate({ children }: { children: ReactNode }) {
   const { isPro } = usePro();
   if (isPro) return <>{children}</>;
   return (
-    <section className="rounded-xl border p-6" aria-label="Pro upgrade">
-      <h2 className="text-xl font-bold">Unlock this Pro feature</h2>
+    <section className="rounded-xl border p-6" aria-label="PRO upgrade">
+      <h2 className="text-xl font-bold">Unlock this PRO feature</h2>
       <p className="my-3">
-        Pro is a {PRO_PRICE_DISPLAY} one-time add-on. All existing JSON tools
+        PRO is a {PRO_PRICE_DISPLAY} one-time add-on. All existing JSON tools
         remain free.
       </p>
       <CheckoutButton />

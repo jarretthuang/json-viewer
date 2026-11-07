@@ -184,7 +184,7 @@ const iterable = (values: object[]) => ({
     yield* values;
   },
 });
-it("recovers a paid Pro purchase while sales are disabled and uses a fresh delivery key", async () => {
+it("recovers a paid PRO purchase while sales are disabled and uses a fresh delivery key", async () => {
   const { POST } = await import("../../src/app/api/license/resend/route");
   process.env.NEXT_PUBLIC_PRO_ENABLED = "false";
   mockCustomers.mockReturnValue(iterable([{ id: "cus_buyer" }]));
@@ -192,7 +192,7 @@ it("recovers a paid Pro purchase while sales are disabled and uses a fresh deliv
   const response = await POST(recoveryRequest());
   expect(response.status).toBe(200);
   expect(await response.json()).toEqual({
-    message: "If that email purchased Pro, the key has been sent.",
+    message: "If that email purchased PRO, the key has been sent.",
   });
   expect(mockCustomers).toHaveBeenCalledWith({
     email: "buyer@example.com",
@@ -214,7 +214,7 @@ it("returns the identical success for an email with no purchase", async () => {
   const response = await POST(recoveryRequest());
   expect(response.status).toBe(200);
   expect(await response.json()).toEqual({
-    message: "If that email purchased Pro, the key has been sent.",
+    message: "If that email purchased PRO, the key has been sent.",
   });
   expect(mockSend).not.toHaveBeenCalled();
 });
@@ -261,7 +261,7 @@ it("recovers a customerless paid session using its email case-insensitively", as
   const response = await POST(recoveryRequest("BUYER@example.com"));
   expect(response.status).toBe(200);
   expect(await response.json()).toEqual({
-    message: "If that email purchased Pro, the key has been sent.",
+    message: "If that email purchased PRO, the key has been sent.",
   });
   expect(mockSessions).toHaveBeenCalledWith({ status: "complete", limit: 100 });
   expect(mockRetrieve).toHaveBeenCalledWith(guest.id, {

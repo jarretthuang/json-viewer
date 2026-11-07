@@ -10,15 +10,15 @@ afterEach(() => {
   process.env = { ...originalEnv };
 });
 
-test("shows only an unavailable message while Pro is off", () => {
+test("shows only an unavailable message while PRO is off", () => {
   delete process.env.NEXT_PUBLIC_PRO_ENABLED;
   render(<ProPage />);
-  expect(screen.getByText("Pro isn't available yet.")).toBeInTheDocument();
+  expect(screen.getByText("PRO isn't available yet.")).toBeInTheDocument();
   expect(screen.queryByTestId("license-screen")).not.toBeInTheDocument();
   expect(screen.queryByRole("button")).not.toBeInTheDocument();
 });
 
-test("renders the redesigned license screen while Pro is on", () => {
+test("renders the redesigned license screen while PRO is on", () => {
   process.env.NEXT_PUBLIC_PRO_ENABLED = "true";
   render(<ProPage />);
   expect(screen.getByTestId("license-screen")).toBeInTheDocument();

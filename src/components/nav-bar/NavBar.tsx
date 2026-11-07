@@ -186,7 +186,7 @@ export default function NavBar({
 
   return (
     <>
-      <nav className="NavBar group h-12 md:h-6" data-expanded={expanded}>
+      <nav className="NavBar h-12 md:h-6" data-expanded={expanded}>
         <ul className="flex h-full w-full items-center justify-between">
           <li className="p-2">
             {/* A full navigation intentionally resets the editor and its history. */}
