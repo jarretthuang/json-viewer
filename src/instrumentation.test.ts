@@ -96,14 +96,37 @@ describe('Sentry URL privacy hooks', () => {
     });
   });
 
-  it('configures the four browser noise filters', async () => {
+  it('configures the browser noise filters', async () => {
     const { ignoreErrors } = await initOptions('browser');
     expect(ignoreErrors).toEqual([
       /Share canceled/,
+      /cancellation of share/,
       /Document is not focused/,
-      /captured as exception/,
+      /captured as (exception|promise rejection)/,
       /reading 'isVisible'/,
+      /Failed to execute 'importScripts'/,
     ]);
+  });
+
+  it.each([
+    ['AbortError: Share canceled', true],
+    ['NotAllowedError: Document is not focused.', true],
+    ['Event: Event `Event` (type=error) captured as exception', true],
+    ["TypeError: Cannot read properties of undefined (reading 'isVisible')", true],
+    ['AbortError: Abort due to cancellation of share.', true],
+    ['Event: Event `Event` (type=error) captured as promise rejection', true],
+    ["Uncaught NetworkError: Failed to execute 'importScripts' on 'WorkerGlobalScope': The script at 'https://jsonviewer.io/_next/static/chunks/211.6062429607874dac.js' failed to load.", true],
+    ['Error: Unrelated application failure', false],
+    ['ChunkLoadError: Loading chunk 211 failed.', false],
+    ['NetworkError: Failed to fetch', false],
+    ["Failed to execute 'postMessage' on 'Worker': Data cannot be cloned, out of memory", false],
+    ['RangeError: Invalid string length', false],
+    ['Error: Unable to share document', false],
+  ])('matches browser noise for %s: %s', async (message, ignored) => {
+    const { ignoreErrors } = await initOptions('browser');
+    expect(ignoreErrors!.some((pattern) => (
+      typeof pattern === 'string' ? message.includes(pattern) : pattern.test(message)
+    ))).toBe(ignored);
   });
 
   it.each(['browser', 'nodejs', 'edge'])('scrubs request URLs in %s', async (runtime) => {
