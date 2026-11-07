@@ -2,6 +2,7 @@
 
 import _ from "lodash";
 import ProBadge from "./ProBadge";
+import { usePro } from "../../../pro/licensing/usePro";
 import Copyright from "../copyright/Copyright";
 import Image from "next/image";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -35,6 +36,7 @@ export default function NavBar({
   showActions = true,
   actionVisibility,
 }: NavBarProps) {
+  const { isPro } = usePro();
   const closeOverlay = () => expand(false);
   const [expanded, expand] = useState(false);
   const [onShare, setOnShare] = useState<number | undefined>(undefined);
@@ -99,7 +101,7 @@ export default function NavBar({
       <div className="content items-center overflow-hidden">
         <div className="flex items-center">
           <span className="title w-min whitespace-nowrap">JSON Viewer</span>
-          <ProBadge showUpgrade onClick={closeOverlay} />
+          <ProBadge onClick={closeOverlay} />
         </div>
         <div className="flex items-center gap-1">
           <span>by</span>
@@ -118,6 +120,11 @@ export default function NavBar({
             />
           </a>
         </div>
+        {!isPro && (
+          <div className="my-3 flex justify-center [&>a]:mb-0 [&>a]:ml-0 [&>a]:self-auto">
+            <ProBadge showUpgrade onClick={closeOverlay} />
+          </div>
+        )}
         <div className="inner-content overflow-auto px-10">
           <ReactMarkdown>{jsonViewerAppDescription}</ReactMarkdown>
         </div>

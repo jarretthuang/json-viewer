@@ -61,7 +61,24 @@ describe("Pro navigation", () => {
       });
       expect(link).toHaveAttribute("href", "/pro");
       const title = within(dialog).getByText("JSON Viewer", { exact: true });
-      expect(link.parentElement).toBe(title.parentElement);
+      const titleRow = title.parentElement!;
+      const byline = within(dialog).getByRole("link", {
+        name: "Open JH Labs homepage",
+      }).parentElement!;
+      expect(within(dialog).getAllByRole("link", { name: /Pro/ })).toHaveLength(1);
+      if (isPro) {
+        expect(link.parentElement).toBe(titleRow);
+        expect(byline.nextElementSibling).toHaveClass("inner-content");
+      } else {
+        expect(within(titleRow).queryByRole("link")).not.toBeInTheDocument();
+        const upgradeRow = link.parentElement!;
+        expect(byline.nextElementSibling).toBe(upgradeRow);
+        expect(upgradeRow.children).toHaveLength(1);
+        expect(upgradeRow).toHaveClass(
+          "my-3", "flex", "justify-center",
+          "[&>a]:mb-0", "[&>a]:ml-0", "[&>a]:self-auto"
+        );
+      }
       expect(link).toHaveClass("rounded-full", "text-[10px]");
       expect(link).not.toHaveClass("underline");
       if (badge) {
