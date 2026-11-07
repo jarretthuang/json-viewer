@@ -118,8 +118,8 @@ it("presents the quiet upgrade with honest rollout copy and activation controls"
   ).toContainElement(screen.getByLabelText("License key"));
   expect(screen.getByRole("button", { name: "Clear key" })).toBeInTheDocument();
   expect(
-    screen.getByRole("link", { name: "Back to JSON Viewer" })
-  ).toHaveAttribute("href", "/");
+    screen.queryByRole("link", { name: "Back to JSON Viewer" })
+  ).not.toBeInTheDocument();
 });
 
 it("prioritizes management and collapses purchasing for an activated browser", () => {

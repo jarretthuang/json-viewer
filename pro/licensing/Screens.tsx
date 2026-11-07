@@ -17,12 +17,6 @@ const messages: Record<LicenseError, string> = {
 function Frame({ title, children }: { title: string; children: ReactNode }) {
   return (
     <main className="mx-auto max-w-[576px] space-y-[24px] px-[24px] py-[40px] text-[16px] sm:py-[64px]">
-      <Link
-        href="/"
-        className="inline-block text-[14px] text-slate-600 underline decoration-powderBlue-200 underline-offset-4 hover:text-slate-950 focus-visible:outline focus-visible:outline-2 focus-visible:outline-powderBlue-400 dark:text-neutral-400 dark:hover:text-offWhite"
-      >
-        Back to JSON Viewer
-      </Link>
       <h1 className="text-[30px] font-medium tracking-tight">{title}</h1>
       {children}
     </main>
