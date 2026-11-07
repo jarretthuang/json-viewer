@@ -33,12 +33,41 @@ it("shows an actionable not-configured state on license entry", async () => {
     "/pro/lost-key"
   );
 });
-it("explains that key recovery is unavailable", () => {
+it("renders and submits email recovery with generic confirmation", async () => {
+  fetchMock.mockResolvedValue({ ok: true });
   render(<LostKeyScreen />);
-  expect(
-    screen.getByText(/Automatic key recovery is unavailable/)
-  ).toBeInTheDocument();
-  expect(fetchMock).not.toHaveBeenCalled();
+  fireEvent.change(screen.getByLabelText("Purchase email"), {
+    target: { value: "buyer@example.com" },
+  });
+  fireEvent.click(screen.getByRole("button", { name: "Send license key" }));
+  await waitFor(() =>
+    expect(
+      screen.getByRole("status", { name: "Recovery status" })
+    ).toHaveTextContent("If that email purchased Pro, the key has been sent.")
+  );
+  expect(fetchMock).toHaveBeenCalledWith(
+    "/api/license/resend",
+    expect.objectContaining({
+      body: JSON.stringify({ email: "buyer@example.com" }),
+    })
+  );
+  expect(screen.getByRole("link", { name: "Enter your key" })).toHaveAttribute(
+    "href",
+    "/pro"
+  );
+});
+it("shows a retry message on recovery delivery failure", async () => {
+  fetchMock.mockResolvedValue({ ok: false, status: 503 });
+  render(<LostKeyScreen />);
+  fireEvent.change(screen.getByLabelText("Purchase email"), {
+    target: { value: "buyer@example.com" },
+  });
+  fireEvent.click(screen.getByRole("button", { name: "Send license key" }));
+  await waitFor(() =>
+    expect(screen.getByRole("status")).toHaveTextContent(
+      "Could not send right now"
+    )
+  );
 });
 it("keeps completion unconfirmed until a verified adapter supplies it", () => {
   const view = render(<ThankYouScreen />);
