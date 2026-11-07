@@ -212,7 +212,7 @@ export default function NavBar({
             {isProEnabled() && isPro && (
               <Link
                 href="/pro"
-                className="ml-2 rounded-full border border-current px-2 py-0.5 text-xs font-semibold leading-none opacity-50 hover:opacity-70"
+                className="mb-1.5 ml-2 self-end rounded-full border border-current px-1.5 py-px text-[10px] font-medium leading-none opacity-50 hover:opacity-70"
               >
                 Pro
               </Link>
