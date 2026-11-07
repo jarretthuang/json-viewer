@@ -60,19 +60,45 @@ export async function fulfill(
   if (result.error) throw new Error("email_delivery_failed");
 }
 
-// Paginate both lists: an older purchase or duplicate customer must remain recoverable.
+// Paginate customer-anchored lists so older purchases remain recoverable.
 export async function recoverLicense(stripe: Stripe, email: string) {
-  for await (const customer of stripe.customers.list({ email, limit: 100 })) {
-    for await (const session of stripe.checkout.sessions.list({
-      customer: customer.id,
-      status: "complete",
+  const normalizedEmail = email.toLowerCase();
+  const customerIds = new Set<string>();
+  for (const lookupEmail of Array.from(new Set([email, normalizedEmail]))) {
+    for await (const customer of stripe.customers.list({
+      email: lookupEmail,
       limit: 100,
     })) {
+      if (customerIds.has(customer.id)) continue;
+      customerIds.add(customer.id);
+      for await (const session of stripe.checkout.sessions.list({
+        customer: customer.id,
+        status: "complete",
+        limit: 100,
+      })) {
+        const license = await paidLicense(stripe, session.id);
+        if (license && license.email.toLowerCase() === normalizedEmail) {
+          await fulfill(stripe, session.id, true);
+          return;
+        }
+      }
+    }
+  }
+
+  // Guest checkout may have no Customer. Scan at most the latest 1,000
+  // completed sessions (10 pages of 100) to bound each recovery request.
+  let scanned = 0;
+  for await (const session of stripe.checkout.sessions.list({
+    status: "complete",
+    limit: 100,
+  })) {
+    if (session.customer_details?.email?.toLowerCase() === normalizedEmail) {
       const license = await paidLicense(stripe, session.id);
-      if (license && license.email.toLowerCase() === email.toLowerCase()) {
+      if (license && license.email.toLowerCase() === normalizedEmail) {
         await fulfill(stripe, session.id, true);
         return;
       }
     }
+    if (++scanned >= 1_000) break;
   }
 }
