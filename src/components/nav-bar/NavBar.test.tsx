@@ -58,7 +58,8 @@ describe("PRO navigation", () => {
         const home = within(nav).getByRole("link", { name: "Go to JSON Viewer home" });
         expect(home).toContainElement(within(nav).getByAltText("JSON Viewer logo"));
         expect(home).toContainElement(within(nav).getByText("jsonviewer.io"));
-        expect(badge?.previousElementSibling).toHaveTextContent("jsonviewer.io");
+        expect(badge?.previousElementSibling).toBe(home);
+        expect(badge).toHaveAccessibleName("PRO");
       } else {
         expect(badge).not.toBeInTheDocument();
       }
@@ -90,13 +91,15 @@ describe("PRO navigation", () => {
           "[&>a]:mb-0", "[&>a]:ml-0", "[&>a]:self-auto"
         );
       }
-      expect(link).toHaveClass(
-        "ml-1", "rounded-full", "px-1.5", "py-px", "text-[25px]", "font-semibold",
-        "border", "border-mono-800/30", "bg-white/70", "text-mono-800/75",
-        "shadow-sm", "leading-none", "hover:bg-white/90", "hover:text-mono-800/90",
-        "dark:bg-white/[0.08]", "dark:border-mono-300/[0.35]", "dark:text-mono-300/75",
-        "dark:hover:bg-white/[0.12]", "dark:hover:text-mono-300/90"
-      );
+      expect(link).toHaveAccessibleName(isPro ? "PRO" : "Upgrade to PRO");
+      const svg = link.querySelector("svg")!;
+      expect(svg).toHaveAttribute("viewBox", `0 0 ${isPro ? 81.075 : 220.3} 29`);
+      expect(svg).toHaveAttribute("aria-hidden", "true");
+      expect(svg).toHaveClass("h-[0.8055555556rem]", "w-auto", "font-semibold");
+      expect(svg.querySelector("rect")).toHaveAttribute("stroke-width", "1");
+      expect(svg.querySelector("text")).toHaveTextContent(isPro ? "PRO" : "Upgrade to PRO");
+      expect(svg.querySelector("text")).toHaveAttribute("font-size", "25");
+      expect(svg.querySelector("text")).toHaveAttribute("text-rendering", "geometricPrecision");
       expect(link).not.toHaveClass("mb-1.5", "self-end");
       expect(titleRow).toHaveClass("flex", "items-center");
       expect(link).not.toHaveClass("underline");
