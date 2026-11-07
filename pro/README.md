@@ -17,6 +17,14 @@ route adapters do import its licensing code.
   errors return 502 so Stripe can retry.
 - `/pro/thank-you?session_id=…` independently retrieves and verifies the purchase
   and re-mints the key for display. It does not confirm email delivery.
+- `/pro/lost-key` submits an email form to `POST /api/license/resend`. The endpoint
+  queries Stripe customers using the as-entered and lowercased email, deduplicates
+  matches, and scans the latest 1,000 completed checkout sessions for a
+  case-insensitive `customer_details.email` match to cover guest checkouts without
+  a Customer object. It re-checks paid status, deterministically re-mints the same
+  key and re-sends it through the normal fulfillment path. Responses are generic
+  to avoid disclosing account existence; requests share the resend rate-limit
+  bucket of 5 requests per 10 minutes.
 
 `pro/licensing/` holds the screens, checkout button, browser license state,
 key signing/verification, validation handler and Stripe/Resend helpers.
@@ -52,12 +60,7 @@ requests share one bucket. Multi-instance limiting needs a shared store.
 
 ## Current status and future work
 
-Pro tools are coming soon. Automatic key recovery is currently unavailable;
-[issue #63](https://github.com/jarretthuang/json-viewer/issues/63) plans Stripe
-lookup by email, deterministic re-minting and re-sending without a database.
-Refund events are logged; revocation is future work. Live mode needs live
-product/price IDs, webhook configuration and keys in Vercel, plus explicit
-launch review.
+Pro tools are coming soon. Refund events are logged; revocation is future work. Live mode needs live product/price IDs, webhook configuration and keys in Vercel, plus explicit launch review.
 
 Reported sandbox verification on November 6, 2026: a sandbox purchase completed,
 the webhook fired, the license email arrived and the key validated
