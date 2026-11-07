@@ -1,5 +1,6 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { LicenseScreen, LostKeyScreen, ThankYouScreen } from "./Screens";
+import { PRO_PRICE_DISPLAY } from "@/lib/pro-config";
 import { ProGate } from "./ProGate";
 import { STORAGE_KEY } from "./usePro";
 
@@ -59,7 +60,9 @@ it("handles checkout not being configured without crashing", async () => {
     json: async () => ({ error: "not_configured" }),
   });
   render(<ProGate>Future feature</ProGate>);
-  expect(screen.getByText(/Pro is a \$19.99 one-time/)).toBeInTheDocument();
+  expect(
+    screen.getByText(`Pro is a ${PRO_PRICE_DISPLAY} one-time`, { exact: false })
+  ).toBeInTheDocument();
   fireEvent.click(screen.getByRole("button", { name: "Upgrade to Pro" }));
   await waitFor(() =>
     expect(
@@ -92,7 +95,7 @@ it("presents the quiet upgrade with honest rollout copy and activation controls"
   expect(
     screen.queryByRole("link", { name: "Upgrade to Pro" })
   ).not.toBeInTheDocument();
-  expect(screen.getByText("$19.99")).toBeInTheDocument();
+  expect(screen.getByText(PRO_PRICE_DISPLAY)).toBeInTheDocument();
   expect(screen.getByText(/USD · one-time purchase/)).toBeInTheDocument();
   expect(
     screen.getByText(

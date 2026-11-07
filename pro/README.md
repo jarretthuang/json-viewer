@@ -30,9 +30,9 @@ secret and retain it: rotating it invalidates issued keys. Never use a public
 Next.js variable for any secret. `.env*` remains ignored.
 
 Price/product constants live in `src/lib/pro-config.ts`. These currently identify
-the sandbox $19.99 USD one-time product. Moving to live mode requires live IDs,
-keys, webhook registration and explicit launch review; there is no test-only
-branch in the integration code. Checkout enables Managed Payments explicitly.
+the sandbox one-time product; `PRO_PRICE_DISPLAY` defines its displayed USD price.
+Moving to live mode requires live IDs, keys, webhook registration and explicit
+launch review; there is no test-only branch in the integration code. Checkout enables Managed Payments explicitly.
 
 Webhook signatures are checked against the raw request body. Both successful
 Checkout events retrieve the session and verify paid status, mode, quantity,
