@@ -24,7 +24,7 @@ export default function ProBadge({
     <Link
       href="/pro"
       onClick={onClick}
-      className="mb-1.5 ml-2 self-end rounded-full border border-current px-1.5 py-px text-[10px] font-medium leading-none opacity-50 hover:opacity-70"
+      className="ml-1 rounded-full border border-current px-2 py-0.5 text-xs font-semibold leading-none opacity-50 hover:opacity-70"
     >
       {isPro ? "Pro" : "Upgrade to Pro"}
     </Link>

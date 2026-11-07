@@ -79,7 +79,10 @@ describe("Pro navigation", () => {
           "[&>a]:mb-0", "[&>a]:ml-0", "[&>a]:self-auto"
         );
       }
-      expect(link).toHaveClass("rounded-full", "text-[10px]");
+      expect(link).toHaveClass(
+        "ml-1", "rounded-full", "px-2", "py-0.5", "text-xs", "font-semibold"
+      );
+      expect(link).not.toHaveClass("mb-1.5", "self-end");
       expect(link).not.toHaveClass("underline");
       if (badge) {
         expect(link.className).toBe(badge.className);
