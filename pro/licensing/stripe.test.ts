@@ -133,6 +133,8 @@ it("verifies the raw body and idempotently fulfills duplicate events", async () 
   const license = await paidLicense(getStripe()!, paid.id);
   expect(verifyLicense(license!.key)).toBe(true);
   expect(mockSend.mock.calls[0][0].text).toContain(license!.key);
+  expect(mockSend.mock.calls[0][0].html).toContain(license!.key);
+  expect(mockSend.mock.calls[0][0].subject).toBe("Your JSON Viewer PRO license key");
 });
 it.each([
   "checkout.session.completed",
@@ -212,6 +214,9 @@ it("recovers a paid PRO purchase while sales are disabled and uses a fresh deliv
     limit: 100,
   });
   expect(mockSend.mock.calls[0][0].text).toContain(
+    (await paidLicense(getStripe()!, paid.id))!.key
+  );
+  expect(mockSend.mock.calls[0][0].html).toContain(
     (await paidLicense(getStripe()!, paid.id))!.key
   );
   expect(mockSend.mock.calls[0][1].idempotencyKey).toMatch(/^pro-recovery\//);
