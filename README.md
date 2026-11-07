@@ -105,6 +105,7 @@ npm run benchmark -- --base-url=http://127.0.0.1:3000 --runs=10 --payloads=1,5,1
 │   │   └── notification/            User notification wrapper and styles
 │   ├── models/                      Shared app copy and descriptions
 │   └── utils/                       Shared utility helpers
+├── pro/                             Proprietary Pro licensing and billing (see pro/README.md)
 ├── public/                          App icons, manifest, and static assets
 ├── e2e/                             Playwright end-to-end coverage
 └── scripts/                         Local project scripts
@@ -122,6 +123,4 @@ Copyright @[Jarrett Huang](https://github.com/jarretthuang), under the [MIT Lice
 
 ## Licensing
 
-The core (everything outside `pro/`) is MIT-licensed and available for source
-review. `pro/` is proprietary under [pro/LICENSE](pro/LICENSE). No outside pull
-requests are merged into `pro/`.
+The core (everything outside `pro/`) is MIT-licensed. `pro/` is proprietary under [pro/LICENSE](pro/LICENSE).

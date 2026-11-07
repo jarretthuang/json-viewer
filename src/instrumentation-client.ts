@@ -7,9 +7,11 @@ if (process.env.NEXT_PUBLIC_SENTRY_DSN) {
     dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
     ignoreErrors: [
       /Share canceled/,
+      /cancellation of share/,
       /Document is not focused/,
-      /captured as exception/,
+      /captured as (exception|promise rejection)/,
       /reading 'isVisible'/,
+      /Failed to execute 'importScripts'/,
     ],
     beforeSend(event) {
       if (typeof event.request?.url === 'string') {
