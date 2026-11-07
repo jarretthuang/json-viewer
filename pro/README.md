@@ -1,7 +1,7 @@
 # Pro licensing and billing
 
 `pro/` contains proprietary Pro licensing and Stripe billing for jsonviewer.io,
-with a one-time $19.99 USD license. The open-core licensing split is described in
+with a one-time paid license. The open-core licensing split is described in
 [LICENSE](LICENSE) and the root README's [Licensing section](../README.md#licensing).
 The JSON editor, tree and toolbar do not import `pro/`; the navbar and Next.js
 route adapters do import its licensing code.
@@ -59,8 +59,8 @@ Refund events are logged; revocation is future work. Live mode needs live
 product/price IDs, webhook configuration and keys in Vercel, plus explicit
 launch review.
 
-Reported sandbox verification on November 6, 2026: a $22.39 purchase including BC
-tax completed, the webhook fired, the license email arrived and the key validated
+Reported sandbox verification on November 6, 2026: a sandbox purchase completed,
+the webhook fired, the license email arrived and the key validated
 on `/pro`.
 
 ## Future extension points (not built)
