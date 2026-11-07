@@ -40,6 +40,8 @@ test.each([
   const badge = within(nav).queryByRole("link", { name: "Pro" });
   if (enabled && isPro) {
     expect(badge).toHaveAttribute("href", "/pro");
+    expect(badge).toHaveAttribute("target", "_blank");
+    expect(badge).toHaveAttribute("rel", "noopener noreferrer");
   } else {
     expect(badge).not.toBeInTheDocument();
   }
@@ -49,6 +51,8 @@ test.each([
   if (enabled) {
     expect(proLink).toHaveTextContent(isPro ? "Pro" : "Upgrade to Pro");
     expect(proLink).toHaveAttribute("href", "/pro");
+    expect(proLink).toHaveAttribute("target", "_blank");
+    expect(proLink).toHaveAttribute("rel", "noopener noreferrer");
   } else {
     expect(proLink).not.toBeInTheDocument();
   }

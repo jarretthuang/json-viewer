@@ -49,6 +49,8 @@ describe("Pro navigation", () => {
       const badge = within(nav).queryByRole("link", { name: /Pro/ });
       if (isPro) {
         expect(badge).toHaveAttribute("href", "/pro");
+        expect(badge).toHaveAttribute("target", "_blank");
+        expect(badge).toHaveAttribute("rel", "noopener noreferrer");
         expect(badge?.parentElement?.closest("a")).toBeNull();
         expect(badge?.parentElement?.tagName).toBe("LI");
         expect(badge?.parentElement).toHaveClass("p-2");
@@ -67,6 +69,8 @@ describe("Pro navigation", () => {
         name: isPro ? "Pro" : "Upgrade to Pro",
       });
       expect(link).toHaveAttribute("href", "/pro");
+      expect(link).toHaveAttribute("target", "_blank");
+      expect(link).toHaveAttribute("rel", "noopener noreferrer");
       const title = within(dialog).getByText("JSON Viewer", { exact: true });
       const titleRow = title.parentElement!;
       const byline = within(dialog).getByRole("link", {
