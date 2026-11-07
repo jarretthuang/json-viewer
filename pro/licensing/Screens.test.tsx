@@ -82,3 +82,117 @@ it("renders new feature content for a cached valid license", () => {
   expect(screen.getByText("Future feature")).toBeInTheDocument();
   expect(fetchMock).not.toHaveBeenCalled();
 });
+
+it("presents the quiet upgrade with honest rollout copy and activation controls", () => {
+  render(<LicenseScreen />);
+  expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(
+    "JSON Viewer Pro"
+  );
+  expect(screen.getByRole("button", { name: "Upgrade to Pro" })).toBeVisible();
+  expect(
+    screen.queryByRole("link", { name: "Upgrade to Pro" })
+  ).not.toBeInTheDocument();
+  expect(screen.getByText("$19.99")).toBeInTheDocument();
+  expect(screen.getByText(/USD · one-time purchase/)).toBeInTheDocument();
+  expect(
+    screen.getByText(
+      /Existing JSON tools stay free. License key delivered by email./
+    )
+  ).toBeInTheDocument();
+  expect(
+    screen.getByText(
+      /Coming soon. Your license unlocks these tools as they roll out/
+    )
+  ).toBeInTheDocument();
+  expect(
+    screen.getAllByRole("listitem").map((item) => item.textContent)
+  ).toEqual([
+    "JSON diff & compare",
+    "JWT inspector",
+    "Schema tools",
+    "Format conversion",
+    "Regex search",
+  ]);
+  expect(
+    screen.getByRole("region", { name: "Already have a license?" })
+  ).toContainElement(screen.getByLabelText("License key"));
+  expect(screen.getByRole("button", { name: "Clear key" })).toBeInTheDocument();
+  expect(
+    screen.queryByRole("link", { name: "Back to JSON Viewer" })
+  ).not.toBeInTheDocument();
+});
+
+it("prioritizes management and collapses purchasing for an activated browser", () => {
+  localStorage.setItem(
+    STORAGE_KEY,
+    JSON.stringify({ key: "example", valid: true, checkedAt: Date.now() })
+  );
+  render(<LicenseScreen />);
+  expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(
+    "Your Pro license"
+  );
+  expect(screen.getByText("Pro is enabled on this browser.")).toBeVisible();
+  expect(
+    screen.getByRole("region", { name: "Manage your license" })
+  ).toBeVisible();
+  expect(
+    screen.getByText("Purchase another license").closest("details")
+  ).not.toHaveAttribute("open");
+  fireEvent.click(screen.getByRole("button", { name: "Clear key" }));
+  expect(localStorage.getItem(STORAGE_KEY)).toBeNull();
+  expect(
+    screen.getByRole("status", { name: "License status" })
+  ).toHaveTextContent("Saved license cleared.");
+  expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(
+    "JSON Viewer Pro"
+  );
+});
+
+it("validates a key, clears the input, and switches to management", async () => {
+  fetchMock.mockResolvedValue({
+    ok: true,
+    json: async () => ({ valid: true }),
+  });
+  render(<LicenseScreen />);
+  fireEvent.change(screen.getByLabelText("License key"), {
+    target: { value: "valid-key" },
+  });
+  fireEvent.click(screen.getByRole("button", { name: "Validate key" }));
+  expect(screen.getByRole("button", { name: "Validating…" })).toBeDisabled();
+  await waitFor(() =>
+    expect(
+      screen.getByRole("status", { name: "License status" })
+    ).toHaveTextContent("License validated and saved on this browser.")
+  );
+  expect(screen.getByLabelText("License key")).toHaveValue("");
+  expect(screen.getByText("Pro is enabled on this browser.")).toBeVisible();
+  expect(fetchMock).toHaveBeenCalledWith(
+    "/api/license/validate",
+    expect.objectContaining({
+      method: "POST",
+      body: JSON.stringify({ key: "valid-key" }),
+    })
+  );
+});
+
+it("retains checkout unavailable handling on the redesigned page", async () => {
+  fetchMock.mockResolvedValue({
+    ok: false,
+    json: async () => ({ error: "not_configured" }),
+  });
+  render(<LicenseScreen />);
+  fireEvent.click(screen.getByRole("button", { name: "Upgrade to Pro" }));
+  await waitFor(() =>
+    expect(
+      screen.getByRole("button", { name: "Upgrade to Pro" })
+    ).toBeDisabled()
+  );
+  expect(
+    screen.getByRole("status", { name: "Checkout status" })
+  ).toHaveTextContent(
+    "Checkout is not configured yet. Your free JSON tools remain available."
+  );
+  expect(fetchMock).toHaveBeenCalledWith("/api/checkout/create", {
+    method: "POST",
+  });
+});

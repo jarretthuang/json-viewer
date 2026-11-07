@@ -49,6 +49,8 @@ describe("Pro navigation", () => {
       const badge = within(nav).queryByRole("link", { name: /Pro/ });
       if (isPro) {
         expect(badge).toHaveAttribute("href", "/pro");
+        expect(badge).toHaveAttribute("target", "_blank");
+        expect(badge).toHaveAttribute("rel", "noopener noreferrer");
         expect(badge?.parentElement?.closest("a")).toBeNull();
         expect(badge?.parentElement?.tagName).toBe("LI");
         expect(badge?.parentElement).toHaveClass("p-2");
@@ -67,6 +69,8 @@ describe("Pro navigation", () => {
         name: isPro ? "Pro" : "Upgrade to Pro",
       });
       expect(link).toHaveAttribute("href", "/pro");
+      expect(link).toHaveAttribute("target", "_blank");
+      expect(link).toHaveAttribute("rel", "noopener noreferrer");
       const title = within(dialog).getByText("JSON Viewer", { exact: true });
       const titleRow = title.parentElement!;
       const byline = within(dialog).getByRole("link", {
@@ -87,10 +91,10 @@ describe("Pro navigation", () => {
         );
       }
       expect(link).toHaveClass(
-        "ml-1", "rounded-full", "px-1.5", "py-px", "text-xs", "font-semibold",
-        "border", "border-mono-800/30", "bg-white/70", "text-mono-800/75",
+        "ml-1", "rounded-full", "px-3", "py-1", "text-xs", "font-semibold",
+        "border-2", "border-mono-800/50", "bg-white/70", "text-mono-800/75",
         "shadow-sm", "leading-none", "hover:bg-white/90", "hover:text-mono-800/90",
-        "dark:bg-white/[0.08]", "dark:border-mono-300/[0.35]", "dark:text-mono-300/75",
+        "dark:bg-white/[0.08]", "dark:border-mono-300/[0.55]", "dark:text-mono-300/75",
         "dark:hover:bg-white/[0.12]", "dark:hover:text-mono-300/90"
       );
       expect(link).not.toHaveClass("mb-1.5", "self-end");
