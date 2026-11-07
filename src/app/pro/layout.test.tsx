@@ -1,6 +1,7 @@
 import { render, screen, within } from "@testing-library/react";
 import { usePro } from "../../../pro/licensing/usePro";
 import ProLayout from "./layout";
+import LegalPage from "@/components/legal/LegalPage";
 import ProPage from "./page";
 
 jest.mock("../../../pro/licensing/usePro", () => ({ usePro: jest.fn() }));
@@ -12,42 +13,62 @@ afterEach(() => {
   process.env = { ...originalEnv };
 });
 
-test.each([
-  [false, false],
-  [false, true],
-  [true, false],
-  [true, true],
-])("renders shared navigation with enabled=%s and isPro=%s", (enabled, isPro) => {
-  process.env.NEXT_PUBLIC_PRO_ENABLED = String(enabled);
-  mockUsePro.mockReturnValue({
-    isPro,
-    validateKey: jest.fn(),
-    clearKey: jest.fn(),
-  });
-  render(
-    <ProLayout>
-      <main>Route content</main>
-    </ProLayout>
-  );
+describe.each(["Pro", "Legal"])("%s page navigation", (page) => {
+  test.each([
+    [false, false],
+    [false, true],
+    [true, false],
+    [true, true],
+  ])(
+    "renders shared navigation with enabled=%s and isPro=%s",
+    (enabled, isPro) => {
+      process.env.NEXT_PUBLIC_PRO_ENABLED = String(enabled);
+      mockUsePro.mockReturnValue({
+        isPro,
+        validateKey: jest.fn(),
+        clearKey: jest.fn(),
+      });
+      render(
+        page === "Pro" ? (
+          <ProLayout>
+            <main>Route content</main>
+          </ProLayout>
+        ) : (
+          <LegalPage title="Legal title">Route content</LegalPage>
+        )
+      );
 
-  const nav = screen.getByRole("navigation");
-  expect(within(nav).getByText("jsonviewer.io")).toBeInTheDocument();
-  expect(within(nav).getByRole("link", { name: "Go to JSON Viewer home" }))
-    .toHaveAttribute("href", "/");
-  expect(nav.compareDocumentPosition(screen.getByRole("main")))
-    .toBe(Node.DOCUMENT_POSITION_FOLLOWING);
-  for (const name of ["Go back", "Go forward", "Share URL", "More options"]) {
-    expect(within(nav).queryByRole("button", { name })).not.toBeInTheDocument();
-  }
-  expect(within(nav).getByRole("button", { name: /theme/i })).toBeInTheDocument();
-  const badge = within(nav).queryByRole("link", { name: "Pro" });
-  if (enabled && isPro) {
-    expect(badge).toHaveAttribute("href", "/pro");
-    expect(badge).toHaveAttribute("target", "_blank");
-    expect(badge).toHaveAttribute("rel", "noopener noreferrer");
-  } else {
-    expect(badge).not.toBeInTheDocument();
-  }
+      const nav = screen.getByRole("navigation");
+      expect(within(nav).getByText("jsonviewer.io")).toBeInTheDocument();
+      expect(
+        within(nav).getByRole("link", { name: "Go to JSON Viewer home" })
+      ).toHaveAttribute("href", "/");
+      expect(nav.compareDocumentPosition(screen.getByRole("main"))).toBe(
+        Node.DOCUMENT_POSITION_FOLLOWING
+      );
+      for (const name of [
+        "Go back",
+        "Go forward",
+        "Share URL",
+        "More options",
+      ]) {
+        expect(
+          within(nav).queryByRole("button", { name })
+        ).not.toBeInTheDocument();
+      }
+      expect(
+        within(nav).getByRole("button", { name: /theme/i })
+      ).toBeInTheDocument();
+      const badge = within(nav).queryByRole("link", { name: "Pro" });
+      if (enabled && isPro) {
+        expect(badge).toHaveAttribute("href", "/pro");
+        expect(badge).toHaveAttribute("target", "_blank");
+        expect(badge).toHaveAttribute("rel", "noopener noreferrer");
+      } else {
+        expect(badge).not.toBeInTheDocument();
+      }
+    }
+  );
 });
 
 test("keeps navigation above the unavailable page while Pro is off", () => {
@@ -57,7 +78,11 @@ test("keeps navigation above the unavailable page while Pro is off", () => {
     validateKey: jest.fn(),
     clearKey: jest.fn(),
   });
-  render(<ProLayout><ProPage /></ProLayout>);
+  render(
+    <ProLayout>
+      <ProPage />
+    </ProLayout>
+  );
   expect(screen.getByRole("navigation")).toBeInTheDocument();
   expect(screen.getByText("Pro isn't available yet.")).toBeInTheDocument();
 });

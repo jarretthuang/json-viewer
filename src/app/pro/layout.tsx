@@ -1,17 +1,10 @@
 import { ReactNode } from "react";
-import NavBar from "@/components/nav-bar/NavBar";
+import InfoPageNavBar from "@/components/nav-bar/InfoPageNavBar";
 
 export default function ProLayout({ children }: { children: ReactNode }) {
   return (
     <>
-      <NavBar
-        actionVisibility={{
-          back: false,
-          forward: false,
-          share: false,
-          moreOptions: false,
-        }}
-      />
+      <InfoPageNavBar />
       {children}
     </>
   );
