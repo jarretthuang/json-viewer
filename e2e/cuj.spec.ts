@@ -226,7 +226,7 @@ test("Monaco search handles special characters and invalid regex patterns", asyn
     await search.fill(value);
     await expect(search).toHaveAttribute("aria-invalid", "true");
   }
-  await search.fill("servlet");
+  await search.fill("servlet|web-app");
   await expect(search).not.toHaveAttribute("aria-invalid", "true");
   await expect(findWidget.locator(".matchesCount")).toHaveText(/\d+ of \d+/);
   expect(errors).toEqual([]);
