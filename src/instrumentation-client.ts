@@ -1,4 +1,5 @@
 import * as Sentry from '@sentry/nextjs';
+import { isMonacoFindRegexEvent } from './sentry-monaco-find';
 import { scrubBreadcrumbUrl, scrubErrorMessage, stripJsonQueryParam } from './sentry-scrub';
 
 // Next.js 15.3+ loads this entry point before hydration.
@@ -14,6 +15,9 @@ if (process.env.NEXT_PUBLIC_SENTRY_DSN) {
       /Failed to execute 'importScripts'/,
     ],
     beforeSend(event) {
+      // Last resort: Monaco has no public catch hook for RegExp.exec in find.
+      // A window listener is insufficient: Sentry also captures wrapped timers.
+      if (isMonacoFindRegexEvent(event)) return null;
       if (typeof event.request?.url === 'string') {
         event.request.url = stripJsonQueryParam(event.request.url);
       }
