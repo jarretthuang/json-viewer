@@ -1,6 +1,6 @@
 import * as Sentry from '@sentry/nextjs';
 import { isMonacoFindRegexEvent } from './sentry-monaco-find';
-import { scrubBreadcrumbUrl, scrubErrorMessage, stripJsonQueryParam } from './sentry-scrub';
+import { scrubBreadcrumbUrl, scrubStackFrames, scrubErrorMessage, stripJsonQueryParam } from './sentry-scrub';
 
 // Next.js 15.3+ loads this entry point before hydration.
 if (process.env.NEXT_PUBLIC_SENTRY_DSN) {
@@ -22,6 +22,7 @@ if (process.env.NEXT_PUBLIC_SENTRY_DSN) {
         event.request.url = stripJsonQueryParam(event.request.url);
       }
       for (const exception of event.exception?.values ?? []) {
+        scrubStackFrames(exception.stacktrace?.frames ?? []);
         if (typeof exception.value === 'string') {
           exception.value = scrubErrorMessage(exception.value);
         }
