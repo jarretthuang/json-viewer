@@ -3,11 +3,19 @@ import { usePro } from "../../../pro/licensing/usePro";
 import ProLayout from "./layout";
 import LegalPage from "@/components/legal/LegalPage";
 import ProPage from "./page";
+import { usePathname } from "next/navigation";
+
+jest.mock("next/navigation", () => ({ usePathname: jest.fn() }));
 
 jest.mock("../../../pro/licensing/usePro", () => ({ usePro: jest.fn() }));
 
 const mockUsePro = jest.mocked(usePro);
+const mockUsePathname = jest.mocked(usePathname);
 const originalEnv = { ...process.env };
+
+beforeEach(() => {
+  mockUsePathname.mockReturnValue("/pro");
+});
 
 afterEach(() => {
   process.env = { ...originalEnv };
@@ -38,7 +46,9 @@ describe.each(["PRO", "Legal"])("%s page navigation", (page) => {
         )
       );
 
-      const nav = screen.getByRole("navigation");
+      const nav = screen
+        .getByRole("link", { name: "Go to JSON Viewer home" })
+        .closest("nav")!;
       expect(within(nav).getByText("jsonviewer.io")).toBeInTheDocument();
       expect(
         within(nav).getByRole("link", { name: "Go to JSON Viewer home" })
@@ -46,6 +56,11 @@ describe.each(["PRO", "Legal"])("%s page navigation", (page) => {
       expect(nav.compareDocumentPosition(screen.getByRole("main"))).toBe(
         Node.DOCUMENT_POSITION_FOLLOWING
       );
+      if (page === "Legal") {
+        expect(
+          screen.queryByRole("navigation", { name: "Breadcrumb" })
+        ).not.toBeInTheDocument();
+      }
       for (const name of [
         "Go back",
         "Go forward",
@@ -83,6 +98,51 @@ test("keeps navigation above the unavailable page while PRO is off", () => {
       <ProPage />
     </ProLayout>
   );
-  expect(screen.getByRole("navigation")).toBeInTheDocument();
+  expect(
+    screen.getByRole("link", { name: "Go to JSON Viewer home" })
+  ).toBeInTheDocument();
   expect(screen.getByText("PRO isn't available yet.")).toBeInTheDocument();
+});
+
+test.each([
+  ["/pro", "Pro"],
+  ["/pro/lost-key", "Lost key"],
+  ["/pro/thank-you", "Thank you"],
+])("renders the breadcrumb for %s", (pathname, label) => {
+  mockUsePathname.mockReturnValue(pathname);
+  mockUsePro.mockReturnValue({
+    isPro: false,
+    validateKey: jest.fn(),
+    clearKey: jest.fn(),
+  });
+  render(
+    <ProLayout>
+      <main>Route content</main>
+    </ProLayout>
+  );
+
+  const breadcrumb = screen.getByRole("navigation", { name: "Breadcrumb" });
+  const items = within(breadcrumb).getAllByRole("listitem");
+  expect(
+    items.map((item) => item.textContent?.replace("/", "").trim())
+  ).toEqual(pathname === "/pro" ? ["Home", "Pro"] : ["Home", "Pro", label]);
+  expect(
+    within(breadcrumb).getByRole("link", { name: "Home" })
+  ).toHaveAttribute("href", "/");
+  if (pathname !== "/pro") {
+    expect(
+      within(breadcrumb).getByRole("link", { name: "Pro" })
+    ).toHaveAttribute("href", "/pro");
+  }
+  expect(
+    within(breadcrumb).queryByRole("link", { name: label })
+  ).not.toBeInTheDocument();
+  expect(within(breadcrumb).getByText(label)).toHaveAttribute(
+    "aria-current",
+    "page"
+  );
+  expect(breadcrumb.previousElementSibling).toBe(
+    screen.getByRole("link", { name: "Go to JSON Viewer home" }).closest("nav")
+  );
+  expect(breadcrumb.nextElementSibling).toBe(screen.getByRole("main"));
 });
