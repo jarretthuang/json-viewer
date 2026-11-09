@@ -1,7 +1,13 @@
 /** @jest-environment node */
 jest.mock("server-only", () => ({}), { virtual: true });
 const mockSismember = jest.fn();
-jest.mock("@vercel/kv", () => ({ kv: { sismember: (...args: unknown[]) => mockSismember(...args) } }));
+jest.mock("@upstash/redis", () => ({
+  Redis: {
+    fromEnv: () => ({
+      sismember: (...args: unknown[]) => mockSismember(...args),
+    }),
+  },
+}));
 import { revokedKeyHash } from "../../../../pro/licensing/revocation";
 import { POST as validate } from "./validate/route";
 import { POST as resend } from "./resend/route";
@@ -14,8 +20,8 @@ const request = (body: unknown) =>
     body: JSON.stringify(body),
   });
 beforeEach(() => {
-  delete process.env.KV_REST_API_URL;
-  delete process.env.KV_REST_API_TOKEN;
+  delete process.env.UPSTASH_REDIS_REST_URL;
+  delete process.env.UPSTASH_REDIS_REST_TOKEN;
   mockSismember.mockReset().mockResolvedValue(0);
   clock += 11 * 60_000;
   jest.spyOn(Date, "now").mockReturnValue(clock);
@@ -82,8 +88,8 @@ it.each([{}, { email: 5 }, { email: "invalid" }, { email: "x".repeat(3000) }])(
 );
 
 it.each([0, 1])("checks revocation for signed keys: %s", async (revoked) => {
-  process.env.KV_REST_API_URL = "https://kv.example.com";
-  process.env.KV_REST_API_TOKEN = "test-token";
+  process.env.UPSTASH_REDIS_REST_URL = "https://redis.example.com";
+  process.env.UPSTASH_REDIS_REST_TOKEN = "test-token";
   mockSismember.mockResolvedValue(revoked);
   const key = mintLicense("cs_test_order", "buyer@example.com");
   const response = await validate(request({ key }));
@@ -95,8 +101,8 @@ it.each([0, 1])("checks revocation for signed keys: %s", async (revoked) => {
 it("skips KV for invalid signatures and absent configuration", async () => {
   const key = mintLicense("cs_test_order", "buyer@example.com");
   expect(await (await validate(request({ key }))).json()).toEqual({ valid: true, activations: 1 });
-  process.env.KV_REST_API_URL = "https://kv.example.com";
-  process.env.KV_REST_API_TOKEN = "test-token";
+  process.env.UPSTASH_REDIS_REST_URL = "https://redis.example.com";
+  process.env.UPSTASH_REDIS_REST_TOKEN = "test-token";
   await validate(request({ key: "invalid" }));
   expect(mockSismember).not.toHaveBeenCalled();
 });

@@ -62,12 +62,13 @@ requests share one bucket. Multi-instance limiting needs a shared store.
 
 Recovery skips revoked keys and keeps searching.
 
-Full refunds add the license key's SHA-256 hash to the Vercel KV set
+Full refunds add the license key's SHA-256 hash to the Redis set
 `pro:revoked-keys:v1`; validation checks this set and revoked keys are not
-re-sent. Link an Upstash Redis store in Vercel and configure `KV_REST_API_URL`
-and `KV_REST_API_TOKEN`. Without both variables, revocation is skipped and the
+re-sent. Link an Upstash Redis store via the Vercel Marketplace and configure
+`UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN`. The client uses
+`@upstash/redis`. Without both variables, revocation is skipped and the
 refund webhook logs a fixed code; validation continues to accept signed keys.
-KV errors return 502 from the webhook so Stripe retries. Partial refunds do not
+Redis errors return 502 from the webhook so Stripe retries. Partial refunds do not
 revoke licenses. The human issuing the refund enforces the 14-day window;
 code does not enforce it. Fair use is a stated policy only.
 
