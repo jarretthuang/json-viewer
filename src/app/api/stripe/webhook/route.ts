@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import { getStripe, fulfill } from "../../../../../pro/licensing/stripe";
+import { getStripe, fulfill, paidLicense } from "../../../../../pro/licensing/stripe";
+import { revokeLicenseKey } from "../../../../../pro/licensing/revocation";
 export const runtime = "nodejs";
 export async function POST(request: Request) {
   const signature = request.headers.get("stripe-signature");
@@ -28,9 +29,29 @@ export async function POST(request: Request) {
       case "checkout.session.async_payment_failed":
         console.info("[stripe] async_payment_failed");
         break;
-      case "charge.refunded":
-        console.info("[stripe] refund_received_revocation_pending");
+      case "charge.refunded": {
+        const charge = event.data.object;
+        if (charge.amount_refunded !== charge.amount) break;
+        const paymentIntent = typeof charge.payment_intent === "string"
+          ? charge.payment_intent
+          : charge.payment_intent?.id;
+        if (!paymentIntent) {
+          console.info("[stripe] refund_session_not_found");
+          break;
+        }
+        const sessions = await stripe.checkout.sessions.list({
+          payment_intent: paymentIntent,
+          limit: 1,
+        });
+        const session = sessions.data[0];
+        if (!session) {
+          console.info("[stripe] refund_session_not_found");
+          break;
+        }
+        const license = await paidLicense(stripe, session.id);
+        if (license) await revokeLicenseKey(license.key);
         break;
+      }
     }
     return NextResponse.json({ received: true });
   } catch {

@@ -4,6 +4,7 @@ import { NextResponse } from "next/server";
 
 import { getStripe, recoverLicense } from "./stripe";
 import { verifyLicense } from "./keys";
+import { isLicenseKeyRevoked } from "./revocation";
 const WINDOW = 10 * 60_000;
 const attempts = new Map<string, number[]>();
 const hash = (value: string) =>
@@ -102,7 +103,7 @@ export async function licenseRequest(
     return reply({ valid: false, error: "bad_request" }, 400);
   if (!process.env.LICENSE_KEY_SECRET)
     return reply({ valid: false, error: "not_configured" }, 503);
-  const valid = verifyLicense(input);
+  const valid = verifyLicense(input) && !(await isLicenseKeyRevoked(input));
   return reply(
     valid ? { valid: true, activations: 1 } : { valid: false, activations: 0 }
   );

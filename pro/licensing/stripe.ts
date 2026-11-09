@@ -4,6 +4,7 @@ import { randomUUID } from "node:crypto";
 import { Resend } from "resend";
 import { STRIPE_PRICE_ID, STRIPE_PRODUCT_ID } from "@/lib/pro-config";
 import { mintLicense } from "./keys";
+import { isLicenseKeyRevoked } from "./revocation";
 import { licenseEmailHtml, licenseEmailText } from "./email";
 export function getStripe() {
   return process.env.STRIPE_SECRET_KEY
@@ -40,6 +41,10 @@ export async function fulfill(
 ) {
   const license = await paidLicense(stripe, sessionId);
   if (!license) return;
+  if (await isLicenseKeyRevoked(license.key)) {
+    console.info("[stripe] revoked_key_not_sent");
+    return;
+  }
   if (!process.env.RESEND_API_KEY) {
     console.info("[stripe] license_email_not_configured");
     if (recovery) throw new Error("email_delivery_failed");
@@ -80,6 +85,10 @@ export async function recoverLicense(stripe: Stripe, email: string) {
       })) {
         const license = await paidLicense(stripe, session.id);
         if (license && license.email.toLowerCase() === normalizedEmail) {
+          if (await isLicenseKeyRevoked(license.key)) {
+            console.info("[stripe] recovery_revoked_key_skipped");
+            continue;
+          }
           await fulfill(stripe, session.id, true);
           return;
         }
@@ -97,8 +106,12 @@ export async function recoverLicense(stripe: Stripe, email: string) {
     if (session.customer_details?.email?.toLowerCase() === normalizedEmail) {
       const license = await paidLicense(stripe, session.id);
       if (license && license.email.toLowerCase() === normalizedEmail) {
-        await fulfill(stripe, session.id, true);
-        return;
+        if (await isLicenseKeyRevoked(license.key)) {
+          console.info("[stripe] recovery_revoked_key_skipped");
+        } else {
+          await fulfill(stripe, session.id, true);
+          return;
+        }
       }
     }
     if (++scanned >= 1_000) break;
