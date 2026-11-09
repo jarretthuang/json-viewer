@@ -2,11 +2,9 @@
 jest.mock("server-only", () => ({}), { virtual: true });
 const mockSismember = jest.fn();
 jest.mock("@upstash/redis", () => ({
-  Redis: {
-    fromEnv: () => ({
-      sismember: (...args: unknown[]) => mockSismember(...args),
-    }),
-  },
+  Redis: jest.fn().mockImplementation(() => ({
+    sismember: (...args: unknown[]) => mockSismember(...args),
+  })),
 }));
 import { revokedKeyHash } from "../../../../pro/licensing/revocation";
 import { POST as validate } from "./validate/route";
@@ -22,6 +20,8 @@ const request = (body: unknown) =>
 beforeEach(() => {
   delete process.env.UPSTASH_REDIS_REST_URL;
   delete process.env.UPSTASH_REDIS_REST_TOKEN;
+  delete process.env.KV_REST_API_URL;
+  delete process.env.KV_REST_API_TOKEN;
   mockSismember.mockReset().mockResolvedValue(0);
   clock += 11 * 60_000;
   jest.spyOn(Date, "now").mockReturnValue(clock);

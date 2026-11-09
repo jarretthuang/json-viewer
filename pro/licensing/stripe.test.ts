@@ -9,12 +9,10 @@ const mockSend = jest.fn();
 const mockSadd = jest.fn();
 const mockSismember = jest.fn();
 jest.mock("@upstash/redis", () => ({
-  Redis: {
-    fromEnv: () => ({
-      sadd: (...args: unknown[]) => mockSadd(...args),
-      sismember: (...args: unknown[]) => mockSismember(...args),
-    }),
-  },
+  Redis: jest.fn().mockImplementation(() => ({
+    sadd: (...args: unknown[]) => mockSadd(...args),
+    sismember: (...args: unknown[]) => mockSismember(...args),
+  })),
 }));
 jest.mock("stripe", () =>
   jest.fn().mockImplementation(() => ({
@@ -37,7 +35,8 @@ import { POST as webhook } from "../../src/app/api/stripe/webhook/route";
 import { getStripe, paidLicense } from "./stripe";
 import { STRIPE_PRICE_ID, STRIPE_PRODUCT_ID } from "@/lib/pro-config";
 import { verifyLicense } from "./keys";
-import { revokedKeyHash } from "./revocation";
+import { Redis } from "@upstash/redis";
+import { isLicenseKeyRevoked, revokeLicenseKey, revokedKeyHash } from "./revocation";
 const originalEnv = { ...process.env };
 const paid = {
   id: "cs_test_order",
@@ -63,6 +62,8 @@ beforeEach(() => {
   jest.clearAllMocks();
   delete process.env.UPSTASH_REDIS_REST_URL;
   delete process.env.UPSTASH_REDIS_REST_TOKEN;
+  delete process.env.KV_REST_API_URL;
+  delete process.env.KV_REST_API_TOKEN;
   mockSadd.mockReset().mockResolvedValue(1);
   mockSismember.mockReset().mockResolvedValue(0);
   process.env.NEXT_PUBLIC_PRO_ENABLED = "true";
@@ -445,4 +446,44 @@ it("does not resend revoked keys and preserves the generic response", async () =
 
 it("hashes revoked keys with SHA-256 hex", () => {
   expect(revokedKeyHash("abc")).toBe("ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad");
+});
+
+it("uses the legacy KV credentials for revocation when Upstash credentials are absent", async () => {
+  process.env.KV_REST_API_URL = "https://legacy-redis.example.com";
+  process.env.KV_REST_API_TOKEN = "legacy-token";
+  mockSismember.mockResolvedValue(1);
+
+  await revokeLicenseKey("test-key");
+  await expect(isLicenseKeyRevoked("test-key")).resolves.toBe(true);
+
+  expect(Redis).toHaveBeenCalledWith({
+    url: process.env.KV_REST_API_URL,
+    token: process.env.KV_REST_API_TOKEN,
+  });
+  expect(mockSadd).toHaveBeenCalledWith("pro:revoked-keys:v1", revokedKeyHash("test-key"));
+  expect(mockSismember).toHaveBeenCalledWith("pro:revoked-keys:v1", revokedKeyHash("test-key"));
+});
+
+it("prefers Upstash credentials over legacy KV credentials", async () => {
+  process.env.UPSTASH_REDIS_REST_URL = "https://redis.example.com";
+  process.env.UPSTASH_REDIS_REST_TOKEN = "test-token";
+  process.env.KV_REST_API_URL = "https://legacy-redis.example.com";
+  process.env.KV_REST_API_TOKEN = "legacy-token";
+
+  await revokeLicenseKey("test-key");
+
+  expect(Redis).toHaveBeenCalledWith({
+    url: process.env.UPSTASH_REDIS_REST_URL,
+    token: process.env.UPSTASH_REDIS_REST_TOKEN,
+  });
+});
+
+it("fails open without either credential pair", async () => {
+  await revokeLicenseKey("test-key");
+  await expect(isLicenseKeyRevoked("test-key")).resolves.toBe(false);
+
+  expect(Redis).not.toHaveBeenCalled();
+  expect(mockSadd).not.toHaveBeenCalled();
+  expect(mockSismember).not.toHaveBeenCalled();
+  expect(console.info).toHaveBeenCalledWith("[stripe] revocation_not_configured");
 });
