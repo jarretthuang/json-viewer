@@ -1,4 +1,4 @@
-import { scrubBreadcrumbUrl, scrubErrorMessage, stripJsonQueryParam } from './sentry-scrub';
+import { scrubBreadcrumbUrl, scrubStackFrames, scrubErrorMessage, stripJsonQueryParam } from './sentry-scrub';
 
 describe('Sentry error message scrubbing', () => {
   it.each([
@@ -41,5 +41,31 @@ describe('Sentry URL scrubbing', () => {
   it.each(['', 'not a URL', 'https://[invalid'])('safely preserves unparseable input %s', (url) => {
     expect(stripJsonQueryParam(url)).toBe(url);
     expect(scrubBreadcrumbUrl(url)).toBe(url);
+  });
+});
+
+describe('Sentry stack frame scrubbing', () => {
+  it('redacts synthetic document fields and leaves frame metadata intact', () => {
+    const frames = [{ function: '"image": "https://assets.example.test/synthetic.jpg",', filename: 'https://assets.example.test/synthetic.jpg', lineno: 12 }];
+    scrubStackFrames(frames);
+    expect(frames).toEqual([{ function: '[redacted]', filename: '[redacted]', lineno: 12 }]);
+  });
+
+  it.each(['p.next', 'p.findMatchesInNode', 'eW.findMatchesInNode', 'eW.findMatchesLineByLine', '?', '<anonymous>', 'Object.next'])('preserves legitimate function %s', (name) => {
+    const frames = [{ function: name }];
+    scrubStackFrames(frames);
+    expect(frames[0].function).toBe(name);
+  });
+
+  it.each(['app:///_next/static/chunks/synthetic.js', 'https://jsonviewer.io/_next/static/chunks/synthetic.js', '/_next/static/chunks/synthetic.js', '/srv/app/index.js'])('preserves code filename %s', (filename) => {
+    const frames = [{ filename }];
+    scrubStackFrames(frames);
+    expect(frames[0].filename).toBe(filename);
+  });
+
+  it.each(['x'.repeat(501), '{ "synthetic": 1 }', 'www.example.test/synthetic', 'https://jsonviewer.io/_next/static/chunks/synthetic.js?document=synthetic', 'https://jsonviewer.io.example.test/_next/static/chunks/synthetic.js'])('redacts clear document content in either field', (value) => {
+    const frames = [{ function: value, filename: value }];
+    scrubStackFrames(frames);
+    expect(frames[0]).toEqual({ function: '[redacted]', filename: '[redacted]' });
   });
 });

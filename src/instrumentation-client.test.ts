@@ -17,17 +17,21 @@ describe('client beforeSend', () => {
     const send = (event: ErrorEvent) => options.beforeSend!(event, {});
     const matching: ErrorEvent = { exception: { values: [{
       value: 'Invalid regular expression: synthetic pattern',
-      stacktrace: { frames: [{ function: 'RegExp.exec' }, { function: 'eW.findMatchesInNode' }] },
+      stacktrace: { frames: [{ function: '"synthetic": 1', filename: 'https://example.test/synthetic.jpg' }, { function: 'RegExp.exec' }, { function: 'eW.findMatchesInNode' }] },
     }] } };
     expect(send(matching)).toBeNull();
+    // A dropped event has not yet been mutated by either message or frame scrubbing.
+    expect(matching.exception!.values![0].value).toContain('synthetic pattern');
+    expect(matching.exception!.values![0].stacktrace!.frames![0].function).toBe('"synthetic": 1');
 
     const unrelated: ErrorEvent = {
       request: { url: 'https://example.test/?json=SYNTHETIC&theme=dark' },
       message: 'Invalid regular expression: synthetic pattern',
-      exception: { values: [{ value: 'Invalid regular expression: synthetic pattern', stacktrace: { frames: [{ function: 'otherSearch' }] } }] },
+      exception: { values: [{ value: 'Invalid regular expression: synthetic pattern', stacktrace: { frames: [{ function: 'otherSearch' }, { function: '"synthetic": 1', filename: 'https://example.test/synthetic.jpg' }] } }] },
     };
     expect(send(unrelated)).toBe(unrelated);
     expect(unrelated.exception!.values![0].value).toBe('Invalid regular expression [redacted]');
+    expect(unrelated.exception!.values![0].stacktrace!.frames![1]).toEqual({ function: '[redacted]', filename: '[redacted]' });
     expect(unrelated.message).toBe('Invalid regular expression [redacted]');
     expect(unrelated.request!.url).toBe('https://example.test/?theme=dark');
     const ordinary: ErrorEvent = { message: 'Network failed' };
