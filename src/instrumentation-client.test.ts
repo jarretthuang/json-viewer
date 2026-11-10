@@ -24,6 +24,13 @@ describe('client beforeSend', () => {
     expect(matching.exception!.values![0].value).toContain('synthetic pattern');
     expect(matching.exception!.values![0].stacktrace!.frames![0].function).toBe('"synthetic": 1');
 
+    const fallback: ErrorEvent = { exception: { values: [{
+      value: 'Invalid regular expression: synthetic pattern\n\nSyntaxError: synthetic\n    at eW.findMatchesLineByLine (https://example.test/editor.js:1:1)',
+      stacktrace: { frames: [{ function: 'otherSearch' }] },
+    }] } };
+    expect(send(fallback)).toBeNull();
+    expect(fallback.exception!.values![0].value).toContain('findMatchesLineByLine');
+
     const unrelated: ErrorEvent = {
       request: { url: 'https://example.test/?json=SYNTHETIC&theme=dark' },
       message: 'Invalid regular expression: synthetic pattern',
