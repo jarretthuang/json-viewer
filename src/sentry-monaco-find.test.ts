@@ -13,10 +13,22 @@ describe('Monaco find telemetry guard', () => {
     }
   );
 
+  it.each(['findMatchesInNode', 'findMatchesLineByLine'])(
+    'matches the embedded stack signature %s without parsed find frames', (fn) => {
+      const value = `${regexMessage}\n\nSyntaxError: synthetic pattern\n    at eW.${fn} (https://example.test/editor.js:1:1)`;
+      expect(isMonacoFindRegexEvent(event(value, 'otherSearch'))).toBe(true);
+      expect(isMonacoFindRegexEvent({ exception: { values: [{ value }] } })).toBe(true);
+    }
+  );
+
   it.each([
     {}, { message: regexMessage },
     { exception: { values: [{ value: regexMessage }] } },
     event('Network failed'),
+    event('Network failed\n    at findMatchesInNode', 'otherSearch'),
+    event(`${regexMessage}\n\n    at otherSearch`, 'otherSearch'),
+    event(`${regexMessage}\n\n    at findMatchesInNodeElsewhere`, 'otherSearch'),
+    { exception: { values: [{ value: regexMessage }, { value: 'Other error\nfindMatchesInNode' }] } },
     event(regexMessage, 'otherSearch'),
     event(regexMessage, 'findMatchesInNodeElsewhere'),
     event('Invalid regular expression [redacted]'),
