@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import Breadcrumb from "@/components/breadcrumb/Breadcrumb";
 import Copyright from "@/components/copyright/Copyright";
 import InfoPageNavBar from "@/components/nav-bar/InfoPageNavBar";
 
@@ -12,6 +13,7 @@ export default function LegalPage({
   return (
     <div className="flex min-h-full flex-col">
       <InfoPageNavBar />
+      <Breadcrumb />
       <main className="mx-auto w-full max-w-[800px] flex-1 px-[24px] py-[40px] text-[16px] leading-relaxed text-mono-800 dark:text-mono-300">
         <h1 className="mb-[24px] text-[32px] font-bold text-slate-950 dark:text-offWhite">
           {title}

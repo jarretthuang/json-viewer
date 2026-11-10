@@ -1,12 +1,12 @@
 import { ReactNode } from "react";
 import InfoPageNavBar from "@/components/nav-bar/InfoPageNavBar";
-import ProBreadcrumb from "./ProBreadcrumb";
+import Breadcrumb from "@/components/breadcrumb/Breadcrumb";
 
 export default function ProLayout({ children }: { children: ReactNode }) {
   return (
     <>
       <InfoPageNavBar />
-      <ProBreadcrumb />
+      <Breadcrumb />
       {children}
     </>
   );

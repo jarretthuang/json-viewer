@@ -36,6 +36,7 @@ describe.each(["PRO", "Legal"])("%s page navigation", (page) => {
         validateKey: jest.fn(),
         clearKey: jest.fn(),
       });
+      mockUsePathname.mockReturnValue(page === "PRO" ? "/pro" : "/privacy");
       render(
         page === "PRO" ? (
           <ProLayout>
@@ -56,11 +57,9 @@ describe.each(["PRO", "Legal"])("%s page navigation", (page) => {
       expect(nav.compareDocumentPosition(screen.getByRole("main"))).toBe(
         Node.DOCUMENT_POSITION_FOLLOWING
       );
-      if (page === "Legal") {
-        expect(
-          screen.queryByRole("navigation", { name: "Breadcrumb" })
-        ).not.toBeInTheDocument();
-      }
+      expect(
+        screen.getByRole("navigation", { name: "Breadcrumb" })
+      ).toBeInTheDocument();
       for (const name of [
         "Go back",
         "Go forward",
@@ -122,6 +121,7 @@ test.each([
   );
 
   const breadcrumb = screen.getByRole("navigation", { name: "Breadcrumb" });
+  expect(breadcrumb).toHaveClass("max-w-[576px]");
   const items = within(breadcrumb).getAllByRole("listitem");
   expect(
     items.map((item) => item.textContent?.replace("/", "").trim())
@@ -145,4 +145,38 @@ test.each([
     screen.getByRole("link", { name: "Go to JSON Viewer home" }).closest("nav")
   );
   expect(breadcrumb.nextElementSibling).toBe(screen.getByRole("main"));
+});
+
+
+test.each([
+  ["/privacy", "Privacy Policy"],
+  ["/terms", "Terms of Service"],
+])("renders the legal breadcrumb for %s", (pathname, title) => {
+  mockUsePathname.mockReturnValue(pathname);
+  mockUsePro.mockReturnValue({
+    isPro: false,
+    validateKey: jest.fn(),
+    clearKey: jest.fn(),
+  });
+  render(<LegalPage title={title}>Route content</LegalPage>);
+
+  const breadcrumb = screen.getByRole("navigation", { name: "Breadcrumb" });
+  expect(breadcrumb).toHaveClass("max-w-[800px]");
+  expect(breadcrumb).not.toHaveClass("max-w-[576px]");
+  expect(
+    within(breadcrumb).getAllByRole("listitem").map((item) =>
+      item.textContent?.replace("/", "").trim()
+    )
+  ).toEqual(["Home", title]);
+  const links = within(breadcrumb).getAllByRole("link");
+  expect(links).toHaveLength(1);
+  expect(links[0]).toHaveTextContent("Home");
+  expect(links[0]).toHaveAttribute("href", "/");
+  expect(links[0]).not.toHaveAttribute("aria-current");
+  expect(within(breadcrumb).getByText(title)).toHaveAttribute("aria-current", "page");
+  expect(breadcrumb.previousElementSibling).toBe(
+    screen.getByRole("link", { name: "Go to JSON Viewer home" }).closest("nav")
+  );
+  expect(breadcrumb.nextElementSibling).toBe(screen.getByRole("main"));
+  expect(screen.getByRole("main")).toHaveClass("max-w-[800px]");
 });
