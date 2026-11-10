@@ -21,7 +21,7 @@ export default function Breadcrumb() {
   return (
     <nav
       aria-label="Breadcrumb"
-      className={`mx-auto w-full ${isLegalPage ? "max-w-[800px]" : "max-w-[576px]"} px-[24px] pt-[16px] text-sm text-mono-600 dark:text-mono-300`}
+      className={`mx-auto w-full ${isLegalPage ? "max-w-[800px]" : "max-w-[576px]"} px-[24px] pt-[16px] text-[14px] leading-[20px] text-mono-600 dark:text-mono-300`}
     >
       <ol className="flex flex-wrap items-center gap-2">
         <li>
