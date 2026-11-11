@@ -3,7 +3,7 @@ import { isMonacoFindRegexEvent } from './sentry-monaco-find';
 
 const regexMessage = 'Invalid regular expression: synthetic pattern';
 function event(value = regexMessage, fn = 'eW.findMatchesInNode'): ErrorEvent {
-  return { exception: { values: [{ value, stacktrace: { frames: [{ function: fn }] } }] } };
+  return { type: undefined, exception: { values: [{ value, stacktrace: { frames: [{ function: fn }] } }] } };
 }
 
 describe('Monaco find telemetry guard', () => {
@@ -17,7 +17,7 @@ describe('Monaco find telemetry guard', () => {
     'matches the embedded stack signature %s without parsed find frames', (fn) => {
       const value = `${regexMessage}\n\nSyntaxError: synthetic pattern\n    at eW.${fn} (https://example.test/editor.js:1:1)`;
       expect(isMonacoFindRegexEvent(event(value, 'otherSearch'))).toBe(true);
-      expect(isMonacoFindRegexEvent({ exception: { values: [{ value }] } })).toBe(true);
+      expect(isMonacoFindRegexEvent({ type: undefined, exception: { values: [{ value }] } })).toBe(true);
     }
   );
 
@@ -35,6 +35,6 @@ describe('Monaco find telemetry guard', () => {
     // Never combine a message on one exception with frames on another.
     { exception: { values: [{ value: regexMessage }, { value: 'Other error', stacktrace: { frames: [{ function: 'eW.findMatchesInNode' }] } }] } },
   ])('preserves unrelated or incomplete events', (input) => {
-    expect(isMonacoFindRegexEvent(input)).toBe(false);
+    expect(isMonacoFindRegexEvent({ ...input, type: undefined })).toBe(false);
   });
 });

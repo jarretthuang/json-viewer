@@ -1,0 +1,248 @@
+.compare-prototype {
+  font-size: 14px;
+}
+.compare-prototype .NavBar > ul > li:first-child > a::after {
+  content: "PRO";
+  border: 1px solid #9bb7bc;
+  border-radius: 20px;
+  padding: 2px 7px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #41646a;
+}
+.prototype-review {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 20px;
+  color: #52777d;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+}
+.prototype-review label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.compare-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin: 12px 0 16px;
+}
+.compare-heading h1 {
+  font-size: 22px;
+  font-weight: 500;
+  color: #245e67;
+}
+.compare-heading p,
+.compare-note {
+  color: #65838a;
+  font-size: 12px;
+  margin-top: 6px;
+}
+.prototype-pill {
+  font-size: 10px;
+  vertical-align: middle;
+  border: 1px solid #9bb7bc;
+  border-radius: 20px;
+  padding: 3px 7px;
+}
+.compare-run {
+  background: #318e99;
+  color: white;
+  border-radius: 9px;
+  padding: 10px 24px;
+  font-weight: 500;
+}
+.compare-prototype button:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+.compare-prototype button:focus-visible {
+  outline: 2px solid #318e99;
+  outline-offset: 2px;
+}
+.compare-inputs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+.compare-pane,
+.compare-results {
+  border: 1px solid #cce3e6;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #fdfeff;
+  box-shadow: 0 2px 10px #18464c08;
+}
+.compare-pane h2,
+.compare-tree h2 {
+  padding: 10px 14px;
+  font-size: 12px;
+  border-bottom: 1px solid #e0eef0;
+  color: #52777d;
+}
+.compare-pane h2 b {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 23px;
+  height: 23px;
+  border-radius: 6px;
+  background: #e7f4f6;
+  margin-right: 8px;
+  color: #245e67;
+}
+.compare-editor {
+  height: 300px;
+}
+.compare-prototype .JsonViewerEditor .tool-bar {
+  font-size: 12px;
+}
+.compare-note {
+  margin: 10px 0 16px;
+}
+.compare-summary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 18px;
+  padding: 14px 0;
+  font-size: 12px;
+}
+.compare-summary strong {
+  font-size: 16px;
+  color: #245e67;
+}
+.count-added {
+  color: #237d4b;
+}
+.count-removed {
+  color: #b44848;
+}
+.count-changed {
+  color: #946700;
+}
+.compare-step {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-left: auto;
+}
+.compare-step button {
+  border: 1px solid #cce3e6;
+  border-radius: 6px;
+  padding: 5px 9px;
+}
+.compare-results {
+  display: grid;
+  grid-template-columns: minmax(240px, 38%) minmax(0, 1fr);
+}
+.compare-list {
+  max-height: 430px;
+  overflow: auto;
+  border-right: 1px solid #d8e9ec;
+}
+.compare-list > button {
+  width: 100%;
+  text-align: left;
+  padding: 13px 14px;
+  border-bottom: 1px solid #e6eff1;
+}
+.compare-list > button[aria-pressed="true"] {
+  background: #e7f4f6;
+  box-shadow: inset 3px 0 #318e99;
+}
+.compare-list > button > span {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 11px;
+}
+.compare-list code {
+  overflow-wrap: anywhere;
+}
+.change-values {
+  display: block;
+  margin-top: 7px;
+  font-size: 12px;
+  color: #65838a;
+}
+.compare-tree {
+  min-width: 0;
+}
+.compare-tree .JsonViewerTree {
+  height: 380px;
+}
+.compare-tree small {
+  display: block;
+  font-size: 10px;
+  margin-top: 4px;
+}
+.compare-tree [data-diff="added"] > .MuiTreeItem-content {
+  background: #e1f3e6;
+  border-left: 3px solid #43a56b;
+}
+.compare-tree [data-diff="removed"] > .MuiTreeItem-content {
+  background: #fbe7e7;
+  border-left: 3px solid #d16b6b;
+  text-decoration: line-through;
+}
+.compare-tree [data-diff="changed"] > .MuiTreeItem-content {
+  background: #fff2ce;
+  border-left: 3px solid #d3a237;
+}
+.compare-tree [data-diff="ancestor"] > .MuiTreeItem-content {
+  box-shadow: inset 2px 0 #c6ae74;
+}
+.compare-tree [data-diff-selected="true"] > .MuiTreeItem-content {
+  outline: 2px solid #318e99;
+  outline-offset: -2px;
+}
+.prototype-normal {
+  height: 75vh;
+}
+.prototype-gate {
+  max-width: 650px;
+  margin: 40px auto;
+}
+.dark .compare-pane,
+.dark .compare-results {
+  background: #18181b;
+  border-color: #34464a;
+}
+.dark .compare-tree [data-diff] > .MuiTreeItem-content {
+  color: #172b30;
+}
+@media (max-width: 700px) {
+  .compare-inputs,
+  .compare-results {
+    grid-template-columns: 1fr;
+  }
+  .compare-editor {
+    height: 280px;
+  }
+  .compare-list {
+    max-height: 280px;
+    border-right: 0;
+  }
+  .compare-step {
+    margin-left: 0;
+  }
+  .prototype-review {
+    padding: 10px 8px;
+  }
+  .compare-heading h1 {
+    font-size: 18px;
+  }
+}
+/* Keep the existing rem-based controls compact inside the two-pane preview. */
+.compare-prototype .view-switcher-button { width: auto; min-width: 76px; padding: 5px 16px; font-size: 14px; }
+.compare-prototype .JsonViewerToolBar { height: 40px; min-height: 40px; padding-left: 6px; margin: 0; }
+.compare-prototype .JsonViewerToolBar .tool-bar-button-label { font-size: 12px; }
+.compare-prototype .JsonViewerToolBar svg { width: 17px; height: 17px; margin: 0 5px 0 0; }
+.compare-prototype .JsonViewerEditor > div.overscroll-x-contain { height: calc(100% - 40px); }
+.compare-prototype .main-tree-view { font-size: 14px; }

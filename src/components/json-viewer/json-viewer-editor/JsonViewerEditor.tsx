@@ -24,6 +24,7 @@ const MonacoEditor = dynamic(() => import("@monaco-editor/react"), {
 });
 
 export type JsonViewerEditorProps = {
+  inputOnly?: boolean;
   currentText: string;
   isActive: boolean;
   isDefaultText: boolean;
@@ -299,6 +300,7 @@ export function readTextFile(file: File): Promise<string> {
 }
 
 function JsonViewerEditor({
+  inputOnly = false,
   currentText,
   isActive,
   isDefaultText,
@@ -519,7 +521,17 @@ function JsonViewerEditor({
         icon: <CleaningServicesIcon />,
       },
     ];
-    return <JsonViewerToolBar options={options} />;
+    return (
+      <JsonViewerToolBar
+        options={
+          inputOnly
+            ? options.filter((option) =>
+                ["Upload", "Paste", "Clear"].includes(option.label)
+              )
+            : options
+        }
+      />
+    );
   }
 
   return (
