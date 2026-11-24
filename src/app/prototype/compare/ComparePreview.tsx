@@ -36,6 +36,7 @@ const MAX_COMPARE_TEXT = 2_000_000;
 export default function ComparePreview() {
   const [a, setA] = useState(pretty(sampleA));
   const [b, setB] = useState(pretty(sampleB));
+  const [variant, setVariant] = useState<"A" | "B" | "C">("A");
   const [compare, setCompare] = useState(false);
   const [free, setFree] = useState(false);
   const [view, setView] = useState<"edit" | "view">("edit");
@@ -132,11 +133,81 @@ export default function ComparePreview() {
   const copy = (text: string) => {
     void navigator.clipboard.writeText(text);
   };
+  const compareSwitch = (
+    <button
+      className="compare-switch"
+      role="switch"
+      aria-checked={compare}
+      onClick={() => setCompare((value) => !value)}
+    >
+      <span className="switch-track">
+        <span />
+      </span>
+      Compare <small>PRO</small>
+    </button>
+  );
+  const comparisonSummary = (
+    <div className="diff-summary" aria-live="polite">
+      <div>
+        {pending ? (
+          "Updating comparison…"
+        ) : diff ? (
+          diff.summary.total ? (
+            <>
+              <span className="added">{diff.summary.added} added</span>
+              <span className="removed">{diff.summary.removed} removed</span>
+              <span className="changed">{diff.summary.changed} changed</span>
+              <span>{diff.summary.total} total</span>
+            </>
+          ) : (
+            "No differences"
+          )
+        ) : (
+          result.note
+        )}
+      </div>
+      <div className="flex items-center gap-2">
+        <button disabled={!diff?.changes.length} onClick={() => step(-1)}>
+          Prev
+        </button>
+        <span>
+          {current ? `${selected + 1} / ${diff?.changes.length}` : "—"}
+        </span>
+        <button disabled={!diff?.changes.length} onClick={() => step(1)}>
+          Next
+        </button>
+      </div>
+    </div>
+  );
   return (
-    <main className="compare-preview flex h-full flex-col bg-powderBlue-50 dark:bg-neutral-950">
+    <main
+      data-placement={variant}
+      className="compare-preview flex h-full flex-col bg-powderBlue-50 dark:bg-neutral-950"
+    >
       <NavBar prototypePro actionVisibility={{ share: false }} />
       <aside className="prototype-controls flex items-center justify-between gap-2 px-3 py-2 text-xs text-powderBlue-600 dark:text-slate-200">
         <span>Prototype · review only</span>
+        <div
+          className="placement-switcher"
+          role="group"
+          aria-label="Mock toggle placement"
+        >
+          {(
+            [
+              ["A", "A: Right-side switch"],
+              ["B", "B: Compare bar"],
+              ["C", "C: PRO bar"],
+            ] as const
+          ).map(([key, label]) => (
+            <button
+              key={key}
+              aria-pressed={variant === key}
+              onClick={() => setVariant(key)}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
         <label className="flex items-center gap-2">
           <input
             type="checkbox"
@@ -147,7 +218,7 @@ export default function ComparePreview() {
         </label>
       </aside>
       <section className="JsonViewer flex min-h-0 flex-1 flex-col px-2 pb-2">
-        <div className="flex flex-wrap items-center justify-center gap-5 pb-3 pt-1">
+        <div className="viewer-tab-row">
           <div className="view-switcher">
             <div
               className="buttons gap-4"
@@ -168,18 +239,23 @@ export default function ComparePreview() {
               ))}
             </div>
           </div>
-          <button
-            className="compare-switch"
-            role="switch"
-            aria-checked={compare}
-            onClick={() => setCompare((value) => !value)}
-          >
-            <span className="switch-track">
-              <span />
+          <div className="viewer-row-controls">
+            <span className="character-count">
+              {a.length.toLocaleString()} characters
             </span>
-            Compare <small>PRO</small>
-          </button>
+            {variant === "A" && compareSwitch}
+          </div>
         </div>
+        {variant !== "A" && (
+          <div
+            className={`compare-bar ${variant === "C" ? "pro-bar" : ""}`}
+            aria-label={variant === "C" ? "PRO features" : "Compare controls"}
+          >
+            {variant === "C" && <span className="pro-bar-mark">PRO</span>}
+            {compareSwitch}
+            {enabled && comparisonSummary}
+          </div>
+        )}
         {compare && free ? (
           <div className="m-auto max-w-xl p-4">
             <ProGate previewLocked>{null}</ProGate>
@@ -217,53 +293,7 @@ export default function ComparePreview() {
             </div>
             {view === "view" && (
               <div className="tree-pane flex min-h-0 flex-1 flex-col overflow-hidden rounded-xl shadow-subtle">
-                {enabled && (
-                  <div className="diff-summary" aria-live="polite">
-                    <div>
-                      {pending ? (
-                        "Updating comparison…"
-                      ) : diff ? (
-                        diff.summary.total ? (
-                          <>
-                            <span className="added">
-                              {diff.summary.added} added
-                            </span>
-                            <span className="removed">
-                              {diff.summary.removed} removed
-                            </span>
-                            <span className="changed">
-                              {diff.summary.changed} changed
-                            </span>
-                            <span>{diff.summary.total} total</span>
-                          </>
-                        ) : (
-                          "No differences"
-                        )
-                      ) : (
-                        result.note
-                      )}
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <button
-                        disabled={!diff?.changes.length}
-                        onClick={() => step(-1)}
-                      >
-                        Prev
-                      </button>
-                      <span>
-                        {current
-                          ? `${selected + 1} / ${diff?.changes.length}`
-                          : "—"}
-                      </span>
-                      <button
-                        disabled={!diff?.changes.length}
-                        onClick={() => step(1)}
-                      >
-                        Next
-                      </button>
-                    </div>
-                  </div>
-                )}
+                {enabled && variant === "A" && comparisonSummary}
                 {diff && (
                   <p className="diff-hint">
                     Arrays compare by position · Values shown from A; additions

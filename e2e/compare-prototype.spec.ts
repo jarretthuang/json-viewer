@@ -66,3 +66,54 @@ test("compare editors stack on narrow screens", async ({ page }) => {
   expect(b).toBeTruthy();
   expect(b!.y).toBeGreaterThanOrEqual(a!.y + a!.height);
 });
+
+test("placement variants preserve comparison and move its controls", async ({
+  page,
+}) => {
+  await page.goto("/prototype/compare");
+  const toggle = page.getByRole("switch", { name: /Compare/ });
+  await expect(
+    page.getByRole("button", { name: "A: Right-side switch" })
+  ).toHaveAttribute("aria-pressed", "true");
+  await expect(
+    page.locator(".viewer-row-controls").getByRole("switch")
+  ).toBeVisible();
+  await toggle.click();
+  await page.getByRole("tab", { name: "View", exact: true }).click();
+  await expect(page.getByText("6 total", { exact: true })).toBeVisible();
+  await page.getByRole("button", { name: "Next", exact: true }).click();
+  for (const variant of [
+    "B: Compare bar",
+    "C: PRO bar",
+    "A: Right-side switch",
+  ]) {
+    await page.getByRole("button", { name: variant, exact: true }).click();
+    await expect(toggle).toHaveAttribute("aria-checked", "true");
+    await expect(page.locator('[data-current-change="true"]')).toHaveAttribute(
+      "data-review-path",
+      '["version"]'
+    );
+    const container = page.locator(
+      variant.startsWith("A") ? ".tree-pane" : ".compare-bar"
+    );
+    await expect(container.getByText("6 total", { exact: true })).toBeVisible();
+    await expect(
+      container.getByRole("button", { name: "Next", exact: true })
+    ).toBeVisible();
+  }
+  for (const variant of ["B: Compare bar", "C: PRO bar"]) {
+    await page.getByRole("button", { name: variant, exact: true }).click();
+    await toggle.click();
+    await expect(
+      page.locator(".compare-bar").getByRole("switch")
+    ).toBeVisible();
+    await expect(page.locator(".diff-summary")).toHaveCount(0);
+    await page.getByLabel("Preview as free user").check();
+    await toggle.click();
+    await expect(
+      page.getByRole("region", { name: "PRO upgrade" })
+    ).toBeVisible();
+    await expect(page.locator(".diff-summary")).toHaveCount(0);
+    await page.getByLabel("Preview as free user").uncheck();
+  }
+});
