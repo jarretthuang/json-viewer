@@ -44,9 +44,19 @@ export function CheckoutButton() {
     </>
   );
 }
-export function ProGate({ children }: { children: ReactNode }) {
+export function ProGate({
+  children,
+  previewLocked = false,
+}: {
+  children: ReactNode;
+  previewLocked?: boolean;
+}) {
   const { isPro } = usePro();
-  if (isPro) return <>{children}</>;
+  if (isPro && !previewLocked) return <>{children}</>;
+  return <ProUpgradePanel />;
+}
+
+export function ProUpgradePanel() {
   return (
     <section className="rounded-xl border p-6" aria-label="PRO upgrade">
       <h2 className="text-xl font-bold">Unlock this PRO feature</h2>

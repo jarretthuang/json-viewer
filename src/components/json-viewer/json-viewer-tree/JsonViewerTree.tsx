@@ -7,7 +7,7 @@ import _ from "lodash";
 import JsonViewerTreeItemLabel, {
   JsonValueType,
 } from "./JsonViewerTreeItemLabel";
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import "./JsonViewerTree.css";
 import JsonViewerToolBar from "../json-viewer-tool-bar/JsonViewerToolBar";
@@ -177,6 +177,57 @@ function JsonViewerTree(props: any) {
   const [focusedNodeId, setFocusedNodeId] = useState<string | null>(null);
   const expandableNodeIds = useRef<Set<string>>(new Set());
 
+  // Optional review-only layer. With no decorations the production tree is unchanged.
+  const decorations = props.decorations as Record<string, string> | undefined;
+  const revealPath = props.revealPath as (string | number)[] | undefined;
+  useEffect(() => {
+    if (!revealPath) return;
+    let value = props.json;
+    let id = ".JSON";
+    const ids = [id];
+    for (const part of revealPath) {
+      if (Array.isArray(value) && shouldChunkArray(value)) {
+        const start =
+          Math.floor(Number(part) / ARRAY_CHILD_CHUNK_SIZE) *
+          ARRAY_CHILD_CHUNK_SIZE;
+        id = getArrayChunkNodeId(id, {
+          start,
+          end: Math.min(start + ARRAY_CHILD_CHUNK_SIZE - 1, value.length - 1),
+        });
+        ids.push(id);
+      }
+      id += "." + part;
+      ids.push(id);
+      value = value?.[part];
+    }
+    setExpanded((previous: string[]) =>
+      Array.from(new Set([...previous, ...ids]))
+    );
+  }, [revealPath, props.json]);
+
+  useEffect(() => {
+    if (!revealPath) return;
+    const timer = window.setTimeout(() => {
+      const nodes =
+        document.querySelectorAll<HTMLElement>("[data-review-path]");
+      const target = Array.from(nodes).find(
+        (node) => node.dataset.reviewPath === JSON.stringify(revealPath)
+      );
+      target?.scrollIntoView?.({ block: "nearest" });
+    }, 100);
+    return () => window.clearTimeout(timer);
+  }, [revealPath, expanded]);
+
+  function reviewProps(path: (string | number)[]) {
+    if (!decorations) return {};
+    return {
+      "data-review-path": JSON.stringify(path),
+      "data-diff": decorations[JSON.stringify(path)],
+      "data-current-change":
+        JSON.stringify(path) === JSON.stringify(revealPath),
+    };
+  }
+
   function handleValueChange(path: (string | number)[], newValue: any) {
     if (!props.onJsonUpdate) return;
     const newJson = _.cloneDeep(props.json);
@@ -231,7 +282,8 @@ function JsonViewerTree(props: any) {
         }}
         onKeyDownCapture={(e) => {
           // Handle tree navigation before MUI, while leaving inline inputs alone.
-          if ((e.target as HTMLElement).getAttribute("role") !== "treeitem") return;
+          if ((e.target as HTMLElement).getAttribute("role") !== "treeitem")
+            return;
           if ((e.key === "Enter" || e.key === " ") && focusedNodeId) {
             if (expandableNodeIds.current.has(focusedNodeId)) {
               e.preventDefault();
@@ -249,7 +301,7 @@ function JsonViewerTree(props: any) {
           }
         }}
       >
-        {renderTreeItems(json, unescaped)}
+        {renderTreeItems(json, unescaped && !decorations)}
       </SimpleTreeView>
     );
   }
@@ -283,6 +335,7 @@ function JsonViewerTree(props: any) {
     if (_.isNull(json) || _.isUndefined(json)) {
       return (
         <JsonViewerTreeItem
+          {...reviewProps(path)}
           itemId={nodeId}
           key={nodeId}
           label={
@@ -296,9 +349,11 @@ function JsonViewerTree(props: any) {
               path={path}
               onKeyChange={handleKeyChange}
               onValueChange={handleValueChange}
-              isKeyEditable={isKeyEditable && !isUnescapedContent}
-              isValueEditable={!isUnescapedContent}
-              isRemovable={isItemRemovable}
+              isKeyEditable={
+                isKeyEditable && !isUnescapedContent && !decorations
+              }
+              isValueEditable={!isUnescapedContent && !decorations}
+              isRemovable={isItemRemovable && !decorations}
               onRemove={handleItemRemove}
             />
           }
@@ -347,6 +402,7 @@ function JsonViewerTree(props: any) {
 
       return (
         <JsonViewerTreeItem
+          {...reviewProps(path)}
           itemId={nodeId}
           key={nodeId}
           label={
@@ -360,9 +416,11 @@ function JsonViewerTree(props: any) {
               path={path}
               onKeyChange={handleKeyChange}
               onValueChange={handleValueChange}
-              isKeyEditable={isKeyEditable && !isUnescapedContent}
-              isValueEditable={!isUnescapedContent}
-              isRemovable={isItemRemovable}
+              isKeyEditable={
+                isKeyEditable && !isUnescapedContent && !decorations
+              }
+              isValueEditable={!isUnescapedContent && !decorations}
+              isRemovable={isItemRemovable && !decorations}
               onRemove={handleItemRemove}
             />
           }
@@ -389,6 +447,7 @@ function JsonViewerTree(props: any) {
     if (hasChildren && depth >= MAX_TREE_DEPTH) {
       return (
         <JsonViewerTreeItem
+          {...reviewProps(path)}
           itemId={nodeId}
           key={nodeId}
           label={`${key}: … (nested content truncated at ${MAX_TREE_DEPTH} levels; full JSON is available in Edit)`}
@@ -410,18 +469,19 @@ function JsonViewerTree(props: any) {
           depth
         )
       : hasChildren
-        ? [
-            <JsonViewerTreeItem
-              key={`${nodeId}.__lazy-placeholder`}
-              itemId={`${nodeId}.__lazy-placeholder`}
-              className="hidden"
-            />,
-          ]
-        : null;
+      ? [
+          <JsonViewerTreeItem
+            key={`${nodeId}.__lazy-placeholder`}
+            itemId={`${nodeId}.__lazy-placeholder`}
+            className="hidden"
+          />,
+        ]
+      : null;
 
     if (Array.isArray(json)) {
       return (
         <JsonViewerTreeItem
+          {...reviewProps(path)}
           itemId={nodeId}
           key={nodeId}
           label={
@@ -432,8 +492,12 @@ function JsonViewerTree(props: any) {
               isUnescapedContent={isUnescapedContent}
               path={path}
               onKeyChange={handleKeyChange}
-              isKeyEditable={isKeyEditable && !isUnescapedContent}
-              isRemovable={path.length > 0 && !isUnescapedContent}
+              isKeyEditable={
+                isKeyEditable && !isUnescapedContent && !decorations
+              }
+              isRemovable={
+                path.length > 0 && !isUnescapedContent && !decorations
+              }
               onRemove={handleItemRemove}
             />
           }
@@ -444,6 +508,7 @@ function JsonViewerTree(props: any) {
     } else {
       return (
         <JsonViewerTreeItem
+          {...reviewProps(path)}
           itemId={nodeId}
           key={nodeId}
           label={
@@ -453,8 +518,12 @@ function JsonViewerTree(props: any) {
               isUnescapedContent={isUnescapedContent}
               path={path}
               onKeyChange={handleKeyChange}
-              isKeyEditable={isKeyEditable && !isUnescapedContent}
-              isRemovable={path.length > 0 && !isUnescapedContent}
+              isKeyEditable={
+                isKeyEditable && !isUnescapedContent && !decorations
+              }
+              isRemovable={
+                path.length > 0 && !isUnescapedContent && !decorations
+              }
               onRemove={handleItemRemove}
             />
           }
@@ -600,7 +669,8 @@ function JsonViewerTree(props: any) {
 
   function renderToolBar() {
     const nodeCount = metadata.nodeCount;
-    const allowExpandAll = !metadata.isCapped && shouldAllowExpandAll(nodeCount);
+    const allowExpandAll =
+      !metadata.isCapped && shouldAllowExpandAll(nodeCount);
     const expandAllDisabled =
       !allowExpandAll ||
       metadata.expandableNodeIds.every((nodeId) => expanded.includes(nodeId));
@@ -635,7 +705,7 @@ function JsonViewerTree(props: any) {
           setUnescaped(true);
         },
         icon: <CodeOffIcon />,
-        hidden: unescaped,
+        hidden: unescaped || Boolean(decorations),
       },
       {
         label: "Undo Unescape",
@@ -643,7 +713,7 @@ function JsonViewerTree(props: any) {
           setUnescaped(false);
         },
         icon: <UndoIcon />,
-        hidden: !unescaped,
+        hidden: !unescaped || Boolean(decorations),
       },
     ];
     return <JsonViewerToolBar options={options} />;
