@@ -1,0 +1,311 @@
+/* Every rule is scoped to the prototype. Slots exist on first paint; no delayed ad load. */
+.ads-prototype {
+  --ad-bg: #f2fafb;
+  --ad-border: #c7e3e8;
+  --ad-text: #28545e;
+  --ad-muted: #496c75;
+  --sticky-height: 92px;
+  min-height: 100svh;
+  background: #fdfeff;
+  color: var(--ad-text);
+  display: flex;
+  flex-direction: column;
+}
+.dark .ads-prototype {
+  --ad-bg: #101e22;
+  --ad-border: #29434a;
+  --ad-text: #d5edf0;
+  --ad-muted: #9cbdc5;
+  background: #0a0a0a;
+}
+.ads-navbar {
+  position: relative;
+}
+.ads-prototype .NavBar {
+  height: 60px;
+}
+.ads-prototype .NavBar li:first-child {
+  padding: 8px;
+  gap: 4px;
+}
+.ads-prototype .NavBar li:first-child > a:not(:first-child) {
+  display: none;
+}
+.ads-prototype .NavBar .nav-icon-button {
+  width: 44px;
+  height: 44px;
+  margin: 0;
+}
+.ads-prototype .NavBar .nav-icon {
+  font-size: 24px;
+}
+.ads-pro-pill {
+  position: absolute;
+  left: calc(207px + 0.35rem);
+  top: 19px;
+  font-size: 13px;
+  line-height: 20px;
+  font-weight: 600;
+  padding: 0 7px;
+  border: 1px solid var(--ad-border);
+  border-radius: 20px;
+  color: var(--ad-muted);
+  pointer-events: none;
+}
+.ads-switcher {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 4px 12px;
+  padding: 4px 8px;
+  font-size: 12px;
+}
+.ads-prototype-label {
+  color: var(--ad-muted);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+.ads-switcher select,
+.ads-switcher button {
+  background: var(--ad-bg);
+  border: 1px solid var(--ad-border);
+  border-radius: 6px;
+  color: var(--ad-text);
+  font: inherit;
+  min-height: 44px;
+  padding: 0 8px;
+  max-width: 100%;
+}
+.ads-pro-toggle {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+}
+.ads-pro-toggle input {
+  width: 16px;
+  height: 16px;
+  accent-color: #287788;
+}
+.ads-prototype :is(button, select, input):focus-visible {
+  outline: 2px solid var(--focus-ring-color);
+  outline-offset: 2px;
+}
+.ads-workspace {
+  position: relative;
+  width: min(1080px, 100%);
+  align-self: center;
+}
+/* Identical editor dimensions in every variant. Ads add page space, never take editor space. */
+.ads-editor {
+  height: max(560px, calc(100svh - 120px));
+  display: flex;
+  min-width: 0;
+}
+.ads-editor > .JsonViewer {
+  min-width: 0;
+}
+.ads-unit {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  height: 100%;
+  padding: 12px;
+  border: 1px solid var(--ad-border);
+  border-radius: 10px;
+  background: var(--ad-bg);
+  overflow: hidden;
+}
+.ads-creative {
+  flex: 0 0 64px;
+  height: 64px;
+  border-radius: 8px;
+  background: #b0e0e6;
+  color: #164b57;
+  display: grid;
+  place-items: center;
+  font:
+    700 26px ui-monospace,
+    monospace;
+}
+.ads-copy {
+  min-width: 0;
+}
+.ads-caption {
+  font-size: 10px;
+  line-height: 16px;
+  color: var(--ad-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.ads-copy p {
+  margin: 2px 0 0;
+  font-size: 13px;
+  line-height: 18px;
+}
+.ads-copy strong {
+  font-weight: 700;
+}
+.ads-dismiss {
+  flex: 0 0 44px;
+  width: 44px;
+  height: 44px;
+  font-size: 25px;
+  border-radius: 6px;
+  color: var(--ad-text);
+  background: transparent;
+}
+.ads-dismiss:hover {
+  background: var(--ad-border);
+}
+.ads-below-slot,
+.ads-rail-slot {
+  width: min(520px, calc(100% - 16px));
+  height: 132px;
+  margin: 12px auto 0;
+}
+.ads-top-slot {
+  width: min(1064px, calc(100% - 16px));
+  height: 84px;
+  margin: 4px auto 8px;
+}
+.ads-unit-top,
+.ads-unit-sticky {
+  padding: 8px 12px;
+  gap: 10px;
+}
+.ads-unit-top .ads-creative,
+.ads-unit-sticky .ads-creative {
+  flex-basis: 44px;
+  height: 44px;
+  font-size: 20px;
+}
+.ads-unit-top .ads-copy p,
+.ads-unit-sticky .ads-copy p {
+  font-size: 12px;
+  line-height: 16px;
+}
+.ads-sticky-reserve {
+  height: calc(var(--sticky-height) + env(safe-area-inset-bottom, 0px));
+  flex-shrink: 0;
+}
+/* Give the page its own scroll viewport above the dock: the fixed ad cannot
+   cover any editor content, toolbar, footer, or focused controls. */
+.ads-prototype[data-placement="sticky"][data-pro="false"] {
+  height: calc(
+    100svh - var(--sticky-height) - env(safe-area-inset-bottom, 0px)
+  );
+  min-height: 0;
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+.ads-prototype[data-placement="sticky"]::-webkit-scrollbar {
+  width: 0;
+}
+.ads-prototype[data-placement="sticky"] .ads-sticky-reserve {
+  height: 0;
+}
+.ads-sticky-slot {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: calc(var(--sticky-height) + env(safe-area-inset-bottom, 0px));
+  padding: 4px 8px calc(4px + env(safe-area-inset-bottom, 0px));
+  background: var(--ad-bg);
+  z-index: 5;
+  border-top: 1px solid var(--ad-border);
+}
+.ads-unit-sticky {
+  max-width: 1064px;
+  margin: 0 auto;
+  border: 0;
+}
+@media (min-width: 1440px) {
+  .ads-rail-slot {
+    position: absolute;
+    left: calc(100% + 16px);
+    top: 48px;
+    width: 156px;
+    height: 268px;
+    margin: 0;
+  }
+  .ads-unit-rail {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .ads-unit-rail .ads-creative {
+    flex-basis: 64px;
+    width: 100%;
+  }
+}
+@media (max-width: 600px) {
+  .ads-prototype {
+    --sticky-height: 132px;
+  }
+  .ads-prototype .NavBar a > span {
+    font-size: 20px;
+  }
+  .ads-prototype .NavBar a > img {
+    width: 24px;
+    height: 24px;
+  }
+  .ads-pro-pill {
+    left: calc(166px + 0.25rem);
+    font-size: 11px;
+    padding: 0 5px;
+  }
+  .ads-switcher {
+    gap: 0 8px;
+  }
+  .ads-switcher .ads-prototype-label {
+    width: 100%;
+    text-align: center;
+  }
+  .ads-switcher select {
+    max-width: 175px;
+  }
+  .ads-navbar {
+    order: 0;
+  }
+  .ads-switcher {
+    order: 1;
+  }
+  .ads-workspace {
+    order: 2;
+  }
+  .ads-top-slot {
+    height: 156px;
+    order: 3;
+    flex-shrink: 0;
+  }
+  .ads-below-slot {
+    order: 3;
+    flex-shrink: 0;
+  }
+  .ads-prototype > footer {
+    order: 4;
+  }
+  .ads-sticky-reserve {
+    order: 5;
+  }
+  .ads-unit-top,
+  .ads-unit-sticky {
+    gap: 8px;
+    padding: 8px;
+  }
+  .ads-unit-top .ads-creative,
+  .ads-unit-sticky .ads-creative {
+    flex-basis: 32px;
+    height: 32px;
+    font-size: 16px;
+  }
+  .ads-copy p {
+    font-size: 12px;
+    line-height: 17px;
+  }
+}
