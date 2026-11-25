@@ -1,0 +1,68 @@
+@tailwind components;
+
+@layer components {
+  .donation-banner {
+    @apply border-powderBlue-100 bg-powderBlue-100/20 text-powderBlue-600 dark:border-powderBlue-500 dark:bg-powderBlue-600/30 dark:text-powderBlue-100;
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    gap: 8px;
+    margin: 12px 20px 0;
+    padding: 6px 8px 6px 16px;
+    border-width: 1px;
+    border-radius: 12px;
+    font-size: 13px;
+    line-height: 20px;
+  }
+
+  html[data-donation-dismissed="true"] .donation-banner {
+    display: none;
+  }
+
+  .donation-banner-content {
+    display: flex;
+    flex: 1;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: center;
+    gap: 4px 16px;
+    min-width: 0;
+  }
+
+  .donation-banner a {
+    @apply hover:text-powderBlue-500 dark:hover:text-offWhite;
+    flex-shrink: 0;
+    font-weight: 500;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    white-space: nowrap;
+  }
+
+  .donation-banner button {
+    @apply hover:bg-powderBlue-100/50 dark:hover:bg-powderBlue-500/50;
+    display: inline-flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+  }
+
+  .donation-banner a:focus-visible,
+  .donation-banner button:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 3px;
+  }
+
+  @media (max-width: 767px) {
+    .donation-banner {
+      margin: 8px 12px 0;
+      padding-left: 12px;
+    }
+
+    .donation-banner-content {
+      justify-content: flex-start;
+    }
+  }
+}
