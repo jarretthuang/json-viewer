@@ -7,12 +7,13 @@
     flex-shrink: 0;
     align-items: center;
     gap: 8px;
-    margin: 12px 20px 0;
-    padding: 6px 8px 6px 16px;
+    /* Match the editor's px-2 inset, which scales with the app's root font size. */
+    margin: 8px 0.5rem 0;
+    padding: 3px 8px 3px 14px;
     border-width: 1px;
     border-radius: 12px;
     font-size: 13px;
-    line-height: 20px;
+    line-height: 18px;
   }
 
   html[data-donation-dismissed="true"] .donation-banner {
@@ -23,18 +24,29 @@
     display: flex;
     flex: 1;
     flex-wrap: wrap;
-    align-items: baseline;
+    align-items: center;
     justify-content: center;
     gap: 4px 16px;
     min-width: 0;
   }
 
-  .donation-banner a {
-    @apply hover:text-powderBlue-500 dark:hover:text-offWhite;
-    flex-shrink: 0;
+  .donation-banner p {
     font-weight: 500;
-    text-decoration: underline;
-    text-underline-offset: 3px;
+    letter-spacing: 0.01em;
+  }
+
+  .donation-banner a {
+    @apply border-powderBlue-200/50 bg-powderBlue-100/40 hover:border-powderBlue-300 hover:bg-powderBlue-100/70 dark:border-powderBlue-100/30 dark:bg-powderBlue-100/10 dark:hover:border-powderBlue-100/60 dark:hover:bg-powderBlue-100/20;
+    display: inline-flex;
+    flex-shrink: 0;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border-width: 1px;
+    border-radius: 999px;
+    font-weight: 500;
+    letter-spacing: 0.015em;
+    text-decoration: none;
     white-space: nowrap;
   }
 
@@ -57,7 +69,6 @@
 
   @media (max-width: 767px) {
     .donation-banner {
-      margin: 8px 12px 0;
       padding-left: 12px;
     }
 

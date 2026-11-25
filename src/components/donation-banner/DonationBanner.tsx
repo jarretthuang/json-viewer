@@ -1,6 +1,7 @@
 "use client";
 
 import CloseIcon from "@mui/icons-material/Close";
+import LocalCafeOutlinedIcon from "@mui/icons-material/LocalCafeOutlined";
 import "./DonationBanner.css";
 
 const dismissalKey = "json-viewer:donation-banner-dismissed";
@@ -33,7 +34,11 @@ export default function DonationBanner() {
             target="_blank"
             rel="noopener noreferrer"
           >
-            Buy me a coffee <span aria-hidden="true">↗</span>
+            <LocalCafeOutlinedIcon
+              aria-hidden="true"
+              style={{ fontSize: 16 }}
+            />
+            Buy me a coffee
             <span className="sr-only"> (opens in a new tab)</span>
           </a>
         </div>
