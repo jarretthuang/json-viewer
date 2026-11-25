@@ -2,6 +2,7 @@ import { expect, test } from "@playwright/test";
 
 test("donation banner uses the footer URL and supports keyboard dismissal across reloads", async ({
   page,
+  browserName,
 }) => {
   await page.goto("/");
   const banner = page.getByRole("complementary", {
@@ -16,7 +17,10 @@ test("donation banner uses the footer URL and supports keyboard dismissal across
   await expect(link).toHaveAttribute("rel", "noopener noreferrer");
 
   await link.focus();
-  await page.keyboard.press("Tab");
+  // macOS WebKit uses Option+Tab to include buttons in keyboard navigation.
+  await page.keyboard.press(
+    browserName === "webkit" && process.platform === "darwin" ? "Alt+Tab" : "Tab"
+  );
   await expect(
     banner.getByRole("button", { name: "Dismiss donation banner" })
   ).toBeFocused();
