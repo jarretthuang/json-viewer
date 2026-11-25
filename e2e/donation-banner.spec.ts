@@ -74,6 +74,7 @@ for (const viewport of [
   { width: 1920, height: 1080 },
   { width: 768, height: 1024 },
   { width: 390, height: 844 },
+  { width: 375, height: 812 },
   { width: 320, height: 640 },
 ]) {
   test(`banner fits above the editor at ${viewport.width}px in light and dark themes`, async ({
@@ -100,22 +101,88 @@ for (const viewport of [
         .locator(".JsonViewerEditor")
         .boundingBox();
       const nav = await page.getByRole("navigation").boundingBox();
+      const tabs = await page
+        .getByRole("tab", { name: /^view$/i })
+        .boundingBox();
+      const dismiss = await banner.getByRole("button").boundingBox();
       const message = await banner.locator("p").boundingBox();
       const cta = await banner.getByRole("link").boundingBox();
       expect(bounds!.x).toBeCloseTo(editorContainer!.x, 1);
       expect(bounds!.width).toBeCloseTo(editorContainer!.width, 1);
-      expect(bounds!.y).toBeGreaterThanOrEqual(nav!.y + nav!.height);
+      const spaceAbove = bounds!.y - (nav!.y + nav!.height);
+      const spaceBelow = tabs!.y - (bounds!.y + bounds!.height);
+      expect(spaceAbove).toBeGreaterThan(0);
+      expect(Math.abs(spaceAbove - spaceBelow)).toBeLessThanOrEqual(1);
       expect(bounds!.height).toBeLessThan(viewport.width < 768 ? 110 : 42);
       if (viewport.width >= 768) {
-        expect(message!.height).toBeLessThanOrEqual(18);
+        expect(message!.height).toBeLessThanOrEqual(20);
         expect(message!.y + message!.height / 2).toBeCloseTo(
           cta!.y + cta!.height / 2,
           0
         );
       }
-      expect(cta!.x + cta!.width).toBeLessThanOrEqual(
-        bounds!.x + bounds!.width
-      );
+      if (viewport.width < 768) {
+        expect(dismiss!.width).toBeGreaterThanOrEqual(44);
+        expect(dismiss!.height).toBeGreaterThanOrEqual(44);
+      }
+      for (const item of [message!, cta!, dismiss!]) {
+        expect(item.x).toBeGreaterThanOrEqual(bounds!.x);
+        expect(item.x + item.width).toBeLessThanOrEqual(
+          bounds!.x + bounds!.width
+        );
+        expect(item.y).toBeGreaterThanOrEqual(bounds!.y);
+        expect(item.y + item.height).toBeLessThanOrEqual(
+          bounds!.y + bounds!.height
+        );
+      }
+      expect(message!.x + message!.width).toBeLessThanOrEqual(dismiss!.x);
+      expect(cta!.x + cta!.width).toBeLessThanOrEqual(dismiss!.x);
+      const messageSize = await banner
+        .locator("p")
+        .evaluate((element) => parseFloat(getComputedStyle(element).fontSize));
+      const ctaSize = await banner
+        .getByRole("link")
+        .evaluate((element) => parseFloat(getComputedStyle(element).fontSize));
+      expect(messageSize).toBeGreaterThan(ctaSize);
+      // Slate 600 / 300 against the composited banner backgrounds in each theme.
+      const contrast = await banner.locator("p").evaluate((element) => {
+        const rgb = (value: string) => value.match(/[\d.]+/g)!.map(Number);
+        let background = [255, 255, 255];
+        const ancestors = [];
+        for (
+          let node: Element | null = element;
+          node;
+          node = node.parentElement
+        ) {
+          ancestors.unshift(node);
+        }
+        for (const node of ancestors) {
+          const [r, g, b, a = 1] = rgb(getComputedStyle(node).backgroundColor);
+          background = [r, g, b].map(
+            (channel, i) => channel * a + background[i] * (1 - a)
+          );
+        }
+        const luminance = (channels: number[]) =>
+          channels
+            .slice(0, 3)
+            .map((channel) => channel / 255)
+            .map((channel) =>
+              channel <= 0.04045
+                ? channel / 12.92
+                : ((channel + 0.055) / 1.055) ** 2.4
+            )
+            .reduce(
+              (sum, channel, i) => sum + channel * [0.2126, 0.7152, 0.0722][i],
+              0
+            );
+        const foreground = luminance(rgb(getComputedStyle(element).color));
+        const backdrop = luminance(background);
+        return (
+          (Math.max(foreground, backdrop) + 0.05) /
+          (Math.min(foreground, backdrop) + 0.05)
+        );
+      });
+      expect(contrast).toBeGreaterThanOrEqual(4.5);
       expect(editor!.y).toBeGreaterThanOrEqual(bounds!.y + bounds!.height);
       expect(editor!.height).toBeGreaterThan(200);
       expect(editor!.y + editor!.height).toBeLessThanOrEqual(viewport.height);
@@ -123,5 +190,10 @@ for (const viewport of [
         await page.evaluate(() => document.documentElement.scrollWidth)
       ).toBe(viewport.width);
     }
+    await page.getByRole("button", { name: /^example$/i }).click();
+    await page.getByRole("tab", { name: /^view$/i }).click();
+    await expect(page.getByLabel(/json viewer tree/i)).toBeVisible();
+    await page.getByRole("tab", { name: /^edit$/i }).click();
+    await expect(page.locator(".monaco-editor").first()).toBeVisible();
   });
 }

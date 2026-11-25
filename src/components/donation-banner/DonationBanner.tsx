@@ -36,7 +36,7 @@ export default function DonationBanner() {
           >
             <LocalCafeOutlinedIcon
               aria-hidden="true"
-              style={{ fontSize: 16 }}
+              style={{ fontSize: 14 }}
             />
             Buy me a coffee
             <span className="sr-only"> (opens in a new tab)</span>

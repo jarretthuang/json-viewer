@@ -2,18 +2,20 @@
 
 @layer components {
   .donation-banner {
-    @apply border-powderBlue-100 bg-powderBlue-100/20 text-powderBlue-600 dark:border-powderBlue-500 dark:bg-powderBlue-600/30 dark:text-powderBlue-100;
+    @apply border-powderBlue-100 bg-powderBlue-100/20 text-slate-600 dark:border-powderBlue-500 dark:bg-powderBlue-600/30 dark:text-slate-300;
     display: flex;
     flex-shrink: 0;
     align-items: center;
     gap: 8px;
     /* Match the editor's px-2 inset, which scales with the app's root font size. */
-    margin: 8px 0.5rem 0;
+    /* The 2rem toolbar centers 1.2rem tabs, leaving 0.4rem above them.
+       Match that space above the banner to center it between navbar and tabs. */
+    margin: 0.4rem 0.5rem 0;
     padding: 3px 8px 3px 14px;
     border-width: 1px;
     border-radius: 12px;
-    font-size: 13px;
-    line-height: 18px;
+    font-size: 14px;
+    line-height: 20px;
   }
 
   html[data-donation-dismissed="true"] .donation-banner {
@@ -40,8 +42,10 @@
     display: inline-flex;
     flex-shrink: 0;
     align-items: center;
-    gap: 6px;
-    padding: 4px 10px;
+    gap: 5px;
+    padding: 3px 8px;
+    font-size: 12px;
+    line-height: 16px;
     border-width: 1px;
     border-radius: 999px;
     font-weight: 500;
@@ -69,11 +73,21 @@
 
   @media (max-width: 767px) {
     .donation-banner {
-      padding-left: 12px;
+      /* Mobile toolbar: (3.5rem row - 2.15rem tabs) / 2. */
+      margin-top: 0.675rem;
+      padding: 6px 6px 6px 12px;
+      font-size: 13.5px;
+      line-height: 19px;
     }
 
     .donation-banner-content {
       justify-content: flex-start;
+      gap: 6px 12px;
+    }
+
+    .donation-banner button {
+      width: 44px;
+      height: 44px;
     }
   }
 }
