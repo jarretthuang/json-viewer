@@ -2,7 +2,7 @@
 
 @layer components {
   .donation-banner {
-    @apply border-powderBlue-100 bg-powderBlue-100/20 text-slate-600 dark:border-powderBlue-500 dark:bg-powderBlue-600/30 dark:text-slate-300;
+    @apply border-powderBlue-100 bg-powderBlue-100/20 text-slate-600 dark:border-white/10 dark:bg-zinc-900 dark:text-mono-500;
     display: flex;
     flex-shrink: 0;
     align-items: center;
@@ -38,7 +38,7 @@
   }
 
   .donation-banner a {
-    @apply border-powderBlue-200/50 bg-powderBlue-100/40 hover:border-powderBlue-300 hover:bg-powderBlue-100/70 dark:border-powderBlue-100/30 dark:bg-powderBlue-100/10 dark:hover:border-powderBlue-100/60 dark:hover:bg-powderBlue-100/20;
+    @apply border-powderBlue-200/50 bg-powderBlue-100/40 hover:border-powderBlue-300 hover:bg-powderBlue-100/70 dark:border-mono-800/60 dark:bg-mono-900 dark:text-mono-400 dark:hover:border-mono-800 dark:hover:bg-mono-800/40;
     display: inline-flex;
     flex-shrink: 0;
     align-items: center;
@@ -55,7 +55,7 @@
   }
 
   .donation-banner button {
-    @apply hover:bg-powderBlue-100/50 dark:hover:bg-powderBlue-500/50;
+    @apply hover:bg-powderBlue-100/50 dark:text-mono-600 dark:hover:bg-mono-900 dark:hover:text-mono-400;
     display: inline-flex;
     flex-shrink: 0;
     align-items: center;

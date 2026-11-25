@@ -144,45 +144,55 @@ for (const viewport of [
         .getByRole("link")
         .evaluate((element) => parseFloat(getComputedStyle(element).fontSize));
       expect(messageSize).toBeGreaterThan(ctaSize);
-      // Slate 600 / 300 against the composited banner backgrounds in each theme.
-      const contrast = await banner.locator("p").evaluate((element) => {
-        const rgb = (value: string) => value.match(/[\d.]+/g)!.map(Number);
-        let background = [255, 255, 255];
-        const ancestors = [];
-        for (
-          let node: Element | null = element;
-          node;
-          node = node.parentElement
-        ) {
-          ancestors.unshift(node);
-        }
-        for (const node of ancestors) {
-          const [r, g, b, a = 1] = rgb(getComputedStyle(node).backgroundColor);
-          background = [r, g, b].map(
-            (channel, i) => channel * a + background[i] * (1 - a)
-          );
-        }
-        const luminance = (channels: number[]) =>
-          channels
-            .slice(0, 3)
-            .map((channel) => channel / 255)
-            .map((channel) =>
-              channel <= 0.04045
-                ? channel / 12.92
-                : ((channel + 0.055) / 1.055) ** 2.4
-            )
-            .reduce(
-              (sum, channel, i) => sum + channel * [0.2126, 0.7152, 0.0722][i],
-              0
+      // Check message, CTA (including its coffee icon), and dismiss control
+      // against their own composited backgrounds in both themes.
+      for (const element of [
+        banner.locator("p"),
+        banner.getByRole("link"),
+        banner.getByRole("button"),
+      ]) {
+        const contrast = await element.evaluate((element) => {
+          const rgb = (value: string) => value.match(/[\d.]+/g)!.map(Number);
+          let background = [255, 255, 255];
+          const ancestors = [];
+          for (
+            let node: Element | null = element;
+            node;
+            node = node.parentElement
+          ) {
+            ancestors.unshift(node);
+          }
+          for (const node of ancestors) {
+            const [r, g, b, a = 1] = rgb(
+              getComputedStyle(node).backgroundColor
             );
-        const foreground = luminance(rgb(getComputedStyle(element).color));
-        const backdrop = luminance(background);
-        return (
-          (Math.max(foreground, backdrop) + 0.05) /
-          (Math.min(foreground, backdrop) + 0.05)
-        );
-      });
-      expect(contrast).toBeGreaterThanOrEqual(4.5);
+            background = [r, g, b].map(
+              (channel, i) => channel * a + background[i] * (1 - a)
+            );
+          }
+          const luminance = (channels: number[]) =>
+            channels
+              .slice(0, 3)
+              .map((channel) => channel / 255)
+              .map((channel) =>
+                channel <= 0.04045
+                  ? channel / 12.92
+                  : ((channel + 0.055) / 1.055) ** 2.4
+              )
+              .reduce(
+                (sum, channel, i) =>
+                  sum + channel * [0.2126, 0.7152, 0.0722][i],
+                0
+              );
+          const foreground = luminance(rgb(getComputedStyle(element).color));
+          const backdrop = luminance(background);
+          return (
+            (Math.max(foreground, backdrop) + 0.05) /
+            (Math.min(foreground, backdrop) + 0.05)
+          );
+        });
+        expect(contrast).toBeGreaterThanOrEqual(4.5);
+      }
       expect(editor!.y).toBeGreaterThanOrEqual(bounds!.y + bounds!.height);
       expect(editor!.height).toBeGreaterThan(200);
       expect(editor!.y + editor!.height).toBeLessThanOrEqual(viewport.height);
@@ -195,5 +205,68 @@ for (const viewport of [
     await expect(page.getByLabel(/json viewer tree/i)).toBeVisible();
     await page.getByRole("tab", { name: /^edit$/i }).click();
     await expect(page.locator(".monaco-editor").first()).toBeVisible();
+  });
+}
+
+// Keep the dark banner close to Monaco's charcoal surface and protect the
+// existing light palette from changes to the shared component styles.
+for (const dark of [false, true]) {
+  test(`banner uses a quiet palette and readable interaction states in ${
+    dark ? "dark" : "light"
+  } mode`, async ({ page }) => {
+    await page.addInitScript(
+      (dark) => localStorage.setItem("theme", dark ? "dark" : "light"),
+      dark
+    );
+    await page.goto("/");
+    await expect(page.locator("html")).toHaveClass(dark ? "dark" : "light");
+    const banner = page.locator(".donation-banner");
+    const link = banner.getByRole("link");
+    const dismiss = banner.getByRole("button");
+    await expect(banner).toHaveCSS(
+      "background-color",
+      dark ? "rgb(24, 24, 27)" : "rgba(176, 224, 230, 0.2)"
+    );
+    await expect(banner).toHaveCSS(
+      "border-top-color",
+      dark ? "rgba(255, 255, 255, 0.1)" : "rgb(176, 224, 230)"
+    );
+    await expect(banner).toHaveCSS(
+      "color",
+      dark ? "rgb(177, 177, 177)" : "rgb(71, 85, 105)"
+    );
+    await expect(link).toHaveCSS(
+      "background-color",
+      dark ? "rgb(42, 42, 42)" : "rgba(176, 224, 230, 0.4)"
+    );
+    await expect(link).toHaveCSS(
+      "color",
+      dark ? "rgb(207, 207, 207)" : "rgb(71, 85, 105)"
+    );
+    await expect(link.locator("svg")).toHaveCSS(
+      "color",
+      dark ? "rgb(207, 207, 207)" : "rgb(71, 85, 105)"
+    );
+    await expect(dismiss.locator("svg")).toHaveCSS(
+      "color",
+      dark ? "rgb(158, 158, 158)" : "rgb(71, 85, 105)"
+    );
+    await link.hover();
+    await expect(link).toHaveCSS(
+      "background-color",
+      dark ? "rgba(77, 77, 77, 0.4)" : "rgba(176, 224, 230, 0.7)"
+    );
+    await link.focus();
+    await expect(link).toHaveCSS("outline-style", "solid");
+    await expect(link).toHaveCSS("outline-width", "2px");
+    await dismiss.hover();
+    await expect(dismiss).toHaveCSS(
+      "background-color",
+      dark ? "rgb(42, 42, 42)" : "rgba(176, 224, 230, 0.5)"
+    );
+    await expect(dismiss).toHaveCSS(
+      "color",
+      dark ? "rgb(207, 207, 207)" : "rgb(71, 85, 105)"
+    );
   });
 }
