@@ -2,7 +2,8 @@
 
 @layer components {
   .donation-banner {
-    @apply border-powderBlue-100 bg-powderBlue-100/20 text-slate-600 dark:border-white/10 dark:bg-zinc-900 dark:text-mono-500;
+    /* Solid equivalent of white/10 over the app's #0a0a0a dark background. */
+    @apply border-powderBlue-100 bg-powderBlue-100 text-slate-600 dark:border-[#232323] dark:bg-[#232323] dark:text-mono-500;
     display: flex;
     flex-shrink: 0;
     align-items: center;
@@ -13,7 +14,7 @@
     margin: 0.4rem 0.5rem 0;
     padding: 3px 8px 3px 14px;
     border-width: 1px;
-    border-radius: 12px;
+    border-radius: 0;
     font-size: 14px;
     line-height: 20px;
   }
@@ -38,7 +39,7 @@
   }
 
   .donation-banner a {
-    @apply border-powderBlue-200/50 bg-powderBlue-100/40 hover:border-powderBlue-300 hover:bg-powderBlue-100/70 dark:border-mono-800/60 dark:bg-mono-900 dark:text-mono-400 dark:hover:border-mono-800 dark:hover:bg-mono-800/40;
+    @apply border-powderBlue-400/50 bg-white/40 hover:border-powderBlue-400 hover:bg-white/60 dark:border-mono-800/60 dark:bg-mono-900 dark:text-mono-400 dark:hover:border-mono-800 dark:hover:bg-mono-800/40;
     display: inline-flex;
     flex-shrink: 0;
     align-items: center;
@@ -55,7 +56,7 @@
   }
 
   .donation-banner button {
-    @apply hover:bg-powderBlue-100/50 dark:text-mono-600 dark:hover:bg-mono-900 dark:hover:text-mono-400;
+    @apply hover:bg-black/5 dark:text-mono-600 dark:hover:bg-mono-900 dark:hover:text-mono-400;
     display: inline-flex;
     flex-shrink: 0;
     align-items: center;

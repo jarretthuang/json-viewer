@@ -208,8 +208,7 @@ for (const viewport of [
   });
 }
 
-// Keep the dark banner close to Monaco's charcoal surface and protect the
-// existing light palette from changes to the shared component styles.
+// Protect the flat, solid strip in both themes and its distinct CTA pill.
 for (const dark of [false, true]) {
   test(`banner uses a quiet palette and readable interaction states in ${
     dark ? "dark" : "light"
@@ -225,19 +224,21 @@ for (const dark of [false, true]) {
     const dismiss = banner.getByRole("button");
     await expect(banner).toHaveCSS(
       "background-color",
-      dark ? "rgb(24, 24, 27)" : "rgba(176, 224, 230, 0.2)"
+      dark ? "rgb(35, 35, 35)" : "rgb(176, 224, 230)"
     );
     await expect(banner).toHaveCSS(
       "border-top-color",
-      dark ? "rgba(255, 255, 255, 0.1)" : "rgb(176, 224, 230)"
+      dark ? "rgb(35, 35, 35)" : "rgb(176, 224, 230)"
     );
+    await expect(banner).toHaveCSS("border-radius", "0px");
+    await expect(banner).toHaveCSS("box-shadow", "none");
     await expect(banner).toHaveCSS(
       "color",
       dark ? "rgb(177, 177, 177)" : "rgb(71, 85, 105)"
     );
     await expect(link).toHaveCSS(
       "background-color",
-      dark ? "rgb(42, 42, 42)" : "rgba(176, 224, 230, 0.4)"
+      dark ? "rgb(42, 42, 42)" : "rgba(255, 255, 255, 0.4)"
     );
     await expect(link).toHaveCSS(
       "color",
@@ -254,7 +255,7 @@ for (const dark of [false, true]) {
     await link.hover();
     await expect(link).toHaveCSS(
       "background-color",
-      dark ? "rgba(77, 77, 77, 0.4)" : "rgba(176, 224, 230, 0.7)"
+      dark ? "rgba(77, 77, 77, 0.4)" : "rgba(255, 255, 255, 0.6)"
     );
     await link.focus();
     await expect(link).toHaveCSS("outline-style", "solid");
@@ -262,7 +263,7 @@ for (const dark of [false, true]) {
     await dismiss.hover();
     await expect(dismiss).toHaveCSS(
       "background-color",
-      dark ? "rgb(42, 42, 42)" : "rgba(176, 224, 230, 0.5)"
+      dark ? "rgb(42, 42, 42)" : "rgba(0, 0, 0, 0.05)"
     );
     await expect(dismiss).toHaveCSS(
       "color",
