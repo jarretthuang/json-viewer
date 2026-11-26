@@ -114,6 +114,8 @@ for (const viewport of [
       expect(spaceAbove).toBeGreaterThan(0);
       expect(Math.abs(spaceAbove - spaceBelow)).toBeLessThanOrEqual(1);
       expect(bounds!.height).toBeLessThan(viewport.width < 768 ? 110 : 42);
+      await expect(banner).toHaveCSS("border-radius", "12px");
+      await expect(banner).not.toHaveCSS("box-shadow", "none");
       if (viewport.width >= 768) {
         expect(message!.height).toBeLessThanOrEqual(20);
         expect(message!.y + message!.height / 2).toBeCloseTo(
@@ -208,7 +210,7 @@ for (const viewport of [
   });
 }
 
-// Protect the flat, solid strip in both themes and its distinct CTA pill.
+// Protect the rounded, elevated solid strip in both themes and its distinct CTA pill.
 for (const dark of [false, true]) {
   test(`banner uses a quiet palette and readable interaction states in ${
     dark ? "dark" : "light"
@@ -230,8 +232,8 @@ for (const dark of [false, true]) {
       "border-top-color",
       dark ? "rgb(35, 35, 35)" : "rgb(176, 224, 230)"
     );
-    await expect(banner).toHaveCSS("border-radius", "0px");
-    await expect(banner).toHaveCSS("box-shadow", "none");
+    await expect(banner).toHaveCSS("border-radius", "12px");
+    await expect(banner).not.toHaveCSS("box-shadow", "none");
     await expect(banner).toHaveCSS(
       "color",
       dark ? "rgb(177, 177, 177)" : "rgb(71, 85, 105)"

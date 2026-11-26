@@ -3,7 +3,9 @@
 @layer components {
   .donation-banner {
     /* Solid equivalent of white/10 over the app's #0a0a0a dark background. */
-    @apply border-powderBlue-100 bg-powderBlue-100 text-slate-600 dark:border-[#232323] dark:bg-[#232323] dark:text-mono-500;
+    @apply border-powderBlue-100 bg-powderBlue-100 text-slate-600 shadow-subtle dark:border-[#232323] dark:bg-[#232323] dark:text-mono-500 dark:shadow-subtleWhite;
+    /* Paint the shadow above the following editor section's background. */
+    position: relative;
     display: flex;
     flex-shrink: 0;
     align-items: center;
@@ -14,7 +16,7 @@
     margin: 0.4rem 0.5rem 0;
     padding: 3px 8px 3px 14px;
     border-width: 1px;
-    border-radius: 0;
+    border-radius: 12px;
     font-size: 14px;
     line-height: 20px;
   }
