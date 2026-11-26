@@ -1,5 +1,6 @@
 "use client";
 
+import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import CloseIcon from "@mui/icons-material/Close";
 import LocalCafeOutlinedIcon from "@mui/icons-material/LocalCafeOutlined";
 import "./DonationBanner.css";
@@ -30,9 +31,15 @@ export default function DonationBanner() {
       <script dangerouslySetInnerHTML={{ __html: restoreDismissal }} />
       <aside className="donation-banner" aria-label="Support JSON Viewer">
         <div className="donation-banner-content">
-          <p>
-            JSON Viewer is free. Your donations help keep it free and online.
-          </p>
+          <div className="donation-banner-message">
+            <InfoOutlinedIcon
+              aria-hidden="true"
+              style={{ fontSize: 20 }}
+            />
+            <p>
+              JSON Viewer is free. Your donations help keep it free and online.
+            </p>
+          </div>
           <a
             href="https://www.buymeacoffee.com/jarretthuang"
             target="_blank"

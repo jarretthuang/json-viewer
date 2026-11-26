@@ -156,13 +156,34 @@ for (const viewport of [
       const dismiss = await banner.getByRole("button").boundingBox();
       const message = await banner.locator("p").boundingBox();
       const cta = await banner.getByRole("link").boundingBox();
+      const infoIcon = banner.getByTestId("InfoOutlinedIcon");
+      await expect(infoIcon).toBeVisible();
+      await expect(infoIcon).toHaveAttribute("aria-hidden", "true");
+      await expect(infoIcon).not.toHaveAttribute("tabindex");
+      await expect(banner.locator("p")).toHaveCSS("text-align", "left");
+      const info = await infoIcon.boundingBox();
+      // Icon starts at the banner's left inset; text follows it closely.
+      expect(info!.x - bounds!.x).toBeCloseTo(viewport.width < 768 ? 13 : 15, 0);
+      expect(info!.width).toBeCloseTo(20, 3);
+      expect(message!.x - (info!.x + info!.width)).toBeCloseTo(
+        viewport.width < 768 ? 6 : 8, 0
+      );
+      expect(info!.y + info!.height / 2).toBeCloseTo(
+        message!.y + message!.height / 2, 0
+      );
+      // Controls stay at the right inset with the original 8px gap.
+      expect(bounds!.x + bounds!.width - (dismiss!.x + dismiss!.width))
+        .toBeCloseTo(viewport.width < 768 ? 7 : 9, 0);
+      expect(dismiss!.x - (cta!.x + cta!.width)).toBeCloseTo(8, 0);
+      expect(cta!.x - (message!.x + message!.width))
+        .toBeGreaterThanOrEqual(viewport.width < 768 ? 7 : 15);
       expect(bounds!.x).toBeCloseTo(editorContainer!.x, 1);
       expect(bounds!.width).toBeCloseTo(editorContainer!.width, 1);
       const spaceAbove = bounds!.y - (nav!.y + nav!.height);
       const spaceBelow = tabs!.y - (bounds!.y + bounds!.height);
       expect(spaceAbove).toBeGreaterThan(0);
       expect(Math.abs(spaceAbove - spaceBelow)).toBeLessThanOrEqual(1);
-      expect(bounds!.height).toBeLessThan(viewport.width < 768 ? 110 : 42);
+      expect(bounds!.height).toBeLessThan(viewport.width < 768 ? 170 : 42);
       await expect(banner).toHaveCSS("border-radius", "12px");
       await expect(banner).not.toHaveCSS("box-shadow", "none");
       if (viewport.width >= 768) {
@@ -186,7 +207,7 @@ for (const viewport of [
         expect(dismiss!.width).toBeGreaterThanOrEqual(44);
         expect(dismiss!.height).toBeGreaterThanOrEqual(44);
       }
-      for (const item of [message!, cta!, dismiss!]) {
+      for (const item of [info!, message!, cta!, dismiss!]) {
         expect(item.x).toBeGreaterThanOrEqual(bounds!.x);
         expect(item.x + item.width).toBeLessThanOrEqual(
           bounds!.x + bounds!.width
@@ -204,11 +225,13 @@ for (const viewport of [
       const ctaSize = await banner
         .getByRole("link")
         .evaluate((element) => parseFloat(getComputedStyle(element).fontSize));
-      expect(messageSize).toBeGreaterThan(ctaSize);
-      // Check message, CTA (including its coffee icon), and dismiss control
+      expect(messageSize).toBe(viewport.width < 768 ? 13.5 : 14);
+      expect(ctaSize).toBe(12);
+      // Check message, info icon, CTA (including its coffee icon), and dismiss control
       // against their own composited backgrounds in both themes.
       for (const element of [
         banner.locator("p"),
+        infoIcon,
         banner.getByRole("link"),
         banner.getByRole("button"),
       ]) {
@@ -294,6 +317,10 @@ for (const dark of [false, true]) {
     await expect(banner).toHaveCSS("border-radius", "12px");
     await expect(banner).not.toHaveCSS("box-shadow", "none");
     await expect(banner).toHaveCSS(
+      "color",
+      dark ? "rgb(177, 177, 177)" : "rgb(71, 85, 105)"
+    );
+    await expect(banner.getByTestId("InfoOutlinedIcon")).toHaveCSS(
       "color",
       dark ? "rgb(177, 177, 177)" : "rgb(71, 85, 105)"
     );
