@@ -311,11 +311,11 @@ for (const dark of [false, true]) {
     const dismiss = banner.getByRole("button");
     await expect(banner).toHaveCSS(
       "background-color",
-      dark ? "rgb(48, 48, 48)" : "rgb(197, 233, 239)"
+      dark ? "rgb(35, 35, 35)" : "rgb(223, 243, 247)"
     );
     await expect(banner).toHaveCSS(
       "border-top-color",
-      dark ? "rgb(48, 48, 48)" : "rgb(197, 233, 239)"
+      dark ? "rgb(35, 35, 35)" : "rgb(223, 243, 247)"
     );
     await expect(banner).toHaveCSS("border-radius", "12px");
     await expect(banner).not.toHaveCSS("box-shadow", "none");
@@ -330,7 +330,7 @@ for (const dark of [false, true]) {
     await expect(link).toHaveCSS("border-radius", "8px");
     await expect(link).toHaveCSS(
       "background-color",
-      dark ? "rgb(42, 42, 42)" : "rgba(255, 255, 255, 0.4)"
+      dark ? "rgb(48, 48, 48)" : "rgba(255, 255, 255, 0.4)"
     );
     await expect(link).toHaveCSS(
       "color",
@@ -357,7 +357,7 @@ for (const dark of [false, true]) {
     await link.hover();
     await expect(link).toHaveCSS(
       "background-color",
-      dark ? "rgba(77, 77, 77, 0.4)" : "rgba(255, 255, 255, 0.6)"
+      dark ? "rgb(56, 56, 56)" : "rgba(255, 255, 255, 0.6)"
     );
     await link.focus();
     await expect(link).toHaveCSS("outline-style", "solid");

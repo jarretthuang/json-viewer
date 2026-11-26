@@ -3,7 +3,7 @@
 @layer components {
   .donation-banner {
     /* Quiet solid strips with matching borders in both themes. */
-    @apply border-[#c5e9ef] bg-[#c5e9ef] text-slate-600 shadow-subtle dark:border-[#303030] dark:bg-[#303030] dark:text-mono-500 dark:shadow-subtleWhite;
+    @apply border-[#dff3f7] bg-[#dff3f7] text-slate-600 shadow-subtle dark:border-[#232323] dark:bg-[#232323] dark:text-mono-500 dark:shadow-subtleWhite;
     /* Paint the shadow above the following editor section's background. */
     position: relative;
     display: flex;
@@ -54,7 +54,7 @@
   }
 
   .donation-banner a {
-    @apply border-powderBlue-400/50 bg-white/40 hover:border-powderBlue-400 hover:bg-white/60 dark:border-mono-800/60 dark:bg-mono-900 dark:text-mono-400 dark:hover:border-mono-800 dark:hover:bg-mono-800/40;
+    @apply border-powderBlue-400/50 bg-white/40 hover:border-powderBlue-400 hover:bg-white/60 dark:border-mono-800/60 dark:bg-[#303030] dark:text-mono-400 dark:hover:border-mono-800 dark:hover:bg-[#383838];
     display: inline-flex;
     flex-shrink: 0;
     align-items: center;
