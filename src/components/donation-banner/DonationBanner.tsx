@@ -58,7 +58,9 @@ export default function DonationBanner() {
           onClick={dismiss}
           aria-label="Dismiss donation banner"
         >
-          <CloseIcon aria-hidden="true" style={{ fontSize: 18 }} />
+          <span className="donation-banner-dismiss-circle">
+            <CloseIcon aria-hidden="true" style={{ fontSize: 18 }} />
+          </span>
         </button>
       </aside>
     </>

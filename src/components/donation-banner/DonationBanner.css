@@ -71,7 +71,7 @@
   }
 
   .donation-banner button {
-    @apply bg-white/40 hover:bg-white/60 dark:bg-white/5 dark:text-mono-500 dark:hover:bg-white/10 dark:hover:text-mono-400;
+    background: transparent;
     display: inline-flex;
     flex-shrink: 0;
     align-items: center;
@@ -81,8 +81,26 @@
     border-radius: 50%;
   }
 
-  .donation-banner a:focus-visible,
+  .donation-banner-dismiss-circle {
+    @apply bg-white/40 dark:bg-white/5 dark:text-mono-500;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+  }
+
+  .donation-banner button:hover .donation-banner-dismiss-circle {
+    @apply bg-white/60 dark:bg-white/10 dark:text-mono-400;
+  }
+
   .donation-banner button:focus-visible {
+    outline: none;
+  }
+
+  .donation-banner a:focus-visible,
+  .donation-banner button:focus-visible .donation-banner-dismiss-circle {
     outline: 2px solid currentColor;
     outline-offset: 3px;
   }

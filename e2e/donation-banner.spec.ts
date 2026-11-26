@@ -154,6 +154,20 @@ for (const viewport of [
         .getByRole("tab", { name: /^view$/i })
         .boundingBox();
       const dismiss = await banner.getByRole("button").boundingBox();
+      const circle = banner.locator(".donation-banner-dismiss-circle");
+      const circleBounds = await circle.boundingBox();
+      await expect(circle).toHaveCSS("width", "32px");
+      await expect(circle).toHaveCSS("height", "32px");
+      expect(circleBounds!.x + circleBounds!.width / 2).toBeCloseTo(
+        dismiss!.x + dismiss!.width / 2, 3
+      );
+      expect(circleBounds!.y + circleBounds!.height / 2).toBeCloseTo(
+        dismiss!.y + dismiss!.height / 2, 3
+      );
+      await expect(banner.getByRole("button")).toHaveCSS(
+        "background-color", "rgba(0, 0, 0, 0)"
+      );
+      await expect(circle.locator("svg")).toHaveCSS("width", "18px");
       const message = await banner.locator("p").boundingBox();
       const cta = await banner.getByRole("link").boundingBox();
       const infoIcon = banner.getByTestId("InfoOutlinedIcon");
@@ -187,6 +201,8 @@ for (const viewport of [
       await expect(banner).toHaveCSS("border-radius", "12px");
       await expect(banner).not.toHaveCSS("box-shadow", "none");
       if (viewport.width >= 768) {
+        await expect(banner.getByRole("button")).toHaveCSS("width", "32px");
+        await expect(banner.getByRole("button")).toHaveCSS("height", "32px");
         expect(message!.height).toBeLessThanOrEqual(20);
         expect(message!.y + message!.height / 2).toBeCloseTo(
           cta!.y + cta!.height / 2,
@@ -236,49 +252,52 @@ for (const viewport of [
         banner.locator("p"),
         infoIcon,
         banner.getByRole("link"),
-        banner.getByRole("button"),
+        circle.locator("svg"),
       ]) {
-        const contrast = await element.evaluate((element) => {
-          const rgb = (value: string) => value.match(/[\d.]+/g)!.map(Number);
-          let background = [255, 255, 255];
-          const ancestors = [];
-          for (
-            let node: Element | null = element;
-            node;
-            node = node.parentElement
-          ) {
-            ancestors.unshift(node);
-          }
-          for (const node of ancestors) {
-            const [r, g, b, a = 1] = rgb(
-              getComputedStyle(node).backgroundColor
-            );
-            background = [r, g, b].map(
-              (channel, i) => channel * a + background[i] * (1 - a)
-            );
-          }
-          const luminance = (channels: number[]) =>
-            channels
-              .slice(0, 3)
-              .map((channel) => channel / 255)
-              .map((channel) =>
-                channel <= 0.04045
-                  ? channel / 12.92
-                  : ((channel + 0.055) / 1.055) ** 2.4
-              )
-              .reduce(
-                (sum, channel, i) =>
-                  sum + channel * [0.2126, 0.7152, 0.0722][i],
-                0
+        for (const hovered of [false, true]) {
+          if (hovered) await element.hover();
+          const contrast = await element.evaluate((element) => {
+            const rgb = (value: string) => value.match(/[\d.]+/g)!.map(Number);
+            let background = [255, 255, 255];
+            const ancestors = [];
+            for (
+              let node: Element | null = element;
+              node;
+              node = node.parentElement
+            ) {
+              ancestors.unshift(node);
+            }
+            for (const node of ancestors) {
+              const [r, g, b, a = 1] = rgb(
+                getComputedStyle(node).backgroundColor
               );
-          const foreground = luminance(rgb(getComputedStyle(element).color));
-          const backdrop = luminance(background);
-          return (
-            (Math.max(foreground, backdrop) + 0.05) /
-            (Math.min(foreground, backdrop) + 0.05)
-          );
-        });
-        expect(contrast).toBeGreaterThanOrEqual(4.5);
+              background = [r, g, b].map(
+                (channel, i) => channel * a + background[i] * (1 - a)
+              );
+            }
+            const luminance = (channels: number[]) =>
+              channels
+                .slice(0, 3)
+                .map((channel) => channel / 255)
+                .map((channel) =>
+                  channel <= 0.04045
+                    ? channel / 12.92
+                    : ((channel + 0.055) / 1.055) ** 2.4
+                )
+                .reduce(
+                  (sum, channel, i) =>
+                    sum + channel * [0.2126, 0.7152, 0.0722][i],
+                  0
+                );
+            const foreground = luminance(rgb(getComputedStyle(element).color));
+            const backdrop = luminance(background);
+            return (
+              (Math.max(foreground, backdrop) + 0.05) /
+              (Math.min(foreground, backdrop) + 0.05)
+            );
+          });
+          expect(contrast).toBeGreaterThanOrEqual(4.5);
+        }
       }
       expect(editor!.y).toBeGreaterThanOrEqual(bounds!.y + bounds!.height);
       expect(editor!.height).toBeGreaterThan(200);
@@ -296,10 +315,13 @@ for (const viewport of [
 }
 
 // Protect the rounded, elevated solid strip in both themes and its softly rounded CTA.
-for (const dark of [false, true]) {
+for (const { width, dark } of [1280, 375, 320].flatMap((width) =>
+  [false, true].map((dark) => ({ width, dark }))
+)) {
   test(`banner uses a quiet palette and readable interaction states in ${
     dark ? "dark" : "light"
-  } mode`, async ({ page }) => {
+  } mode at ${width}px`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 800 });
     await page.addInitScript(
       (dark) => localStorage.setItem("theme", dark ? "dark" : "light"),
       dark
@@ -309,6 +331,7 @@ for (const dark of [false, true]) {
     const banner = page.locator(".donation-banner");
     const link = banner.getByRole("link");
     const dismiss = banner.getByRole("button");
+    const circle = dismiss.locator(".donation-banner-dismiss-circle");
     await expect(banner).toHaveCSS(
       "background-color",
       dark ? "rgb(35, 35, 35)" : "rgb(223, 243, 247)"
@@ -344,16 +367,16 @@ for (const dark of [false, true]) {
       "color",
       dark ? "rgb(177, 177, 177)" : "rgb(71, 85, 105)"
     );
-    await expect(dismiss).toHaveCSS("border-radius", "50%");
-    await expect(dismiss).toHaveCSS(
+    await expect(circle).toHaveCSS("border-radius", "50%");
+    await expect(circle).toHaveCSS(
       "background-color",
       dark ? "rgba(255, 255, 255, 0.05)" : "rgba(255, 255, 255, 0.4)"
     );
-    await expect(dismiss).toHaveCSS("width", "32px");
-    await expect(dismiss).toHaveCSS("height", "32px");
+    await expect(dismiss).toHaveCSS("width", width < 768 ? "44px" : "32px");
+    await expect(dismiss).toHaveCSS("height", width < 768 ? "44px" : "32px");
     await dismiss.focus();
-    await expect(dismiss).toHaveCSS("outline-style", "solid");
-    await expect(dismiss).toHaveCSS("outline-width", "2px");
+    await expect(circle).toHaveCSS("outline-style", "solid");
+    await expect(circle).toHaveCSS("outline-width", "2px");
     await link.hover();
     await expect(link).toHaveCSS(
       "background-color",
@@ -363,11 +386,11 @@ for (const dark of [false, true]) {
     await expect(link).toHaveCSS("outline-style", "solid");
     await expect(link).toHaveCSS("outline-width", "2px");
     await dismiss.hover();
-    await expect(dismiss).toHaveCSS(
+    await expect(circle).toHaveCSS(
       "background-color",
       dark ? "rgba(255, 255, 255, 0.1)" : "rgba(255, 255, 255, 0.6)"
     );
-    await expect(dismiss).toHaveCSS(
+    await expect(circle).toHaveCSS(
       "color",
       dark ? "rgb(207, 207, 207)" : "rgb(71, 85, 105)"
     );
