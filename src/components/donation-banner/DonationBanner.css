@@ -58,14 +58,14 @@
   }
 
   .donation-banner button {
-    @apply hover:bg-black/5 dark:text-mono-600 dark:hover:bg-mono-900 dark:hover:text-mono-400;
+    @apply bg-white/40 hover:bg-white/60 dark:bg-white/5 dark:text-mono-500 dark:hover:bg-white/10 dark:hover:text-mono-400;
     display: inline-flex;
     flex-shrink: 0;
     align-items: center;
     justify-content: center;
     width: 32px;
     height: 32px;
-    border-radius: 8px;
+    border-radius: 50%;
   }
 
   .donation-banner a:focus-visible,
@@ -84,8 +84,14 @@
     }
 
     .donation-banner-content {
+      flex-wrap: nowrap;
       justify-content: flex-start;
-      gap: 6px 12px;
+      gap: 6px 8px;
+    }
+
+    .donation-banner p {
+      flex: 1;
+      min-width: 0;
     }
 
     .donation-banner button {

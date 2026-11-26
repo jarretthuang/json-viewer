@@ -26,7 +26,15 @@ test("donation banner uses the footer URL and supports keyboard dismissal across
   await expect(
     banner.getByRole("button", { name: "Dismiss donation banner" })
   ).toBeFocused();
+  const beforeDismissal = await page.evaluate(() => Date.now());
   await page.keyboard.press("Enter");
+  const expiry = await page.evaluate(() =>
+    Number(localStorage.getItem("json-viewer:donation-banner-dismissed"))
+  );
+  const afterDismissal = await page.evaluate(() => Date.now());
+  const thirtyDaysMs = 30 * 24 * 60 * 60 * 1000;
+  expect(expiry).toBeGreaterThanOrEqual(beforeDismissal + thirtyDaysMs);
+  expect(expiry).toBeLessThanOrEqual(afterDismissal + thirtyDaysMs);
   await expect(banner).toBeHidden();
   await page.reload();
   await expect(banner).toBeHidden();
@@ -39,7 +47,10 @@ test("saved dismissal applies before hydration without reserving banner space", 
   page,
 }) => {
   await page.addInitScript(() => {
-    localStorage.setItem("json-viewer:donation-banner-dismissed", "true");
+    localStorage.setItem(
+      "json-viewer:donation-banner-dismissed",
+      String(Date.now() + 60_000)
+    );
   });
   // The inline storage check must work even before the app's JavaScript loads.
   await page.route("**/_next/static/**/*.js", (route) => route.abort());
@@ -49,6 +60,42 @@ test("saved dismissal applies before hydration without reserving banner space", 
     "data-donation-dismissed",
     "true"
   );
+});
+
+for (const savedValue of ["past", "true", "invalid", "Infinity"]) {
+  test(`expired or invalid dismissal (${savedValue}) shows before hydration`, async ({
+    page,
+  }) => {
+    await page.addInitScript((savedValue) => {
+      localStorage.setItem(
+        "json-viewer:donation-banner-dismissed",
+        savedValue === "past" ? String(Date.now() - 60_000) : savedValue
+      );
+    }, savedValue);
+    await page.route("**/_next/static/**/*.js", (route) => route.abort());
+    await page.goto("/", { waitUntil: "load" });
+    await expect(page.locator(".donation-banner")).toBeVisible();
+    await expect(page.locator("html")).not.toHaveAttribute(
+      "data-donation-dismissed",
+      "true"
+    );
+  });
+}
+
+test("legacy dismissal is replaced by a fresh expiry", async ({ page }) => {
+  await page.goto("/");
+  await page.evaluate(() =>
+    localStorage.setItem("json-viewer:donation-banner-dismissed", "true")
+  );
+  await page.reload();
+  await page.getByRole("button", { name: "Dismiss donation banner" }).click();
+  expect(
+    await page.evaluate(() =>
+      Number(localStorage.getItem("json-viewer:donation-banner-dismissed"))
+    )
+  ).toBeGreaterThan(Date.now());
+  await page.reload();
+  await expect(page.locator(".donation-banner")).toBeHidden();
 });
 
 test("storage restrictions still allow dismissal and editor use", async ({
@@ -67,6 +114,8 @@ test("storage restrictions still allow dismissal and editor use", async ({
   await expect(page.locator(".donation-banner")).toBeHidden();
   await page.getByRole("button", { name: /^example$/i }).click();
   await expect(page.locator(".monaco-editor").first()).toBeVisible();
+  await page.reload();
+  await expect(page.locator(".donation-banner")).toBeVisible();
 });
 
 for (const viewport of [
@@ -124,6 +173,16 @@ for (const viewport of [
         );
       }
       if (viewport.width < 768) {
+        expect(cta!.x).toBeGreaterThanOrEqual(message!.x + message!.width);
+        expect(message!.y + message!.height / 2).toBeCloseTo(
+          cta!.y + cta!.height / 2,
+          0
+        );
+        await expect(banner.getByRole("link")).toHaveCSS(
+          "white-space",
+          "nowrap"
+        );
+        expect(cta!.height).toBeLessThanOrEqual(24);
         expect(dismiss!.width).toBeGreaterThanOrEqual(44);
         expect(dismiss!.height).toBeGreaterThanOrEqual(44);
       }
@@ -253,8 +312,18 @@ for (const dark of [false, true]) {
     );
     await expect(dismiss.locator("svg")).toHaveCSS(
       "color",
-      dark ? "rgb(158, 158, 158)" : "rgb(71, 85, 105)"
+      dark ? "rgb(177, 177, 177)" : "rgb(71, 85, 105)"
     );
+    await expect(dismiss).toHaveCSS("border-radius", "50%");
+    await expect(dismiss).toHaveCSS(
+      "background-color",
+      dark ? "rgba(255, 255, 255, 0.05)" : "rgba(255, 255, 255, 0.4)"
+    );
+    await expect(dismiss).toHaveCSS("width", "32px");
+    await expect(dismiss).toHaveCSS("height", "32px");
+    await dismiss.focus();
+    await expect(dismiss).toHaveCSS("outline-style", "solid");
+    await expect(dismiss).toHaveCSS("outline-width", "2px");
     await link.hover();
     await expect(link).toHaveCSS(
       "background-color",
@@ -266,7 +335,7 @@ for (const dark of [false, true]) {
     await dismiss.hover();
     await expect(dismiss).toHaveCSS(
       "background-color",
-      dark ? "rgb(42, 42, 42)" : "rgba(0, 0, 0, 0.05)"
+      dark ? "rgba(255, 255, 255, 0.1)" : "rgba(255, 255, 255, 0.6)"
     );
     await expect(dismiss).toHaveCSS(
       "color",

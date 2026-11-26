@@ -5,17 +5,21 @@ import LocalCafeOutlinedIcon from "@mui/icons-material/LocalCafeOutlined";
 import "./DonationBanner.css";
 
 const dismissalKey = "json-viewer:donation-banner-dismissed";
+const dismissalDurationMs = 30 * 24 * 60 * 60 * 1000;
 
 // Run before the banner is parsed so saved dismissals never flash or shift layout.
-const restoreDismissal = `try{if(localStorage.getItem(${JSON.stringify(
+const restoreDismissal = `try{const expiresAt=Number(localStorage.getItem(${JSON.stringify(
   dismissalKey
-)})==="true"){document.documentElement.setAttribute("data-donation-dismissed","true")}}catch{}`;
+)}));if(Number.isFinite(expiresAt)&&expiresAt>Date.now()){document.documentElement.setAttribute("data-donation-dismissed","true")}}catch{}`;
 
 export default function DonationBanner() {
   const dismiss = () => {
     document.documentElement.setAttribute("data-donation-dismissed", "true");
     try {
-      localStorage.setItem(dismissalKey, "true");
+      localStorage.setItem(
+        dismissalKey,
+        String(Date.now() + dismissalDurationMs)
+      );
     } catch {
       // Dismiss for this visit even when browser storage is unavailable.
     }
