@@ -204,8 +204,11 @@ for (const viewport of [
           "nowrap"
         );
         expect(cta!.height).toBeLessThanOrEqual(24);
-        expect(dismiss!.width).toBeGreaterThanOrEqual(44);
-        expect(dismiss!.height).toBeGreaterThanOrEqual(44);
+        // Firefox can report fractional bounds a few millionths below 44px.
+        await expect(banner.getByRole("button")).toHaveCSS("width", "44px");
+        await expect(banner.getByRole("button")).toHaveCSS("height", "44px");
+        expect(dismiss!.width).toBeCloseTo(44, 3);
+        expect(dismiss!.height).toBeCloseTo(44, 3);
       }
       for (const item of [info!, message!, cta!, dismiss!]) {
         expect(item.x).toBeGreaterThanOrEqual(bounds!.x);
