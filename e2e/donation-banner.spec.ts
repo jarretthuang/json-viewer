@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { waitForEditor } from "./helpers/editor";
 
 test("donation banner uses the footer URL and supports keyboard dismissal across reloads", async ({
   page,
@@ -113,7 +114,7 @@ test("storage restrictions still allow dismissal and editor use", async ({
   await page.getByRole("button", { name: "Dismiss donation banner" }).click();
   await expect(page.locator(".donation-banner")).toBeHidden();
   await page.getByRole("button", { name: /^example$/i }).click();
-  await expect(page.locator(".monaco-editor").first()).toBeVisible();
+  await waitForEditor(page);
   await page.reload();
   await expect(page.locator(".donation-banner")).toBeVisible();
 });
@@ -135,7 +136,7 @@ for (const viewport of [
       name: "Support JSON Viewer",
     });
     await expect(banner).toBeVisible();
-    await expect(page.locator(".monaco-editor").first()).toBeVisible();
+    await waitForEditor(page);
 
     for (const dark of [false, true]) {
       await page.evaluate(
@@ -310,7 +311,7 @@ for (const viewport of [
     await page.getByRole("tab", { name: /^view$/i }).click();
     await expect(page.getByLabel(/json viewer tree/i)).toBeVisible();
     await page.getByRole("tab", { name: /^edit$/i }).click();
-    await expect(page.locator(".monaco-editor").first()).toBeVisible();
+    await waitForEditor(page);
   });
 }
 

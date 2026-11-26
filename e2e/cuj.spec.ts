@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { waitForEditor } from "./helpers/editor";
 import { compressToEncodedURIComponent } from "lz-string";
 
 test("core CUJ smoke flow works", async ({ page }) => {
@@ -40,8 +41,7 @@ test("edit tab can format and minimize JSON", async ({ page }) => {
 
   await page.getByRole("tab", { name: /^edit$/i }).click();
 
-  const editor = page.locator(".monaco-editor").first();
-  await expect(editor).toBeVisible();
+  const editor = await waitForEditor(page);
   await editor.click();
 
   const modifier = process.platform === "darwin" ? "Meta" : "Control";
@@ -64,8 +64,7 @@ test("format resets Monaco horizontal scroll to the left", async ({ page }) => {
 
   await page.getByRole("tab", { name: /^edit$/i }).click();
 
-  const editor = page.locator(".monaco-editor").first();
-  await expect(editor).toBeVisible();
+  const editor = await waitForEditor(page);
   await editor.click();
 
   const modifier = process.platform === "darwin" ? "Meta" : "Control";
@@ -100,8 +99,7 @@ test("edit tab lets keyboard users leave Monaco after Escape then Tab", async ({
 
   await page.getByRole("tab", { name: /^edit$/i }).click();
 
-  const editor = page.locator(".monaco-editor").first();
-  await expect(editor).toBeVisible();
+  const editor = await waitForEditor(page);
   await editor.click();
 
   await expect
@@ -127,8 +125,7 @@ test("edit tab lets keyboard users leave Monaco after Escape then Tab", async ({
 test("navbar overlay covers Monaco find widget", async ({ page }) => {
   await page.goto("/");
 
-  const editor = page.locator(".monaco-editor").first();
-  await expect(editor).toBeVisible();
+  const editor = await waitForEditor(page);
   await editor.evaluate((editorElement) => {
     const findWidget = document.createElement("div");
     findWidget.className = "editor-widget find-widget visible";
@@ -206,8 +203,7 @@ test("Monaco search handles special characters and invalid regex patterns", asyn
   await page.getByRole("button", { name: /^example$/i }).click();
   await page.getByRole("tab", { name: /^edit$/i }).click();
 
-  const editor = page.locator(".monaco-editor").first();
-  await expect(editor).toBeVisible();
+  const editor = await waitForEditor(page);
   await editor.click();
   // Support Monaco's platform-specific find binding on local and CI browsers.
   await page.keyboard.press("Meta+f");
