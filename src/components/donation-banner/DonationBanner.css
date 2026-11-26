@@ -1,0 +1,130 @@
+@tailwind components;
+
+@layer components {
+  .donation-banner {
+    /* Quiet solid strips with matching borders in both themes. */
+    @apply border-[#dff3f7] bg-[#dff3f7] text-slate-600 shadow-subtle dark:border-[#232323] dark:bg-[#232323] dark:text-mono-500 dark:shadow-subtleWhite;
+    /* Paint the shadow above the following editor section's background. */
+    position: relative;
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    gap: 8px;
+    /* Match the editor's px-2 inset, which scales with the app's root font size. */
+    /* The 2rem toolbar centers 1.2rem tabs, leaving 0.4rem above them.
+       Match that space above the banner to center it between navbar and tabs. */
+    margin: 0.4rem 0.5rem 0;
+    padding: 3px 8px 3px 14px;
+    border-width: 1px;
+    border-radius: 12px;
+    font-size: 14px;
+    line-height: 20px;
+  }
+
+  html[data-donation-dismissed="true"] .donation-banner {
+    display: none;
+  }
+
+  .donation-banner-content {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    min-width: 0;
+  }
+
+  .donation-banner-message {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+  }
+
+  .donation-banner-message > svg {
+    flex-shrink: 0;
+  }
+
+  .donation-banner p {
+    min-width: 0;
+    text-align: left;
+    font-weight: 500;
+    letter-spacing: 0.01em;
+  }
+
+  .donation-banner a {
+    @apply border-powderBlue-400/50 bg-white/40 hover:border-powderBlue-400 hover:bg-white/60 dark:border-mono-800/60 dark:bg-[#303030] dark:text-mono-400 dark:hover:border-mono-800 dark:hover:bg-[#383838];
+    display: inline-flex;
+    flex-shrink: 0;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 8px;
+    font-size: 12px;
+    line-height: 16px;
+    border-width: 1px;
+    border-radius: 8px;
+    font-weight: 500;
+    letter-spacing: 0.015em;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+
+  .donation-banner button {
+    background: transparent;
+    display: inline-flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+  }
+
+  .donation-banner-dismiss-circle {
+    @apply bg-white/40 dark:bg-white/5 dark:text-mono-500;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+  }
+
+  .donation-banner button:hover .donation-banner-dismiss-circle {
+    @apply bg-white/60 dark:bg-white/10 dark:text-mono-400;
+  }
+
+  .donation-banner button:focus-visible {
+    outline: none;
+  }
+
+  .donation-banner a:focus-visible,
+  .donation-banner button:focus-visible .donation-banner-dismiss-circle {
+    outline: 2px solid currentColor;
+    outline-offset: 3px;
+  }
+
+  @media (max-width: 767px) {
+    .donation-banner {
+      /* Mobile toolbar: (3.5rem row - 2.15rem tabs) / 2. */
+      margin-top: 0.675rem;
+      padding: 6px 6px 6px 12px;
+      font-size: 13.5px;
+      line-height: 19px;
+    }
+
+    .donation-banner-content {
+      gap: 8px;
+    }
+
+    .donation-banner-message {
+      gap: 6px;
+    }
+
+    .donation-banner button {
+      width: 44px;
+      height: 44px;
+    }
+  }
+}
