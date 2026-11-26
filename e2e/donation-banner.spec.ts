@@ -210,7 +210,7 @@ for (const viewport of [
   });
 }
 
-// Protect the rounded, elevated solid strip in both themes and its distinct CTA pill.
+// Protect the rounded, elevated solid strip in both themes and its softly rounded CTA.
 for (const dark of [false, true]) {
   test(`banner uses a quiet palette and readable interaction states in ${
     dark ? "dark" : "light"
@@ -226,11 +226,11 @@ for (const dark of [false, true]) {
     const dismiss = banner.getByRole("button");
     await expect(banner).toHaveCSS(
       "background-color",
-      dark ? "rgb(35, 35, 35)" : "rgb(176, 224, 230)"
+      dark ? "rgb(48, 48, 48)" : "rgb(197, 233, 239)"
     );
     await expect(banner).toHaveCSS(
       "border-top-color",
-      dark ? "rgb(35, 35, 35)" : "rgb(176, 224, 230)"
+      dark ? "rgb(48, 48, 48)" : "rgb(197, 233, 239)"
     );
     await expect(banner).toHaveCSS("border-radius", "12px");
     await expect(banner).not.toHaveCSS("box-shadow", "none");
@@ -238,6 +238,7 @@ for (const dark of [false, true]) {
       "color",
       dark ? "rgb(177, 177, 177)" : "rgb(71, 85, 105)"
     );
+    await expect(link).toHaveCSS("border-radius", "8px");
     await expect(link).toHaveCSS(
       "background-color",
       dark ? "rgb(42, 42, 42)" : "rgba(255, 255, 255, 0.4)"
