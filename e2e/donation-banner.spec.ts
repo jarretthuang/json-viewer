@@ -170,19 +170,19 @@ for (const viewport of [
       await expect(circle.locator("svg")).toHaveCSS("width", "18px");
       const message = await banner.locator("p").boundingBox();
       const cta = await banner.getByRole("link").boundingBox();
-      const infoIcon = banner.getByTestId("InfoOutlinedIcon");
-      await expect(infoIcon).toBeVisible();
-      await expect(infoIcon).toHaveAttribute("aria-hidden", "true");
-      await expect(infoIcon).not.toHaveAttribute("tabindex");
+      const heartIcon = banner.getByTestId("FavoriteBorderIcon");
+      await expect(heartIcon).toBeVisible();
+      await expect(heartIcon).toHaveAttribute("aria-hidden", "true");
+      await expect(heartIcon).not.toHaveAttribute("tabindex");
       await expect(banner.locator("p")).toHaveCSS("text-align", "left");
-      const info = await infoIcon.boundingBox();
+      const heart = await heartIcon.boundingBox();
       // Icon starts at the banner's left inset; text follows it closely.
-      expect(info!.x - bounds!.x).toBeCloseTo(viewport.width < 768 ? 13 : 15, 0);
-      expect(info!.width).toBeCloseTo(20, 3);
-      expect(message!.x - (info!.x + info!.width)).toBeCloseTo(
+      expect(heart!.x - bounds!.x).toBeCloseTo(viewport.width < 768 ? 13 : 15, 0);
+      expect(heart!.width).toBeCloseTo(20, 3);
+      expect(message!.x - (heart!.x + heart!.width)).toBeCloseTo(
         viewport.width < 768 ? 6 : 8, 0
       );
-      expect(info!.y + info!.height / 2).toBeCloseTo(
+      expect(heart!.y + heart!.height / 2).toBeCloseTo(
         message!.y + message!.height / 2, 0
       );
       // Controls stay at the right inset with the original 8px gap.
@@ -226,7 +226,7 @@ for (const viewport of [
         expect(dismiss!.width).toBeCloseTo(44, 3);
         expect(dismiss!.height).toBeCloseTo(44, 3);
       }
-      for (const item of [info!, message!, cta!, dismiss!]) {
+      for (const item of [heart!, message!, cta!, dismiss!]) {
         expect(item.x).toBeGreaterThanOrEqual(bounds!.x);
         expect(item.x + item.width).toBeLessThanOrEqual(
           bounds!.x + bounds!.width
@@ -246,11 +246,11 @@ for (const viewport of [
         .evaluate((element) => parseFloat(getComputedStyle(element).fontSize));
       expect(messageSize).toBe(viewport.width < 768 ? 13.5 : 14);
       expect(ctaSize).toBe(12);
-      // Check message, info icon, CTA (including its coffee icon), and dismiss control
+      // Check message, heart icon, CTA (including its coffee icon), and dismiss control
       // against their own composited backgrounds in both themes.
       for (const element of [
         banner.locator("p"),
-        infoIcon,
+        heartIcon,
         banner.getByRole("link"),
         circle.locator("svg"),
       ]) {
@@ -346,7 +346,7 @@ for (const { width, dark } of [1280, 375, 320].flatMap((width) =>
       "color",
       dark ? "rgb(177, 177, 177)" : "rgb(71, 85, 105)"
     );
-    await expect(banner.getByTestId("InfoOutlinedIcon")).toHaveCSS(
+    await expect(banner.getByTestId("FavoriteBorderIcon")).toHaveCSS(
       "color",
       dark ? "rgb(177, 177, 177)" : "rgb(71, 85, 105)"
     );

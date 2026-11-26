@@ -1,6 +1,6 @@
 "use client";
 
-import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
+import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import CloseIcon from "@mui/icons-material/Close";
 import LocalCafeOutlinedIcon from "@mui/icons-material/LocalCafeOutlined";
 import "./DonationBanner.css";
@@ -32,7 +32,7 @@ export default function DonationBanner() {
       <aside className="donation-banner" aria-label="Support JSON Viewer">
         <div className="donation-banner-content">
           <div className="donation-banner-message">
-            <InfoOutlinedIcon
+            <FavoriteBorderIcon
               aria-hidden="true"
               style={{ fontSize: 20 }}
             />
