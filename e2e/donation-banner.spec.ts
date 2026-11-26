@@ -63,6 +63,51 @@ test("saved dismissal applies before hydration without reserving banner space", 
   );
 });
 
+for (const legalPage of ["/privacy", "/terms"]) {
+  for (const expired of [false, true]) {
+    test(`${expired ? "expired" : "saved"} dismissal applies after Home breadcrumb navigation from ${legalPage}`, async ({
+      page,
+    }) => {
+      await page.goto(legalPage);
+      // The theme control mounts after hydration; wait so Link handles the click.
+      await expect(page.getByRole("button", { name: /^Theme:/ })).toBeVisible();
+      await page.evaluate((expired) => {
+        localStorage.setItem(
+          "json-viewer:donation-banner-dismissed",
+          String(Date.now() + (expired ? -60_000 : 60_000))
+        );
+        // This marker survives client navigation, but not a full document load.
+        document.documentElement.setAttribute("data-navigation-test", "true");
+      }, expired);
+      await expect(page.locator("html")).not.toHaveAttribute(
+        "data-donation-dismissed",
+        "true"
+      );
+
+      await page
+        .getByRole("navigation", { name: "Breadcrumb" })
+        .getByRole("link", { name: "Home", exact: true })
+        .click();
+      await expect(page).toHaveURL((url) => url.pathname === "/");
+      await expect(page.locator("html")).toHaveAttribute(
+        "data-navigation-test",
+        "true"
+      );
+      const banner = page.locator(".donation-banner");
+      await expect(banner).toBeAttached();
+      if (expired) {
+        await expect(banner).toBeVisible();
+      } else {
+        await expect(page.locator("html")).toHaveAttribute(
+          "data-donation-dismissed",
+          "true"
+        );
+        await expect(banner).toBeHidden();
+      }
+    });
+  }
+}
+
 for (const savedValue of ["past", "true", "invalid", "Infinity"]) {
   test(`expired or invalid dismissal (${savedValue}) shows before hydration`, async ({
     page,

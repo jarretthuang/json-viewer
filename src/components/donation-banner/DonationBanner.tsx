@@ -3,6 +3,7 @@
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import CloseIcon from "@mui/icons-material/Close";
 import LocalCafeOutlinedIcon from "@mui/icons-material/LocalCafeOutlined";
+import { useEffect } from "react";
 import "./DonationBanner.css";
 
 const dismissalKey = "json-viewer:donation-banner-dismissed";
@@ -14,6 +15,18 @@ const restoreDismissal = `try{const expiresAt=Number(localStorage.getItem(${JSON
 )}));if(Number.isFinite(expiresAt)&&expiresAt>Date.now()){document.documentElement.setAttribute("data-donation-dismissed","true")}}catch{}`;
 
 export default function DonationBanner() {
+  useEffect(() => {
+    // React-inserted inline scripts do not run on client-side navigation.
+    try {
+      const expiresAt = Number(localStorage.getItem(dismissalKey));
+      if (Number.isFinite(expiresAt) && expiresAt > Date.now()) {
+        document.documentElement.setAttribute("data-donation-dismissed", "true");
+      }
+    } catch {
+      // Keep the banner usable when browser storage is unavailable.
+    }
+  }, []);
+
   const dismiss = () => {
     document.documentElement.setAttribute("data-donation-dismissed", "true");
     try {
