@@ -28,12 +28,14 @@ type NavBarActionVisibility = {
 
 type NavBarProps = Partial<WithNotification> & {
   showActions?: boolean;
+  prototypePro?: boolean;
   actionVisibility?: NavBarActionVisibility;
 };
 
 export default function NavBar({
   createNotification,
   showActions = true,
+  prototypePro = false,
   actionVisibility,
 }: NavBarProps) {
   const { isPro } = usePro();
@@ -50,7 +52,7 @@ export default function NavBar({
 
       return actionVisibility?.[key] ?? true;
     },
-    [showActions, actionVisibility],
+    [showActions, actionVisibility]
   );
 
   const showAnyAction =
@@ -207,7 +209,13 @@ export default function NavBar({
                 jsonviewer.io
               </span>
             </a>
-            <ProBadge />
+            {prototypePro ? (
+              <span className="ml-1 rounded-full border px-2 text-xs opacity-60">
+                PRO
+              </span>
+            ) : (
+              <ProBadge />
+            )}
           </li>
           {showAnyAction && (
             <li className="flex h-full justify-end p-1">
